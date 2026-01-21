@@ -15,6 +15,7 @@ body {
 /* 3. 기본 폰트 렌더링 통일 */
 body {
   font-family:
+    var(--font-pretendard),
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -23,8 +24,10 @@ body {
     Helvetica,
     Arial,
     sans-serif;
+
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 4. 이미지 기본 동작 안정화 */
