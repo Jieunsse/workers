@@ -1,0 +1,31 @@
+name: Daily Main Backup
+
+on:
+  schedule:
+    # 매일 한국시간 05:00 → UTC 기준 20:00
+    - cron: '0 20 * * *'
+  workflow_dispatch: # 수동 실행도 가능하게
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Push main to backup branch
+        run: |
+          git checkout -B backup/main-daily
+          git push origin backup/main-daily --force
