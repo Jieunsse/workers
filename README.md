@@ -28,7 +28,6 @@ src/
 │  ├─ buttons/
 │  ├─ icons/
 │  ├─ logos/
-│  └─ svgs/
 ├─ components/              # 재사용 UI 컴포넌트
 └─ shared/                  # 도메인과 무관한 공통 코드
    ├─ apis/                 # Fetch 함수
