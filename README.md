@@ -31,7 +31,7 @@ src/
 │  └─ svgs/
 ├─ components/              # 재사용 UI 컴포넌트
 └─ shared/                  # 도메인과 무관한 공통 코드
-   ├─ apis/                 # axios 인스턴스 / 인터셉터 / 에러 처리
+   ├─ apis/                 # Fetch 함수
    ├─ constants/            # 전역 상수
    ├─ styles/               # 공통 스타일 유틸
    ├─ types/                # 공통 타입
