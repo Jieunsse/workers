@@ -1,0 +1,37 @@
+.item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 8px 12px;
+  text-align: center;
+  color: #111827;
+  font-family: Pretendard, sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.item:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: -2px;
+}
+
+.default {
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.small {
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.repeat {
+  font-size: 14px;
+  line-height: 17px;
+  text-align: left;
+  margin-left: 16px;
+}
+
+.selected {
+  font-weight: 600;
+}
