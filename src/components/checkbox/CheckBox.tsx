@@ -28,7 +28,7 @@ export default function CheckBox({
   options,
   onCheckedChange,
 }: CheckBoxProps) {
-  const hasLabel = label != null && (typeof label !== 'string' || label.trim() !== '');
+const hasLabel = label != null && (typeof label === 'string' ? label.trim() !== '' : true);
   const isReadOnly = options?.readOnly || !onCheckedChange;
   const isDisabled = disabled;
   const iconSrc = checked
