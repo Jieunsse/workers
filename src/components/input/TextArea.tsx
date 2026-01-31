@@ -5,7 +5,6 @@ import styles from './styles/TextArea.module.css';
 /**
  * 멀티라인 입력 컴포넌트.
  * @param className 추가 CSS 클래스
- * @param ref 외부에서 전달하는 ref (react-hook-form 등)
  * @param props 네이티브 textarea의 모든 속성(placeholder, rows, onChange 등)
  */
 export default function TextArea({ className, ref, ...props }: TextAreaProps) {

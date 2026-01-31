@@ -1,12 +1,12 @@
-import { ComponentPropsWithRef, ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 
-export type InputProps = ComponentPropsWithRef<'input'>;
+export type InputProps = ComponentPropsWithoutRef<'input'>;
 
-export type PasswordInputProps = Omit<ComponentPropsWithRef<'input'>, 'type'>;
+export type PasswordInputProps = Omit<ComponentPropsWithoutRef<'input'>, 'type'>;
 
-export type TextAreaProps = ComponentPropsWithRef<'textarea'>;
-
-export type PasswordFieldProps = Omit<ComponentPropsWithRef<'input'>, 'type'>;
+export type TextAreaProps = ComponentPropsWithoutRef<'textarea'> & {
+  ref?: Ref<HTMLTextAreaElement>;
+};
 
 export type ActionTextAreaProps = TextAreaProps & {
   onSubmit?: () => void;
@@ -22,7 +22,7 @@ export type AccountInputProps = {
 
 export type ChangePasswordProps = {
   isEditing?: boolean;
-  newPasswordProps?: PasswordFieldProps;
-  confirmPasswordProps?: PasswordFieldProps;
+  newPasswordProps?: PasswordInputProps;
+  confirmPasswordProps?: PasswordInputProps;
   children?: ReactNode;
 };

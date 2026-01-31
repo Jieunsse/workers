@@ -12,16 +12,14 @@ import styles from './styles/PasswordInput.module.css';
 /**
  * 비밀번호 Input 컴포넌트.
  * @param className 추가 CSS 클래스
- * @param ref 외부에서 전달하는 ref (react-hook-form 등)
  * @param props 네이티브 input의 모든 속성(type 제외)
  */
-export default function PasswordInput({ className, ref, ...props }: PasswordInputProps) {
+export default function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className={styles.wrapper}>
       <Input
-        ref={ref}
         type={showPassword ? 'text' : 'password'}
         className={clsx(styles.input, className)}
         {...props}
