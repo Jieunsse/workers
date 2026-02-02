@@ -31,11 +31,7 @@
  * @param teamGroupId     variant='team'일 때 PATCH /groups/{id} 호출에 필요한 그룹 id
  * @param onError         업로드/패치 실패 시 상위에서 토스트 등 처리할 수 있게 콜백 제공
  *
- * 아토믹 대응 추가:
- * @param apiBaseUrl      API Base URL (예: process.env.NEXT_PUBLIC_API_BASE_URL)
- * @param teamId          teamId (예: "20-1")
- *
- * - 업로드(multipart)는 fetch로 유지
+ * - fetchApi는 JSON 전용(Content-Type 강제)이라 업로드(multipart)는 fetch로 유지
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -50,6 +46,9 @@ import PencilLarge from '@/assets/buttons/edit/editButtonLarge.svg';
 import PencilSmall from '@/assets/buttons/edit/editButtonSmall.svg';
 
 import TeamDefault from '@/assets/icons/img/img.svg';
+
+import { fetchApi } from '@/shared/apis/fetchApi';
+import { BASE_URL, TEAM_ID } from '@/shared/apis/config';
 
 export type ProfileImageSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 export type ProfileImageVariant = 'profile' | 'team';
@@ -77,10 +76,6 @@ export type ProfileImageProps = {
   showBorder?: boolean;
 
   enableApi?: boolean;
-
-  /** 아토믹 대응: API base url / team id */
-  apiBaseUrl?: string;
-  teamId?: string;
 
   /** variant='team'에서 그룹 이미지 PATCH에 필요한 groupId */
   teamGroupId?: number;
@@ -118,27 +113,6 @@ const BORDER_BY_SIZE: Record<ProfileImageSize, number> = {
   sm: 0,
   xs: 0,
 };
-
-function stripTrailingSlash(url: string) {
-  return url.endsWith('/') ? url.slice(0, -1) : url;
-}
-
-function buildTeamUrl(apiBaseUrl: string, teamId: string, path: string) {
-  const base = stripTrailingSlash(apiBaseUrl);
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return `${base}/${teamId}${p}`;
-}
-
-async function fetchJson(url: string, options: RequestInit = {}) {
-  const headers = new Headers(options.headers);
-
-  // PATCH/POST JSON만 Content-Type 강제
-  if (options.body != null && typeof options.body === 'string' && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-
-  return fetch(url, { ...options, headers });
-}
 
 function getDefaultResponsiveSize(
   baseSize: ProfileImageSize,
@@ -228,8 +202,6 @@ export default function ProfileImage({
   clickToEdit,
   showBorder,
   enableApi = true,
-  apiBaseUrl,
-  teamId,
   teamGroupId,
   onError,
   authHeaders,
@@ -310,16 +282,12 @@ export default function ProfileImage({
 
   const uploadImage = useCallback(
     async (file: File) => {
-      const base = apiBaseUrl ?? process.env.NEXT_PUBLIC_API_BASE_URL;
-      const tId = teamId;
-
-      if (!base) throw new Error('apiBaseUrl is missing');
-      if (!tId) throw new Error('teamId is missing');
+      if (!BASE_URL) throw new Error('NEXT_PUBLIC_API_BASE_URL is missing');
 
       const formData = new FormData();
       formData.append('image', file);
 
-      const res = await fetch(`${stripTrailingSlash(base)}/${tId}/images/upload`, {
+      const res = await fetch(`${BASE_URL}/${TEAM_ID}/images/upload`, {
         method: 'POST',
         body: formData,
         headers: mergedUploadHeaders,
@@ -333,18 +301,12 @@ export default function ProfileImage({
       const data = (await res.json()) as { url: string };
       return data.url;
     },
-    [apiBaseUrl, teamId, mergedUploadHeaders],
+    [mergedUploadHeaders],
   );
 
   const patchProfileImage = useCallback(
     async (url: string) => {
-      const base = apiBaseUrl ?? process.env.NEXT_PUBLIC_API_BASE_URL;
-      const tId = teamId;
-
-      if (!base) throw new Error('apiBaseUrl is missing');
-      if (!tId) throw new Error('teamId is missing');
-
-      const res = await fetchJson(buildTeamUrl(base, tId, '/user'), {
+      const res = await fetchApi('/user', {
         method: 'PATCH',
         body: JSON.stringify({ image: url }),
         headers: authHeaders,
@@ -355,18 +317,12 @@ export default function ProfileImage({
         throw new Error(`patch profile failed ${res.status}: ${text}`);
       }
     },
-    [apiBaseUrl, teamId, authHeaders],
+    [authHeaders],
   );
 
   const patchTeamImage = useCallback(
     async (url: string, groupId: number) => {
-      const base = apiBaseUrl ?? process.env.NEXT_PUBLIC_API_BASE_URL;
-      const tId = teamId;
-
-      if (!base) throw new Error('apiBaseUrl is missing');
-      if (!tId) throw new Error('teamId is missing');
-
-      const res = await fetchJson(buildTeamUrl(base, tId, `/groups/${groupId}`), {
+      const res = await fetchApi(`/groups/${groupId}`, {
         method: 'PATCH',
         body: JSON.stringify({ image: url }),
         headers: authHeaders,
@@ -377,7 +333,7 @@ export default function ProfileImage({
         throw new Error(`patch team failed ${res.status}: ${text}`);
       }
     },
-    [apiBaseUrl, teamId, authHeaders],
+    [authHeaders],
   );
 
   const handleFileChange = useCallback(
@@ -415,7 +371,7 @@ export default function ProfileImage({
             return url;
           });
         } catch (err) {
-          // 실패 시 원복
+          // 실패 시 사용자가 "바뀐 줄" 착각하지 않게 되돌림
           setPreviewUrl(prevPreview ?? null);
 
           const stage: ErrorStage =
