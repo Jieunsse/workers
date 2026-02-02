@@ -1,7 +1,5 @@
 'use client';
 
-import ProfileImage from '@/components/profile-img/ProfileImage';
-
 export default function Home() {
   return (
     <main>
