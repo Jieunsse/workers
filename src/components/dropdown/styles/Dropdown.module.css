@@ -36,6 +36,10 @@
   white-space: nowrap;
 }
 
+.placeholder {
+  color: var(--Text-Placeholder, #94a3b8);
+}
+
 .icon {
   display: inline-flex;
   align-items: center;

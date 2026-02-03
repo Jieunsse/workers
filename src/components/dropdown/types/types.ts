@@ -11,6 +11,7 @@ export interface DropdownProps {
   items: DropdownItemData[];
   defaultValue?: string;
   value?: string;
+  placeholder?: string;
   size?: DropdownMenuSize;
   disabled?: boolean;
   ariaLabel?: string;
@@ -27,6 +28,8 @@ export interface DropdownItemProps {
   size: DropdownMenuSize;
   className?: string;
   onSelect: () => void;
+  tabIndex?: number;
+  onFocus?: () => void;
 }
 
 export interface UseDropdownOptions {

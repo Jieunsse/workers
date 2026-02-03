@@ -25,14 +25,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: var(--checkbox-box-size, 18px);
+  height: var(--checkbox-box-size, 18px);
   flex-shrink: 0;
-}
-
-.small .box {
-  width: 16px;
-  height: 16px;
 }
 
 .icon {

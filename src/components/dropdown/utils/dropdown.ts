@@ -8,5 +8,5 @@ export function resolveInitialValue(items: DropdownItemData[], defaultValue?: st
 }
 
 export function getSelectedItem(items: DropdownItemData[], currentValue: string) {
-  return items.find((item) => item.value === currentValue) ?? items[0];
+  return items.find((item) => item.value === currentValue);
 }
