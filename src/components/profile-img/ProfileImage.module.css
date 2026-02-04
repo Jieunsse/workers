@@ -1,0 +1,197 @@
+.frame {
+  display: inline-block;
+}
+
+.outer {
+  position: relative;
+  overflow: visible;
+  display: inline-block;
+}
+
+.box {
+  width: var(--pi-box-base);
+  height: var(--pi-box-base);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+
+  overflow: visible;
+}
+
+.mask {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* avatar */
+.avatar {
+  width: var(--pi-img-base);
+  height: var(--pi-img-base);
+
+  position: relative;
+  overflow: hidden;
+
+  background: inherit;
+  border-radius: inherit;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* border: breakpoint별 var로 대응 */
+.avatarBorder {
+  border-style: solid;
+  border-color: #e2e8f0; 
+  border-width: var(--pi-border-base);
+  box-sizing: border-box;
+}
+
+.img {
+  display: block;
+  border-radius: inherit;
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.contain {
+  object-fit: contain;
+}
+
+/* radius */
+.r8 {
+  border-radius: 8px;
+}
+.r12 {
+  border-radius: 12px;
+}
+.r20 {
+  border-radius: 20px;
+}
+.r32 {
+  border-radius: 32px;
+}
+
+/* edit 버튼 */
+.editButton {
+  position: absolute;
+  right: 3px;
+  bottom: 6px;
+
+  background: var(--color-background-tertiary);
+  border-radius: 50%;
+  border: none; 
+  padding: 0;
+  cursor: pointer;
+
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 아이콘 표시 제어 */
+.pencilSmall {
+  display: inline-flex;
+}
+.pencilLarge {
+  display: none;
+}
+
+/* breakpoint: sm */
+@media (min-width: 640px) {
+  .box {
+    width: var(--pi-box-sm);
+    height: var(--pi-box-sm);
+  }
+  .avatar {
+    width: var(--pi-img-sm);
+    height: var(--pi-img-sm);
+  }
+  .avatarBorder {
+    border-width: var(--pi-border-sm);
+  }
+}
+
+@media (max-width: 767px) {
+  .r32 {
+    border-radius: 20px;
+  }
+}
+
+/* md 이상 */
+@media (min-width: 768px) {
+  .box {
+    width: var(--pi-box-md);
+    height: var(--pi-box-md);
+  }
+  .avatar {
+    width: var(--pi-img-md);
+    height: var(--pi-img-md);
+  }
+  .avatarBorder {
+    border-width: var(--pi-border-md);
+  }
+
+  .editButton {
+    right: 0;
+    width: 32px;
+    height: 32px;
+
+    /* ✅ md 버전에서만 흰색 보더 */
+    border: 1px solid var(--color-background-inverse);
+  }
+
+  .pencilSmall {
+    display: none;
+  }
+  .pencilLarge {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .box {
+    width: var(--pi-box-lg);
+    height: var(--pi-box-lg);
+  }
+  .avatar {
+    width: var(--pi-img-lg);
+    height: var(--pi-img-lg);
+  }
+  .avatarBorder {
+    border-width: var(--pi-border-lg);
+  }
+}
+
+@media (min-width: 1280px) {
+  .box {
+    width: var(--pi-box-xl);
+    height: var(--pi-box-xl);
+  }
+  .avatar {
+    width: var(--pi-img-xl);
+    height: var(--pi-img-xl);
+  }
+  .avatarBorder {
+    border-width: var(--pi-border-xl);
+  }
+}
