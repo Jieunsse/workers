@@ -4,35 +4,18 @@ import Image from 'next/image';
 import type { FormEvent } from 'react';
 import BaseButton from '@/components/Button/base/BaseButton';
 import { Input } from '@/components/input';
-import type { InputProps } from '@/components/input/types/types';
 import Modal from '../../../Modal';
 import styles from './AddTodoList.module.css';
 import xMarkBig from '@/assets/icons/xMark/xMarkBig.svg';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'add-todo-list-title';
-const CLOSE_BUTTON_ARIA_LABEL = '닫기';
-const DEFAULT_TITLE = '할 일 목록';
-const DEFAULT_PLACEHOLDER = '할 일을 입력하세요';
-const DEFAULT_SUBMIT_LABEL = '만들기';
-
-type TodoInputProps = Omit<InputProps, 'className' | 'type' | 'name' | 'placeholder'>;
-
-interface AddTodoListTextOptions {
-  title?: string;
-  submitLabel?: string;
-  inputPlaceholder?: string;
-}
-
-interface AddTodoListInputOptions {
-  props?: TodoInputProps;
-}
-
-export interface AddTodoListProps extends BaseDomainModalProps {
-  onSubmit: () => void;
-  text?: AddTodoListTextOptions;
-  input?: AddTodoListInputOptions;
-}
+import {
+  CLOSE_BUTTON_ARIA_LABEL,
+  DEFAULT_PLACEHOLDER,
+  DEFAULT_SUBMIT_LABEL,
+  DEFAULT_TITLE,
+  TITLE_ID,
+} from './AddTodoList.constants';
+import type { AddTodoListProps } from './AddTodoList.types';
+export type { AddTodoListProps } from './AddTodoList.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

@@ -5,40 +5,18 @@ import type { FormEvent } from 'react';
 import Modal from '../../../Modal';
 import BaseButton from '@/components/Button/base/BaseButton';
 import { Input } from '@/components/input';
-import type { InputProps } from '@/components/input/types/types';
 import styles from './ResetPassword.module.css';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'reset-password-title';
-const DESCRIPTION_ID = 'reset-password-description';
-const DEFAULT_TITLE = '비밀번호 재설정';
-const DEFAULT_DESCRIPTION = '비밀번호 재설정 링크를 보내드립니다.';
-const DEFAULT_CLOSE_LABEL = '닫기';
-const DEFAULT_SUBMIT_LABEL = '링크 보내기';
-const DEFAULT_EMAIL_PLACEHOLDER = '이메일을 입력하세요';
-
-type EmailInputFieldProps = Omit<
-  InputProps,
-  'className' | 'type' | 'name' | 'autoComplete' | 'placeholder'
->;
-
-interface ResetPasswordTextOptions {
-  title?: string;
-  description?: string;
-  closeLabel?: string;
-  submitLabel?: string;
-  emailPlaceholder?: string;
-}
-
-interface ResetPasswordInputOptions {
-  email?: EmailInputFieldProps;
-}
-
-export interface ResetPasswordProps extends BaseDomainModalProps {
-  onSubmit: () => void;
-  text?: ResetPasswordTextOptions;
-  input?: ResetPasswordInputOptions;
-}
+import {
+  DEFAULT_CLOSE_LABEL,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_EMAIL_PLACEHOLDER,
+  DEFAULT_SUBMIT_LABEL,
+  DEFAULT_TITLE,
+  DESCRIPTION_ID,
+  TITLE_ID,
+} from './ResetPassword.constants';
+import type { ResetPasswordProps } from './ResetPassword.types';
+export type { ResetPasswordProps } from './ResetPassword.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

@@ -1,6 +1,5 @@
 'use client';
 
-import type { ImageProps } from 'next/image';
 import Image from 'next/image';
 
 import Modal from '../../../Modal';
@@ -8,26 +7,15 @@ import styles from './ProfileModal.module.css';
 import BaseButton from '@/components/Button/base/BaseButton';
 import profileFallback from '@/assets/icons/img/img.svg';
 import xMarkBig from '@/assets/icons/xMark/xMarkBig.svg';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'profile-modal-title';
-const EMAIL_ID = 'profile-modal-email';
-const CLOSE_BUTTON_ARIA_LABEL = '닫기';
-const DEFAULT_COPY_LABEL = '이메일 복사하기';
-const DEFAULT_PROFILE_ALT = '프로필 이미지';
-
-interface ProfileModalProfileOptions {
-  title: string;
-  email: string;
-  imageSrc?: ImageProps['src'];
-  imageAlt?: string;
-  copyButtonLabel?: string;
-}
-
-export interface ProfileModalProps extends BaseDomainModalProps {
-  onCopyEmail: () => void;
-  profile: ProfileModalProfileOptions;
-}
+import {
+  CLOSE_BUTTON_ARIA_LABEL,
+  DEFAULT_COPY_LABEL,
+  DEFAULT_PROFILE_ALT,
+  EMAIL_ID,
+  TITLE_ID,
+} from './ProfileModal.constants';
+import type { ProfileModalProps } from './ProfileModal.types';
+export type { ProfileModalProps } from './ProfileModal.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

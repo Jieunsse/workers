@@ -1,0 +1,10 @@
+export const TITLE_ID = 'change-password-title';
+export const NEW_PASSWORD_NAME = 'newPassword';
+export const CONFIRM_PASSWORD_NAME = 'confirmPassword';
+export const DEFAULT_TITLE = '비밀번호 변경하기';
+export const DEFAULT_NEW_PASSWORD_LABEL = '새 비밀번호';
+export const DEFAULT_CONFIRM_PASSWORD_LABEL = '새 비밀번호 확인';
+export const DEFAULT_NEW_PASSWORD_PLACEHOLDER = '새 비밀번호를 입력해주세요.';
+export const DEFAULT_CONFIRM_PASSWORD_PLACEHOLDER = '새 비밀번호를 다시 한 번 입력해주세요.';
+export const DEFAULT_CLOSE_LABEL = '닫기';
+export const DEFAULT_SUBMIT_LABEL = '변경하기';

@@ -6,26 +6,16 @@ import Modal from '../../../Modal';
 import BaseButton from '@/components/Button/base/BaseButton';
 import styles from './WarningModal.module.css';
 import alertSmall from '@/assets/icons/alert/alertSmall.svg';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'warning-modal-title';
-const DESCRIPTION_ID = 'warning-modal-description';
-const DEFAULT_TITLE = '회원 탈퇴를 진행하시겠어요?';
-const DEFAULT_DESCRIPTION = '그룹장으로 있는 그룹은 자동으로 삭제되고,\n모든 그룹에서 나가집니다.';
-const DEFAULT_CLOSE_LABEL = '닫기';
-const DEFAULT_CONFIRM_LABEL = '회원 탈퇴';
-
-interface WarningModalTextOptions {
-  title?: string;
-  description?: string;
-  closeLabel?: string;
-  confirmLabel?: string;
-}
-
-export interface WarningModalProps extends BaseDomainModalProps {
-  onConfirm: () => void;
-  text?: WarningModalTextOptions;
-}
+import {
+  DEFAULT_CLOSE_LABEL,
+  DEFAULT_CONFIRM_LABEL,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_TITLE,
+  DESCRIPTION_ID,
+  TITLE_ID,
+} from './WarningModal.constants';
+import type { WarningModalProps } from './WarningModal.types';
+export type { WarningModalProps } from './WarningModal.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

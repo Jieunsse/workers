@@ -3,23 +3,14 @@
 import Modal from '../../../Modal';
 import BaseButton from '@/components/Button/base/BaseButton';
 import styles from './LogoutModal.module.css';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'logout-modal-title';
-const DEFAULT_TITLE = '로그아웃 하시겠어요?';
-const DEFAULT_CLOSE_LABEL = '닫기';
-const DEFAULT_CONFIRM_LABEL = '로그아웃';
-
-interface LogoutModalTextOptions {
-  title?: string;
-  closeLabel?: string;
-  confirmLabel?: string;
-}
-
-export interface LogoutModalProps extends BaseDomainModalProps {
-  onConfirm: () => void;
-  text?: LogoutModalTextOptions;
-}
+import {
+  DEFAULT_CLOSE_LABEL,
+  DEFAULT_CONFIRM_LABEL,
+  DEFAULT_TITLE,
+  TITLE_ID,
+} from './LogoutModal.constants';
+import type { LogoutModalProps } from './LogoutModal.types';
+export type { LogoutModalProps } from './LogoutModal.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

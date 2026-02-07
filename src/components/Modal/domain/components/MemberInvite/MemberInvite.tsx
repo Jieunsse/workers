@@ -5,30 +5,16 @@ import Modal from '../../../Modal';
 import styles from './MemberInvite.module.css';
 import BaseButton from '@/components/Button/base/BaseButton';
 import xMarkBig from '@/assets/icons/xMark/xMarkBig.svg';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'member-invite-title';
-const DESCRIPTION_ID = 'member-invite-description';
-const CLOSE_BUTTON_ARIA_LABEL = '닫기';
-const DEFAULT_TITLE = '멤버 초대';
-const DEFAULT_DESCRIPTION = '그룹에 참여할 수 있는 링크를 복사합니다.';
-const DEFAULT_COPY_LABEL = '링크 복사하기';
-
-interface MemberInviteTextOptions {
-  title?: string;
-  description?: string;
-  copyButtonLabel?: string;
-}
-
-interface MemberInviteInviteOptions {
-  link: string;
-  onCopyLink?: (link: string) => void;
-}
-
-export interface MemberInviteProps extends BaseDomainModalProps {
-  invite: MemberInviteInviteOptions;
-  text?: MemberInviteTextOptions;
-}
+import {
+  CLOSE_BUTTON_ARIA_LABEL,
+  DEFAULT_COPY_LABEL,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_TITLE,
+  DESCRIPTION_ID,
+  TITLE_ID,
+} from './MemberInvite.constants';
+import type { MemberInviteProps } from './MemberInvite.types';
+export type { MemberInviteProps } from './MemberInvite.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.

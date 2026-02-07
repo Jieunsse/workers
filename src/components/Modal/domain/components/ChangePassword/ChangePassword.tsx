@@ -6,46 +6,21 @@ import { useId } from 'react';
 import Modal from '../../../Modal';
 import BaseButton from '@/components/Button/base/BaseButton';
 import { Input } from '@/components/input';
-import type { InputProps } from '@/components/input/types/types';
 import styles from './ChangePassword.module.css';
-import type { BaseDomainModalProps } from '../../types/types';
-
-const TITLE_ID = 'change-password-title';
-const NEW_PASSWORD_NAME = 'newPassword';
-const CONFIRM_PASSWORD_NAME = 'confirmPassword';
-const DEFAULT_TITLE = '비밀번호 변경하기';
-const DEFAULT_NEW_PASSWORD_LABEL = '새 비밀번호';
-const DEFAULT_CONFIRM_PASSWORD_LABEL = '새 비밀번호 확인';
-const DEFAULT_NEW_PASSWORD_PLACEHOLDER = '새 비밀번호를 입력해주세요.';
-const DEFAULT_CONFIRM_PASSWORD_PLACEHOLDER = '새 비밀번호를 다시 한 번 입력해주세요.';
-const DEFAULT_CLOSE_LABEL = '닫기';
-const DEFAULT_SUBMIT_LABEL = '변경하기';
-
-type PasswordInputFieldProps = Omit<
-  InputProps,
-  'className' | 'type' | 'name' | 'autoComplete' | 'placeholder'
->;
-
-interface ChangePasswordTextOptions {
-  title?: string;
-  newPasswordLabel?: string;
-  confirmPasswordLabel?: string;
-  newPasswordPlaceholder?: string;
-  confirmPasswordPlaceholder?: string;
-  closeLabel?: string;
-  submitLabel?: string;
-}
-
-interface ChangePasswordInputOptions {
-  newPassword?: PasswordInputFieldProps;
-  confirmPassword?: PasswordInputFieldProps;
-}
-
-export interface ChangePasswordProps extends BaseDomainModalProps {
-  onSubmit: () => void;
-  text?: ChangePasswordTextOptions;
-  input?: ChangePasswordInputOptions;
-}
+import {
+  CONFIRM_PASSWORD_NAME,
+  DEFAULT_CLOSE_LABEL,
+  DEFAULT_CONFIRM_PASSWORD_LABEL,
+  DEFAULT_CONFIRM_PASSWORD_PLACEHOLDER,
+  DEFAULT_NEW_PASSWORD_LABEL,
+  DEFAULT_NEW_PASSWORD_PLACEHOLDER,
+  DEFAULT_SUBMIT_LABEL,
+  DEFAULT_TITLE,
+  NEW_PASSWORD_NAME,
+  TITLE_ID,
+} from './ChangePassword.constants';
+import type { ChangePasswordProps } from './ChangePassword.types';
+export type { ChangePasswordProps } from './ChangePassword.types';
 
 /**
  * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.
