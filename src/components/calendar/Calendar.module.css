@@ -1,0 +1,188 @@
+/* 감싸는 박스 */
+.wrapper {
+  width: 336px;
+  padding: 16px 43px; /* ✅ 위아래 16 / 좌우 43 */
+  background: #fff;
+  border: 1px solid #416ec8;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+/* 달력 자체 border 제거 + 폰트 14 */
+:global(.react-calendar) {
+  width: 250px; /* ✅ 내부 달력 폭 250px 고정 -> 7등분하면 35.71px */
+  border: none !important;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+/* ✅ 네비게이션: margin-bottom 제거 */
+:global(.react-calendar__navigation) {
+  display: flex;
+  height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}
+
+/* 연도 이동 버튼 제거 */
+:global(.react-calendar__navigation__prev2-button),
+:global(.react-calendar__navigation__next2-button) {
+  display: none !important;
+}
+
+/* ✅ 네비게이션 버튼 min-width:44px 제거 (강하게) */
+:global(.react-calendar__navigation button) {
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* 월 이동 버튼(<, >) */
+:global(.react-calendar__navigation__prev-button),
+:global(.react-calendar__navigation__next-button) {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 가운데 타이틀 */
+:global(.react-calendar__navigation__label) {
+  font-size: 16px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  cursor: default;
+  pointer-events: none;
+  margin: 0 !important;
+}
+
+:global(.react-calendar__month-view__weekdays) {
+  color: #8b95a1;
+  margin-bottom: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+:global(.react-calendar__month-view__weekdays__weekday) {
+  padding: 0 !important;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: 0 !important;
+}
+
+:global(.react-calendar__month-view__weekdays abbr) {
+  text-decoration: none;
+}
+
+:global(.react-calendar__month-view__days) {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 32px;
+}
+
+:global(.react-calendar__tile) {
+  padding: 0 !important;
+  width: 100%;
+  max-width: none !important;
+  height: 32px;
+  font-size: 14px;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+}
+
+/* hover */
+:global(.react-calendar__tile:enabled:hover) {
+  background: #f2f4f6;
+  border-radius: 8px;
+}
+
+/* 오늘 날짜 */
+:global(.react-calendar__tile--now) {
+  background: transparent !important;
+  color: #5189fa !important;
+}
+
+/* 선택 날짜 */
+:global(.react-calendar__tile--active) {
+  background: #5189fa !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+
+:global(.react-calendar__tile--active:enabled:hover),
+:global(.react-calendar__tile--active:enabled:focus) {
+  background: #5189fa !important;
+  color: #fff !important;
+}
+
+/* 오늘+선택 */
+:global(.react-calendar__tile--now.react-calendar__tile--active) {
+  background: #5189fa !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+}
+
+/* 주말 빨간색 제거 */
+:global(.react-calendar__month-view__days__day--weekend) {
+  color: inherit !important;
+}
+
+/* 공휴일 스타일 제거 */
+:global(.react-calendar__tile--holiday) {
+  color: inherit !important;
+}
+
+.arrowButton {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrowIcon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) saturate(100%);
+}
+
+.prev {
+  transform: rotate(90deg);
+}
+
+.next {
+  transform: rotate(-90deg);
+}
+
+/* 년/월 타이틀: 500 */
+:global(.react-calendar__navigation__label) {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* 요일(일 월 화 수 목 금 토): 500 */
+:global(.react-calendar__month-view__weekdays) {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* 날짜 숫자: 400 */
+:global(.react-calendar__tile) {
+  font-weight: 400;
+  font-size: 14px;
+}

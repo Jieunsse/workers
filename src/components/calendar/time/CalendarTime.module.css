@@ -1,0 +1,106 @@
+.container {
+  width: 288px;
+  height: 176px;
+
+  display: flex;
+  gap: 12px;
+
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--color-background-inverse, #ffffff);
+
+  border: 1px solid var(--color-interaction-hover, #416ec8);
+}
+
+.periodCol {
+  width: 78px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.periodBtn {
+  width: 78px;
+  height: 40px;
+
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+
+  background: var(--color-background-inverse, #ffffff);
+  color: var(--color-text-default, #64748b);
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.periodBtnActive {
+  background: var(--color-brand-primary, #5189fa);
+  border-color: var(--color-brand-primary, #5189fa);
+  color: var(--color-background-inverse, #ffffff);
+}
+
+.timeBox {
+  width: 172px;
+  height: 152px;
+
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: var(--color-background-inverse, #ffffff);
+
+  overflow: hidden;
+}
+
+.timeList {
+  height: 100%;
+  overflow-y: auto;
+
+  padding: 8px 8px 8px 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeRow {
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.timeItem {
+  width: 100%;
+  height: 34px;
+
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+
+  color: var(--color-text-default, #64748b);
+  cursor: pointer;
+}
+.timeItemActive {
+  background: var(--color-brand-primary, #5189fa);
+  color: #fff;
+}
+
+.timeList::-webkit-scrollbar {
+  width: 3px;
+}
+.timeList::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 999px;
+}
+.timeList::-webkit-scrollbar-track {
+  background: transparent;
+}
