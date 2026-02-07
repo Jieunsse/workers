@@ -24,6 +24,7 @@ export default function Modal({
   ariaLabelledby,
   ariaDescribedby,
   className,
+  contentClassName,
   closeOnOverlayClick = true,
   closeOnEscape = true,
 }: ModalProps) {
@@ -55,7 +56,7 @@ export default function Modal({
       role="presentation"
     >
       <div
-        className={style.contentsBox}
+        className={clsx(style.contentsBox, contentClassName)}
         ref={dialogRef}
         onClick={stopPropagation}
         onKeyDown={onKeyDown}
