@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Sidebar from './Sidebar';
 import SidebarButton from './SidebarButton';
 import SidebarTeamSelect from './SidebarTeamSelect';
-import SidebarAddButton from './SidebarAddButton';
+import GnbAddButton from '@/components/Button/domain/GnbAddButton/GnbAddButton';
 import chessSmall from '@/assets/icons/chess/chessSmall.svg';
 import chessBig from '@/assets/icons/chess/chessBig.svg';
 import boardSmall from '@/assets/icons/board/boardSmall.svg';
@@ -41,7 +41,7 @@ export const LoggedIn: Story = {
       ),
     addButton: (isCollapsed: boolean) => (
       <>
-        {!isCollapsed && <SidebarAddButton label="팀 추가하기" />}
+        {!isCollapsed && <GnbAddButton label="팀 추가하기" onClick={() => {}} />}
         <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
         <SidebarButton
           icon={
