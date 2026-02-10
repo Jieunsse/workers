@@ -1,0 +1,159 @@
+.container {
+  width: 100%;
+  max-width: 780px;
+  background: var(--color-background-primary);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-icon-primary);
+  transition: color 0.2s;
+}
+
+.closeButton:hover {
+  color: var(--color-text-secondary);
+}
+
+.title {
+  flex: 1;
+  margin: 0 40px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.kebabWrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.assigneeSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-background-tertiary);
+}
+
+.assigneeName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.metaSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  min-width: 80px;
+}
+
+.metaValue {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.descriptionSection {
+  padding: 16px 0;
+  border-top: 1px solid var(--color-background-tertiary);
+  border-bottom: 1px solid var(--color-background-tertiary);
+}
+
+.description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.actionSection {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.commentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.commentTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+}
+
+.commentCount {
+  color: var(--color-brand-primary);
+}
+
+.commentInputWrapper {
+  margin-bottom: 8px;
+}
+
+.commentList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .title {
+    font-size: 18px;
+    margin: 0 32px;
+  }
+
+  .metaLabel {
+    min-width: 70px;
+    font-size: 13px;
+  }
+
+  .metaValue {
+    font-size: 13px;
+  }
+}

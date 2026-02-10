@@ -1,0 +1,166 @@
+.card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  padding: 4px 8px;
+  background: var(--color-background-tertiary);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+.badge img {
+  filter: brightness(0) saturate(100%) invert(46%) sepia(94%) saturate(2667%) hue-rotate(207deg)
+    brightness(98%) contrast(96%);
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+
+  /* 2줄 말줄임 (비표준이지만 모든 브라우저 지원) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.preview {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+
+  /* 2줄 말줄임 (비표준이지만 모든 브라우저 지원) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.writer {
+  font-weight: 500;
+}
+
+.divider {
+  color: var(--color-text-disabled);
+}
+
+.date {
+  font-weight: 400;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.imageWrapper {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-background-secondary);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.like {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* 태블릿 */
+@media (max-width: 1199px) {
+  .card {
+    padding: 16px;
+  }
+
+  .imageWrapper {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+  .card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 14px;
+  }
+
+  .preview {
+    font-size: 13px;
+  }
+
+  .meta {
+    font-size: 12px;
+  }
+
+  .like {
+    font-size: 12px;
+  }
+
+  .imageWrapper {
+    width: 80px;
+    height: 80px;
+  }
+}

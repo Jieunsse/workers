@@ -1,0 +1,99 @@
+.container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 12px;
+  background: var(--color-background-primary);
+  overflow: hidden;
+}
+
+.large {
+  width: 120px;
+  height: 120px;
+}
+
+.small {
+  width: 80px;
+  height: 80px;
+}
+
+.uploadSlot {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.uploadSlot:hover {
+  background: var(--color-background-secondary);
+}
+
+.uploadSlot:active {
+  transform: scale(0.98);
+}
+
+.emptySlot {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.count {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.removeButton:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .large {
+    width: 100px;
+    height: 100px;
+  }
+
+  .small {
+    width: 70px;
+    height: 70px;
+  }
+
+  .count {
+    font-size: 12px;
+  }
+}
