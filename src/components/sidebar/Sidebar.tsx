@@ -27,6 +27,8 @@ type SidebarProps = {
  * 접기/펼치기를 지원하며, teamSelect·children·addButton·footer 슬롯으로 구성됩니다.
  * 각 슬롯에 함수를 전달하면 `(isCollapsed: boolean) => ReactNode` 형태로 접힘 상태를 받을 수 있습니다.
  */
+type SlotNode = ReactNode | ((isCollapsed: boolean) => ReactNode);
+
 export default function Sidebar({
   teamSelect,
   addButton,
@@ -37,6 +39,11 @@ export default function Sidebar({
   profileTeam,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const renderSlot = (slot: SlotNode) => {
+    if (!slot) return null;
+    return typeof slot === 'function' ? slot(isCollapsed) : slot;
+  };
 
   return (
     <motion.aside
@@ -89,17 +96,14 @@ export default function Sidebar({
             transition={{ duration: 0.15 }}
             style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
           >
-            {teamSelect &&
-              (typeof teamSelect === 'function' ? teamSelect(isCollapsed) : teamSelect)}
-            {typeof children === 'function' ? children(isCollapsed) : children}
-            {addButton && (typeof addButton === 'function' ? addButton(isCollapsed) : addButton)}
+            {renderSlot(teamSelect)}
+            {renderSlot(children)}
+            {renderSlot(addButton)}
           </motion.div>
         </AnimatePresence>
       </div>
       {footer ? (
-        <div className={styles.footer}>
-          {typeof footer === 'function' ? footer(isCollapsed) : footer}
-        </div>
+        <div className={styles.footer}>{renderSlot(footer)}</div>
       ) : profileImage ? (
         <div className={styles.footer}>
           <div className={styles.profileImage}>{profileImage}</div>
