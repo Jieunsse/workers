@@ -41,7 +41,7 @@ import TeamDefault from '@/assets/icons/img/img.svg';
 
 export type ProfileImageSize = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 export type ProfileImageVariant = 'profile' | 'team';
-export type ProfileImageRadius = 'r8' | 'r12' | 'r20' | 'r32';
+export type ProfileImageRadius = 'r6' | 'r8' | 'r12' | 'r16' | 'r20' | 'r32';
 
 type Breakpoint = 'base' | 'sm' | 'md' | 'lg' | 'xl';
 type SizeSpec = { box: number; image: number };
@@ -75,8 +75,8 @@ const SIZE_PRESET: Record<ProfileImageSize, SizeSpec> = {
   xl: { box: 112, image: 100 },
   lg: { box: 78, image: 64 },
   md: { box: 40, image: 32 },
-  sm: { box: 32, image: 24 },
-  xs: { box: 24, image: 16 },
+  sm: { box: 28, image: 24 },
+  xs: { box: 20, image: 20 },
 };
 
 const BP_ORDER: Breakpoint[] = ['base', 'sm', 'md', 'lg', 'xl'];
@@ -171,7 +171,7 @@ export default function ProfileImage({
   size = 'md',
   responsiveSize,
   responsiveSpec,
-  radius = 'r12',
+  radius = 'r16',
   editable = false,
   showEditButton = true,
   clickToEdit,
@@ -211,7 +211,12 @@ export default function ProfileImage({
   const isErrored = !!currentSrcKey && erroredSrc === currentSrcKey;
 
   const effectiveSrc = isErrored ? fallback : imageSrc || fallback;
-  const usingFallback = isErrored || !imageSrc;
+
+  const isFallback = isErrored || !imageSrc;
+
+  const fitClass = isFallback ? styles.contain : styles.cover;
+
+  const shouldProfileFallbackBg = variant === 'profile' && isFallback;
 
   const shouldClickToEdit = clickToEdit ?? (editable && !showEditButton);
 
@@ -242,6 +247,7 @@ export default function ProfileImage({
       setErroredSrc(null);
 
       // local preview
+
       const localUrl = URL.createObjectURL(file);
       setPreviewUrl((prev) => {
         if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
@@ -297,9 +303,13 @@ export default function ProfileImage({
         <div className={`${styles.box} ${styles[radius]}`}>
           <div className={`${styles.mask} ${styles[radius]}`}>
             <div
-              className={`${styles.avatar} ${styles[radius]} ${hasBorder ? styles.avatarBorder : ''} ${
-                editable && shouldClickToEdit ? styles.clickable : ''
-              }`}
+              className={[
+                styles.avatar,
+                styles[radius],
+                hasBorder ? styles.avatarBorder : '',
+                editable && shouldClickToEdit ? styles.clickable : '',
+                shouldProfileFallbackBg ? styles.profileFallbackBg : '', // ✅ CHANGED
+              ].join(' ')}
               onClick={handleAvatarClick}
               onKeyDown={handleKeyDown}
               role={editable && shouldClickToEdit ? 'button' : undefined}
@@ -311,9 +321,7 @@ export default function ProfileImage({
                 alt={alt}
                 fill
                 sizes={sizesAttr}
-                className={`${styles.img} ${styles[radius]} ${
-                  usingFallback ? styles.contain : styles.cover
-                }`}
+                className={`${styles.img} ${styles[radius]} ${fitClass}`}
                 priority={priority}
                 loading={priority ? 'eager' : 'lazy'}
                 onError={() => {

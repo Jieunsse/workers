@@ -45,7 +45,7 @@
   position: relative;
   overflow: hidden;
 
-  background: inherit;
+  background: transparent;
   border-radius: inherit;
 }
 
@@ -56,7 +56,7 @@
 /* border: breakpoint별 var로 대응 */
 .avatarBorder {
   border-style: solid;
-  border-color: #e2e8f0; 
+  border-color: #e2e8f0;
   border-width: var(--pi-border-base);
   box-sizing: border-box;
 }
@@ -74,12 +74,22 @@
   object-fit: contain;
 }
 
+.profileFallbackBg {
+  background: var(--color-background-tertiary, #e2e8f0);
+}
+
 /* radius */
+.r6 {
+  border-radius: 6px;
+}
 .r8 {
   border-radius: 8px;
 }
 .r12 {
   border-radius: 12px;
+}
+.r16 {
+  border-radius: 16px;
 }
 .r20 {
   border-radius: 20px;
@@ -96,7 +106,7 @@
 
   background: var(--color-background-tertiary);
   border-radius: 50%;
-  border: none; 
+  border: none;
   padding: 0;
   cursor: pointer;
 
@@ -106,6 +116,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .editButton {
+    border: 1px solid var(--color-background-inverse);
+  }
+
+  .r32 {
+    border-radius: 20px;
+  }
 }
 
 /* 아이콘 표시 제어 */
@@ -131,12 +151,6 @@
   }
 }
 
-@media (max-width: 767px) {
-  .r32 {
-    border-radius: 20px;
-  }
-}
-
 /* md 이상 */
 @media (min-width: 768px) {
   .box {
@@ -155,9 +169,7 @@
     right: 0;
     width: 32px;
     height: 32px;
-
-    /* ✅ md 버전에서만 흰색 보더 */
-    border: 1px solid var(--color-background-inverse);
+    border: none;
   }
 
   .pencilSmall {
