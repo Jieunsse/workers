@@ -1,6 +1,5 @@
 .track {
   width: 100%;
-  max-width: 322px;
   height: 20px;
 
   border-radius: 9999px;
@@ -29,14 +28,12 @@
 
 @media (min-width: 744px) {
   .track {
-    max-width: 566px;
     height: 27px;
   }
 }
 
 @media (min-width: 1024px) {
   .track {
-    max-width: 1010px;
     height: 27px;
   }
 }
