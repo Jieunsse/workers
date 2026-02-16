@@ -1,26 +1,36 @@
 import { CREATE_TEAM_MESSAGES } from '../_constants/createTeam';
 
+const DUPLICATED_STATUS = 'status: 409';
+const INVALID_REQUEST_STATUS = 'status: 400';
+const UNAUTHORIZED_STATUSES = ['status: 401', 'status: 403'] as const;
+
+function hasStatusMessage(message: string, status: string) {
+  return message.includes(status);
+}
+
 export function getCreateTeamFailureMessage(error: unknown) {
   if (!(error instanceof Error)) {
     return CREATE_TEAM_MESSAGES.defaultFailure;
   }
 
-  if (error.message === CREATE_TEAM_MESSAGES.emptyTeamNameError) {
+  const { message } = error;
+
+  if (message === CREATE_TEAM_MESSAGES.emptyTeamNameError) {
     return CREATE_TEAM_MESSAGES.emptyTeamNameError;
   }
 
   if (
-    error.message === CREATE_TEAM_MESSAGES.duplicatedTeamNameError ||
-    error.message.includes('status: 409')
+    message === CREATE_TEAM_MESSAGES.duplicatedTeamNameError ||
+    hasStatusMessage(message, DUPLICATED_STATUS)
   ) {
     return CREATE_TEAM_MESSAGES.duplicatedTeamNameFailure;
   }
 
-  if (error.message.includes('status: 400')) {
+  if (hasStatusMessage(message, INVALID_REQUEST_STATUS)) {
     return CREATE_TEAM_MESSAGES.invalidRequestFailure;
   }
 
-  if (error.message.includes('status: 401') || error.message.includes('status: 403')) {
+  if (UNAUTHORIZED_STATUSES.some((status) => hasStatusMessage(message, status))) {
     return CREATE_TEAM_MESSAGES.unauthorizedFailure;
   }
 
