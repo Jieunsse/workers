@@ -7,7 +7,7 @@
   background: var(--color-background-inverse);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 375px) {
   .sidebar {
     display: none;
   }
