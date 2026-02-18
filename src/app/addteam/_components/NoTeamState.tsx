@@ -1,18 +1,16 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { BaseButton } from '@/components/Button/base';
 import noTeamImage from '../svg/noTeamImg.svg';
 import noTeamStateStyles from './NoTeamState.module.css';
 import clsx from 'clsx';
 import commonStyles from '../_styles/common.module.css';
 
-interface NoTeamStateProps {
-  onCreateTeamClick: () => void;
-  onJoinTeamClick: () => void;
-}
+export default function NoTeamState() {
+  const router = useRouter();
 
-export default function NoTeamState({ onCreateTeamClick, onJoinTeamClick }: NoTeamStateProps) {
   return (
     <section className={clsx(commonStyles.flexColCenter, noTeamStateStyles.noTeamState)}>
       <Image
@@ -27,13 +25,16 @@ export default function NoTeamState({ onCreateTeamClick, onJoinTeamClick }: NoTe
         팀을 생성하거나 팀에 참여해보세요.
       </p>
       <div className={clsx(commonStyles.flexCol, noTeamStateStyles.noTeamActions)}>
-        <BaseButton className={noTeamStateStyles.noTeamActionButton} onClick={onCreateTeamClick}>
+        <BaseButton
+          className={noTeamStateStyles.noTeamActionButton}
+          onClick={() => router.push('/addteam/create')}
+        >
           팀 생성하기
         </BaseButton>
         <BaseButton
           variant="outline"
           className={noTeamStateStyles.noTeamActionButton}
-          onClick={onJoinTeamClick}
+          onClick={() => router.push('/addteam/join')}
         >
           팀 참가하기
         </BaseButton>

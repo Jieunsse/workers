@@ -1,3 +1,4 @@
+/* TODO 무조건적인 true 대신에 로그인한 유저의 정보를 바탕으로 받아오는 로직 작성해야 함*/
 export const ENABLE_NO_TEAM_STATE_PREVIEW = true;
 
 export const CREATE_TEAM_MESSAGES = {

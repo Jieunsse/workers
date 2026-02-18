@@ -1,4 +1,5 @@
 .joinCard {
+  position: relative;
   display: inline-flex;
   justify-content: center;
   width: var(--join-card-width-desktop);
