@@ -1,0 +1,226 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background-secondary);
+}
+
+/* 모바일 헤더 - 모바일에서만 표시 */
+.mobileHeader {
+  display: none;
+}
+
+/* 사이드바 - 태블릿/데스크탑에서 표시 */
+.sidebar {
+  display: block;
+}
+
+/* 모바일 타이틀 - 모바일에서만 표시 */
+.mobileTitle {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+.cardWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 792px;
+}
+
+.card {
+  width: 100%;
+  background-color: var(--color-background-inverse);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 32px;
+}
+
+.profileImageWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.passwordField {
+  position: relative;
+}
+
+.passwordInput {
+  padding-right: 100px;
+}
+
+.changeButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.withdrawButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-status-danger);
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.withdrawButton:hover {
+  text-decoration: underline;
+}
+
+.toastWrapper {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  margin-top: 24px;
+}
+
+.toast {
+  position: static;
+  width: 100%;
+}
+
+/* 태블릿/데스크탑 레이아웃 */
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row;
+  }
+}
+
+/* 태블릿 (767px 이하) */
+@media (max-width: 767px) {
+  .layout {
+    flex-direction: row;
+  }
+
+  .main {
+    padding: 32px 24px;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+}
+
+/* 모바일 (375px 이하) */
+@media (max-width: 375px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .mobileHeader {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .mobileTitle {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+    align-self: flex-start;
+  }
+
+  .main {
+    flex: 1;
+    justify-content: flex-start;
+    padding: 24px 16px;
+  }
+
+  .card {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .title {
+    display: none;
+  }
+
+  .profileImageWrapper {
+    margin-bottom: 24px;
+  }
+
+  .form {
+    gap: 16px;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  /* 모바일 모달 - 하단 고정 */
+  :global(section[class*='overlay']) {
+    align-items: flex-end !important;
+  }
+
+  :global(section[class*='overlay'] > div[class*='contentsBox']) {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 12px 12px 0 0 !important;
+  }
+
+  :global([class*='modalContent']) {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  :global([class*='field']) {
+    width: 100% !important;
+  }
+
+  :global([class*='actions']) {
+    width: 100% !important;
+  }
+
+  :global([class*='closeButton']),
+  :global([class*='submitButton']),
+  :global([class*='confirmButton']) {
+    flex: 1 !important;
+    width: auto !important;
+  }
+}
