@@ -3,6 +3,7 @@ import '@/shared/styles/color.css';
 import './globals.css';
 
 import { pretendard } from '@/shared/styles/font';
+import Providers from './providers';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className={pretendard.variable}>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

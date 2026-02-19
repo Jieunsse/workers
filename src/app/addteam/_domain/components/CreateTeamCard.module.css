@@ -1,0 +1,85 @@
+.title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.label {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 19px;
+}
+
+.card {
+  position: relative;
+  width: var(--create-card-width-desktop);
+  padding: 32px 28px;
+  gap: 20px;
+  border-radius: 24px;
+  box-shadow: 4px 4px 10px 0 #24242440;
+  background-color: var(--color-background-inverse);
+}
+
+.profileSection {
+  gap: 12px;
+}
+
+.inputSection {
+  gap: 8px;
+}
+
+.teamNameInput {
+  height: var(--control-height-desktop);
+}
+
+.submitButton {
+  margin-top: 40px;
+  height: var(--control-height-desktop);
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .label {
+    color: var(--color-text-primary);
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .card {
+    width: var(--create-card-width-mobile);
+    min-height: 464px;
+    padding: 24px 22px;
+    gap: 0;
+    border-radius: 24px;
+  }
+
+  .profileSection {
+    margin-top: 34px;
+  }
+
+  .inputSection {
+    margin-top: 24px;
+    gap: 8px;
+  }
+
+  .teamNameInput {
+    height: var(--control-height-mobile);
+    padding: 12px;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .submitButton {
+    margin-top: 40px;
+    height: var(--control-height-mobile);
+    font-size: 14px;
+  }
+}

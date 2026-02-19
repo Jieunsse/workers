@@ -1,0 +1,37 @@
+.helperText {
+  margin: 0;
+  color: var(--color-text-default);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--color-status-danger);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.successText {
+  margin: 0;
+  color: var(--color-brand-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .helperText,
+  .errorText,
+  .successText {
+    margin-top: 16px;
+  }
+
+  .helperText {
+    font-size: 12px;
+    line-height: 14px;
+  }
+}
