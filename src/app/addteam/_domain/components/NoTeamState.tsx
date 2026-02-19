@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BaseButton } from '@/components/Button/base';
-import noTeamImage from '../../svg/noTeamImg.svg';
+import noTeamImage from '../svg/noTeamImg.svg';
 import noTeamStateStyles from './NoTeamState.module.css';
 import clsx from 'clsx';
 import commonStyles from '../styles/common.module.css';
