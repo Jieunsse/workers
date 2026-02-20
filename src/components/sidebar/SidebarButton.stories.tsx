@@ -6,6 +6,7 @@ import Image from 'next/image';
 import SidebarButton from './SidebarButton';
 import chessSmall from '@/assets/icons/chess/chessSmall.svg';
 import chessBig from '@/assets/icons/chess/chessBig.svg';
+import boardSmall from '@/assets/icons/board/boardSmall.svg';
 
 const meta = {
   title: 'Components/SidebarButton',
@@ -25,6 +26,9 @@ const meta = {
     },
     iconOnly: {
       control: 'boolean',
+    },
+    href: {
+      control: 'text',
     },
   },
   decorators: [
@@ -54,6 +58,14 @@ export const IconOnly: Story = {
   },
 };
 
+export const WithLink: Story = {
+  args: {
+    icon: <Image src={boardSmall} alt="" width={20} height={20} />,
+    label: '자유게시판',
+    href: '/boards',
+  },
+};
+
 export const Overview: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 240 }}>
@@ -70,6 +82,11 @@ export const Overview: Story = {
         icon={<Image src={chessBig} alt="" width={24} height={24} />}
         label="경영관리팀"
         iconOnly
+      />
+      <SidebarButton
+        icon={<Image src={boardSmall} alt="" width={20} height={20} />}
+        label="자유게시판"
+        href="/boards"
       />
     </div>
   ),

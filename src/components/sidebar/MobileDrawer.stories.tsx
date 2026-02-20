@@ -43,6 +43,7 @@ export const Open: Story = {
         <SidebarButton
           icon={<Image src={boardSmall} alt="" width={20} height={20} />}
           label="자유게시판"
+          href="/boards"
         />
       </>
     ),

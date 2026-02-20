@@ -11,6 +11,7 @@ import logoLarge from '@/assets/logos/logoLarge.svg';
 import logoIcon from '@/assets/logos/logoIcon.svg';
 import foldLeftLarge from '@/assets/icons/fold/foldLeftLarge.svg';
 import foldRightLarge from '@/assets/icons/fold/foldRightLarge.svg';
+import humanBig from '@/assets/buttons/human/humanBig.svg';
 
 type SidebarProps = {
   teamSelect?: ReactNode | ((isCollapsed: boolean) => ReactNode);
@@ -20,6 +21,9 @@ type SidebarProps = {
   profileImage?: ReactNode;
   profileName?: string;
   profileTeam?: string;
+  defaultCollapsed?: boolean;
+  isLoggedIn?: boolean;
+  onProfileClick?: () => void;
 };
 
 /**
@@ -37,12 +41,68 @@ export default function Sidebar({
   profileImage,
   profileName,
   profileTeam,
+  defaultCollapsed,
+  isLoggedIn,
+  onProfileClick,
 }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed ?? false);
 
   const renderSlot = (slot: SlotNode) => {
     if (!slot) return null;
     return typeof slot === 'function' ? slot(isCollapsed) : slot;
+  };
+
+  const renderFooter = () => {
+    if (footer) {
+      return (
+        <div className={styles.footer} onClick={onProfileClick}>
+          {renderSlot(footer)}
+        </div>
+      );
+    }
+
+    if (!isLoggedIn) {
+      return (
+        <motion.div className={styles.footer} onClick={onProfileClick} layout>
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.div
+                className={styles.profileImage}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Image src={humanBig} alt="" width={40} height={40} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.span className={styles.loginText} layout transition={{ duration: 0.3 }}>
+            로그인
+          </motion.span>
+        </motion.div>
+      );
+    }
+
+    return (
+      <div className={styles.footer} onClick={onProfileClick}>
+        <div className={styles.profileImage}>{profileImage}</div>
+        <AnimatePresence>
+          {!isCollapsed && (
+            <motion.div
+              className={styles.profileInfo}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className={styles.profileName}>{profileName}</span>
+              <span className={styles.profileTeam}>{profileTeam}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
   };
 
   return (
@@ -102,27 +162,7 @@ export default function Sidebar({
           </motion.div>
         </AnimatePresence>
       </div>
-      {footer ? (
-        <div className={styles.footer}>{renderSlot(footer)}</div>
-      ) : profileImage ? (
-        <div className={styles.footer}>
-          <div className={styles.profileImage}>{profileImage}</div>
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div
-                className={styles.profileInfo}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <span className={styles.profileName}>{profileName}</span>
-                <span className={styles.profileTeam}>{profileTeam}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      ) : null}
+      {renderFooter()}
     </motion.aside>
   );
 }

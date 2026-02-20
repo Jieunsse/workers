@@ -24,7 +24,10 @@ export type ActionTextAreaProps = TextAreaProps & {
   wrapperClassName?: string;
 };
 
-export type CommentInputProps = Omit<ActionTextAreaProps, 'wrapperClassName'>;
+export type CommentInputProps = Omit<ActionTextAreaProps, 'wrapperClassName'> & {
+  /** 입력 필드 왼쪽에 표시할 프로필 이미지 */
+  profileImage?: ReactNode;
+};
 
 export type AccountInputProps = {
   /** 표시할 이메일 주소 (읽기 전용) */
