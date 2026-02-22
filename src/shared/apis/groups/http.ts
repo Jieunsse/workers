@@ -1,4 +1,4 @@
-import { fetchApi } from '../fetchApi';
+import { fetchApi } from '../fetchApi.server';
 
 interface RequestErrorContext {
   message: string;

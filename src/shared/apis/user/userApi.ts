@@ -1,4 +1,4 @@
-import { fetchApi } from '../fetchApi';
+import { fetchApi } from '../fetchApi.server';
 import { BASE_URL, TEAM_ID } from '../config';
 import type {
   UserResponse,
