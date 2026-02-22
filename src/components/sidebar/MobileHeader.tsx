@@ -17,6 +17,10 @@ type MobileHeaderProps = {
   onMenuClick?: () => void;
   /** 프로필 버튼 클릭 시 호출되는 콜백 */
   onProfileClick?: () => void;
+  /** 로고 너비 (기본값: 102) */
+  logoWidth?: number;
+  /** 로고 높이 (기본값: 20) */
+  logoHeight?: number;
 };
 
 /**
@@ -29,12 +33,14 @@ export default function MobileHeader({
   profileImage,
   onMenuClick,
   onProfileClick,
+  logoWidth = 102,
+  logoHeight = 20,
 }: MobileHeaderProps) {
   if (!isLoggedIn) {
     return (
       <header className={styles.header}>
         <div className={styles.logo}>
-          <Image src={logoSmall} alt="COWORKERS" width={102} height={20} />
+          <Image src={logoSmall} alt="COWORKERS" width={logoWidth} height={logoHeight} />
         </div>
       </header>
     );

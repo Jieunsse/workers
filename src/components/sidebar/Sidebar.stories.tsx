@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
+import { fn } from 'storybook/test';
 import Image from 'next/image';
 import Sidebar from './Sidebar';
 import SidebarButton from './SidebarButton';
@@ -19,6 +20,10 @@ const meta = {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
+  argTypes: {
+    defaultCollapsed: { control: 'boolean' },
+    isLoggedIn: { control: 'boolean' },
+  },
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;
@@ -26,6 +31,8 @@ type Story = StoryObj<typeof meta>;
 
 export const LoggedIn: Story = {
   args: {
+    isLoggedIn: true,
+    onProfileClick: fn(),
     profileImage: (
       <div style={{ width: 40, height: 40, borderRadius: 12, background: '#cbd5e1' }} />
     ),
@@ -54,6 +61,7 @@ export const LoggedIn: Story = {
           }
           label="자유게시판"
           iconOnly={isCollapsed}
+          href="/boards"
         />
       </>
     ),
@@ -83,22 +91,22 @@ export const LoggedIn: Story = {
 
 export const LoggedOut: Story = {
   args: {
-    footer: (isCollapsed: boolean) =>
-      isCollapsed ? (
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#0f172a' }}>로그인</span>
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: '#e2e8f0',
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>로그인</span>
-        </div>
-      ),
+    isLoggedIn: false,
+    onProfileClick: fn(),
+  },
+};
+
+export const LoggedOutCollapsed: Story = {
+  args: {
+    isLoggedIn: false,
+    defaultCollapsed: true,
+    onProfileClick: fn(),
+  },
+};
+
+export const DefaultCollapsed: Story = {
+  args: {
+    ...LoggedIn.args,
+    defaultCollapsed: true,
   },
 };

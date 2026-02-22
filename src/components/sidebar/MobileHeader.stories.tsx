@@ -12,6 +12,10 @@ const meta = {
     viewport: { defaultViewport: 'mobile1' },
   },
   tags: ['autodocs'],
+  argTypes: {
+    logoWidth: { control: 'number' },
+    logoHeight: { control: 'number' },
+  },
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 375 }}>
@@ -34,5 +38,12 @@ export const LoggedIn: Story = {
     ),
     onMenuClick: fn(),
     onProfileClick: fn(),
+  },
+};
+
+export const CustomLogoSize: Story = {
+  args: {
+    logoWidth: 80,
+    logoHeight: 16,
   },
 };

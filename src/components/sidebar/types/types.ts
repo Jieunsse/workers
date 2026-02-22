@@ -11,4 +11,6 @@ export type SidebarButtonProps = {
   iconOnly?: boolean;
   /** 클릭 시 호출되는 콜백 */
   onClick?: () => void;
+  /** 링크 URL (설정 시 <a> 태그로 렌더링) */
+  href?: string;
 };
