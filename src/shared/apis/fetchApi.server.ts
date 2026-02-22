@@ -1,9 +1,14 @@
-import { BASE_URL, TEAM_ID } from './config';
+// TODO: 팀원 코드 BFF 마이그레이션 완료 후 주석 해제
+// import 'server-only';
+
+import { getBaseUrl, getTeamId } from './config';
 
 const BODYLESS_METHODS = new Set(['GET', 'HEAD']);
-const NORMALIZED_BASE_URL = normalizeBaseUrl(BASE_URL);
-const DEV_ACCESS_TOKEN = process.env.NEXT_PUBLIC_DEV_ACCESS_TOKEN;
-const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+
+// 모듈 최상위에서 환경변수를 읽지 않는다.
+// Next.js 빌드의 page data collecting 단계에서 환경변수 주입 전에 실행되면
+// "API_BASE_URL is not defined" 에러가 발생하기 때문이다.
+// 실제 fetch 호출 시점(런타임)에 환경변수를 읽도록 buildApiUrl을 함수 내부로 이동한다.
 
 function normalizeBaseUrl(baseUrl: string) {
   return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -14,8 +19,10 @@ function normalizePath(path: string) {
 }
 
 function buildApiUrl(path: string) {
-  const relativePath = `${TEAM_ID}/${normalizePath(path)}`;
-  return new URL(relativePath, NORMALIZED_BASE_URL).toString();
+  const baseUrl = normalizeBaseUrl(getBaseUrl());
+  const teamId = getTeamId();
+  const relativePath = `${teamId}/${normalizePath(path)}`;
+  return new URL(relativePath, baseUrl).toString();
 }
 
 function getMethod(options: RequestInit) {
@@ -39,22 +46,13 @@ function shouldSetJsonContentType(headers: Headers, body: RequestInit['body']) {
   return typeof body === 'string';
 }
 
-function shouldAttachDevAuthHeader(headers: Headers) {
-  if (!DEV_ACCESS_TOKEN) return false;
-  if (headers.has('Authorization')) return false;
-  return IS_DEVELOPMENT;
-}
-
-export function fetchApi(path: string, options: RequestInit = {}) {
+export function fetchApiServer(path: string, options: RequestInit = {}) {
   const method = getMethod(options);
   assertBodyAllowed(method, options.body);
 
   const headers = new Headers(options.headers);
   if (shouldSetJsonContentType(headers, options.body)) {
     headers.set('Content-Type', 'application/json');
-  }
-  if (shouldAttachDevAuthHeader(headers)) {
-    headers.set('Authorization', `Bearer ${DEV_ACCESS_TOKEN}`);
   }
 
   return fetch(buildApiUrl(path), {
@@ -63,3 +61,7 @@ export function fetchApi(path: string, options: RequestInit = {}) {
     headers,
   });
 }
+
+// TODO: 팀원 BFF 마이그레이션 완료 후 제거
+// groups/http.ts, user/userApi.ts가 fetchApi 이름으로 import 중 — 호환용 alias
+export const fetchApi = fetchApiServer;

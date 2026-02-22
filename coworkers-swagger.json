@@ -1,0 +1,4761 @@
+{
+  "openapi": "3.0.0",
+  "components": {
+    "examples": {},
+    "headers": {},
+    "parameters": {},
+    "requestBodies": {},
+    "responses": {},
+    "schemas": {
+      "_36_Enums.Role": {
+        "type": "string",
+        "enum": ["ADMIN", "MEMBER"]
+      },
+      "_36_Enums.FrequencyType": {
+        "type": "string",
+        "enum": ["DAILY", "WEEKLY", "MONTHLY", "ONCE"]
+      },
+      "UrlType": {
+        "type": "string",
+        "example": "https://example.com/...",
+        "format": "url",
+        "pattern": "^https?://.+"
+      },
+      "Email": {
+        "type": "string",
+        "example": "example@email.com",
+        "format": "email",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+      },
+      "SendResetPasswordEmailRequest": {
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          },
+          "redirectUrl": {
+            "$ref": "#/components/schemas/UrlType"
+          }
+        },
+        "required": ["email", "redirectUrl"],
+        "type": "object"
+      },
+      "Password": {
+        "type": "string",
+        "example": "password",
+        "minLength": 8,
+        "pattern": "^([a-z]|[A-Z]|[0-9]|[!@#$%^&*])+$"
+      },
+      "ResetPasswordBody": {
+        "properties": {
+          "passwordConfirmation": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": ["passwordConfirmation", "password", "token"],
+        "type": "object"
+      },
+      "UpdatePasswordBody": {
+        "properties": {
+          "passwordConfirmation": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          }
+        },
+        "required": ["passwordConfirmation", "password"],
+        "type": "object"
+      },
+      "Pick_UpdateUserBody.Exclude_keyofUpdateUserBody.encryptedPassword__": {
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "description": "From T, pick a set of properties whose keys are in the union K"
+      },
+      "Omit_UpdateUserBody.encryptedPassword_": {
+        "$ref": "#/components/schemas/Pick_UpdateUserBody.Exclude_keyofUpdateUserBody.encryptedPassword__",
+        "description": "Construct a type with the properties of T except for those in type K."
+      },
+      "FrequencyType": {
+        "type": "string",
+        "enum": ["DAILY", "WEEKLY", "MONTHLY", "ONCE"]
+      },
+      "Task": {
+        "properties": {
+          "doneBy": {
+            "properties": {
+              "user": {
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "nickname": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                },
+                "required": ["id"],
+                "type": "object",
+                "nullable": true
+              }
+            },
+            "type": "object",
+            "nullable": true
+          },
+          "writer": {
+            "properties": {
+              "image": {
+                "type": "string",
+                "nullable": true
+              },
+              "nickname": {
+                "type": "string"
+              },
+              "id": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "required": ["id"],
+            "type": "object",
+            "nullable": true
+          },
+          "displayIndex": {
+            "type": "number",
+            "format": "double"
+          },
+          "commentCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "recurringId": {
+            "type": "number",
+            "format": "double"
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/FrequencyType"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "doneAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": [
+          "doneBy",
+          "displayIndex",
+          "commentCount",
+          "deletedAt",
+          "recurringId",
+          "frequency",
+          "updatedAt",
+          "doneAt",
+          "date",
+          "description",
+          "name",
+          "id"
+        ],
+        "type": "object"
+      },
+      "DateString": {
+        "type": "string",
+        "example": "2021-01-01T00:00:00Z",
+        "format": "date-time"
+      },
+      "Id": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 1
+      },
+      "DisplayIndex": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
+      },
+      "MonthlyRecurringCreateBody": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "frequencyType": {
+            "type": "string",
+            "enum": ["MONTHLY"],
+            "nullable": false
+          },
+          "monthDay": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "required": ["name", "frequencyType", "monthDay"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "WeeklyRecurringCreateBody": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "frequencyType": {
+            "type": "string",
+            "enum": ["WEEKLY"],
+            "nullable": false
+          },
+          "weekDays": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["name", "frequencyType", "weekDays"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DailyRecurringCreateBody": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "frequencyType": {
+            "type": "string",
+            "enum": ["DAILY"],
+            "nullable": false
+          }
+        },
+        "required": ["name", "frequencyType"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "OnceRecurringCreateBody": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "frequencyType": {
+            "type": "string",
+            "enum": ["ONCE"],
+            "nullable": false
+          }
+        },
+        "required": ["name", "frequencyType"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TaskRecurringCreateDto": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/MonthlyRecurringCreateBody"
+          },
+          {
+            "$ref": "#/components/schemas/WeeklyRecurringCreateBody"
+          },
+          {
+            "$ref": "#/components/schemas/DailyRecurringCreateBody"
+          },
+          {
+            "$ref": "#/components/schemas/OnceRecurringCreateBody"
+          }
+        ]
+      },
+      "TaskUpdateDto": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "TaskRecurringUpdateDto": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "$ref": "#/components/schemas/DateString"
+          },
+          "frequencyType": {
+            "$ref": "#/components/schemas/FrequencyType"
+          },
+          "monthDay": {
+            "type": "number",
+            "format": "double"
+          },
+          "weekDays": {
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object",
+        "additionalProperties": false
+      },
+      "_36_Enums.OauthProvider": {
+        "type": "string",
+        "enum": ["GOOGLE", "KAKAO"]
+      },
+      "OauthProvider": {
+        "$ref": "#/components/schemas/_36_Enums.OauthProvider"
+      },
+      "AppKey": {
+        "type": "string",
+        "description": "간편 로그인을 위한 인증 키 입니다.\n\n* Google 의 경우에는 \"클라이언트 id\" 입니다.\n* Kakao 의 경우에는 \"REST API 키\" 입니다.\n\n\n실습을 위해 발급받은 키를 등록해주세요. 실제 서비스에서 사용 하는 키는 등록하시면 안됩니다."
+      },
+      "AppSecret": {
+        "type": "string",
+        "description": "간편 로그인을 위한 비밀 키 입니다.\n\n* Google 의 경우에는 필요하지 않습니다.\n* Kakao 의 경우에는 필요하지 않습니다."
+      },
+      "OauthApp": {
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "appSecret": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AppSecret"
+              }
+            ],
+            "nullable": true
+          },
+          "appKey": {
+            "$ref": "#/components/schemas/AppKey"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/OauthProvider"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "required": ["createdAt", "updatedAt", "appSecret", "appKey", "provider", "teamId", "id"],
+        "type": "object"
+      },
+      "UpsertOauthAppRequestBody": {
+        "properties": {
+          "appSecret": {
+            "$ref": "#/components/schemas/AppSecret"
+          },
+          "appKey": {
+            "$ref": "#/components/schemas/AppKey"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/OauthProvider"
+          }
+        },
+        "required": ["appKey", "provider"],
+        "type": "object"
+      },
+      "Nickname": {
+        "type": "string",
+        "example": "Nickname",
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "CreateGroupBody": {
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/UrlType"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Nickname"
+          }
+        },
+        "required": ["name"],
+        "type": "object"
+      },
+      "GroupUpdateBody": {
+        "properties": {
+          "image": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UrlType"
+              }
+            ],
+            "nullable": true
+          },
+          "name": {
+            "$ref": "#/components/schemas/Nickname"
+          }
+        },
+        "type": "object"
+      },
+      "CreateCommentDto": {
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": ["content"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UpdateCommentDto": {
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": ["content"],
+        "type": "object",
+        "additionalProperties": false
+      },
+      "User": {
+        "properties": {
+          "teamId": {
+            "type": "string"
+          },
+          "image": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UrlType"
+              }
+            ],
+            "nullable": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nickname": {
+            "$ref": "#/components/schemas/Nickname"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "required": ["teamId", "image", "updatedAt", "createdAt", "nickname", "id"],
+        "type": "object"
+      },
+      "SignUpResponse": {
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "properties": {
+                  "email": {
+                    "$ref": "#/components/schemas/Email"
+                  }
+                },
+                "required": ["email"],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": ["refreshToken", "accessToken", "user"],
+        "type": "object"
+      },
+      "SignUpRequestBody": {
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/UrlType"
+          },
+          "passwordConfirmation": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "nickname": {
+            "$ref": "#/components/schemas/Nickname"
+          },
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          }
+        },
+        "required": ["passwordConfirmation", "password", "nickname", "email"],
+        "type": "object"
+      },
+      "SignInResponse": {
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              },
+              {
+                "properties": {
+                  "email": {
+                    "$ref": "#/components/schemas/Email"
+                  }
+                },
+                "required": ["email"],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": ["refreshToken", "accessToken", "user"],
+        "type": "object"
+      },
+      "SignInRequestBody": {
+        "properties": {
+          "password": {
+            "$ref": "#/components/schemas/Password"
+          },
+          "email": {
+            "$ref": "#/components/schemas/Email"
+          }
+        },
+        "required": ["password", "email"],
+        "type": "object"
+      },
+      "OauthToken": {
+        "type": "string",
+        "description": "간편 로그인 과정을 통해 발급받은 토큰입니다.<br />\n\n* Google 의 경우에는 <b>Google Id 토큰</b>(JWT) 입니다.\n* Kakao 의 경우에는 <b>인가 코드</b> 입니다."
+      },
+      "SignInWithOauthRequestBody": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "description": "code를 얻을 때 사용하였던 state 값을 그대로 사용합니다."
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "Kakao 의 경우에는 필수입니다.<br/>\n인가 코드를 얻을 때 사용하였던 redirect_uri 값을 그대로 사용합니다.",
+            "example": "http://localhost:3000/oauth/kakao"
+          },
+          "token": {
+            "$ref": "#/components/schemas/OauthToken"
+          }
+        },
+        "required": ["token"],
+        "type": "object"
+      },
+      "CommentType": {
+        "properties": {
+          "writer": {
+            "properties": {
+              "image": {
+                "type": "string",
+                "nullable": true
+              },
+              "nickname": {
+                "type": "string"
+              },
+              "id": {
+                "$ref": "#/components/schemas/Id"
+              }
+            },
+            "required": ["image", "nickname", "id"],
+            "type": "object"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "required": ["writer", "updatedAt", "createdAt", "content", "id"],
+        "type": "object"
+      },
+      "CreateCommentBody": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["content"],
+        "type": "object"
+      },
+      "CursorBasedPaginationResponse_CommentType_": {
+        "properties": {
+          "nextCursor": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/CommentType"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["nextCursor", "list"],
+        "type": "object"
+      },
+      "UpdateCommentBody": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "type": "object"
+      },
+      "ArticleTitle": {
+        "type": "string",
+        "example": "게시글 제목입니다.",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "ArticleContent": {
+        "type": "string",
+        "example": "게시글 내용입니다.",
+        "minLength": 1
+      },
+      "ArticleWriter": {
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "required": ["nickname", "id"],
+        "type": "object"
+      },
+      "ArticleListType": {
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "commentCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "likeCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "writer": {
+            "$ref": "#/components/schemas/ArticleWriter"
+          },
+          "image": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UrlType"
+              }
+            ],
+            "nullable": true
+          },
+          "content": {
+            "$ref": "#/components/schemas/ArticleContent"
+          },
+          "title": {
+            "$ref": "#/components/schemas/ArticleTitle"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          }
+        },
+        "required": [
+          "updatedAt",
+          "createdAt",
+          "commentCount",
+          "likeCount",
+          "writer",
+          "image",
+          "content",
+          "title",
+          "id"
+        ],
+        "type": "object"
+      },
+      "CreateArticleBody": {
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/UrlType"
+          },
+          "content": {
+            "$ref": "#/components/schemas/ArticleContent"
+          },
+          "title": {
+            "$ref": "#/components/schemas/ArticleTitle"
+          }
+        },
+        "required": ["content", "title"],
+        "type": "object"
+      },
+      "OffsetBasedPaginationResponse_ArticleListType_": {
+        "properties": {
+          "totalCount": {
+            "type": "number",
+            "format": "double"
+          },
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/ArticleListType"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["totalCount", "list"],
+        "type": "object"
+      },
+      "ListArticleOrder": {
+        "type": "string",
+        "enum": ["recent", "like"],
+        "default": "recent"
+      },
+      "ArticleDetailType": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ArticleListType"
+          },
+          {
+            "properties": {
+              "isLiked": {
+                "type": "boolean",
+                "nullable": true
+              }
+            },
+            "required": ["isLiked"],
+            "type": "object"
+          }
+        ]
+      },
+      "UpdateArticleBody": {
+        "properties": {
+          "image": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UrlType"
+              }
+            ],
+            "nullable": true
+          },
+          "content": {
+            "$ref": "#/components/schemas/ArticleContent"
+          },
+          "title": {
+            "$ref": "#/components/schemas/ArticleTitle"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "info": {
+    "title": "coworkers-api",
+    "version": "1.0.0",
+    "license": {
+      "name": "ISC"
+    },
+    "contact": {}
+  },
+  "paths": {
+    "/{teamId}/user": {
+      "get": {
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "teamId": {
+                      "type": "string"
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "memberships": {
+                      "items": {
+                        "allOf": [
+                          {
+                            "properties": {
+                              "group": {
+                                "properties": {
+                                  "teamId": {
+                                    "type": "string"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "image": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "type": "number",
+                                    "format": "double"
+                                  }
+                                },
+                                "required": [
+                                  "teamId",
+                                  "updatedAt",
+                                  "createdAt",
+                                  "image",
+                                  "name",
+                                  "id"
+                                ],
+                                "type": "object"
+                              }
+                            },
+                            "required": ["group"],
+                            "type": "object"
+                          },
+                          {
+                            "properties": {
+                              "role": {
+                                "$ref": "#/components/schemas/_36_Enums.Role"
+                              },
+                              "userImage": {
+                                "type": "string"
+                              },
+                              "userEmail": {
+                                "type": "string"
+                              },
+                              "userName": {
+                                "type": "string"
+                              },
+                              "groupId": {
+                                "type": "number",
+                                "format": "double"
+                              },
+                              "userId": {
+                                "type": "number",
+                                "format": "double"
+                              }
+                            },
+                            "required": [
+                              "role",
+                              "userImage",
+                              "userEmail",
+                              "userName",
+                              "groupId",
+                              "userId"
+                            ],
+                            "type": "object"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "teamId",
+                    "image",
+                    "nickname",
+                    "updatedAt",
+                    "createdAt",
+                    "email",
+                    "id",
+                    "memberships"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateMe",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Omit_UpdateUserBody.encryptedPassword_"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteMe",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "description": "회원 탈퇴",
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/user/groups": {
+      "get": {
+        "operationId": "GetGroups",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "teamId": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "image": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "number",
+                        "format": "double"
+                      }
+                    },
+                    "required": ["teamId", "updatedAt", "createdAt", "image", "name", "id"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/user/memberships": {
+      "get": {
+        "operationId": "GetMemberships",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "allOf": [
+                      {
+                        "properties": {
+                          "group": {
+                            "properties": {
+                              "teamId": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "image": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "number",
+                                "format": "double"
+                              }
+                            },
+                            "required": ["teamId", "updatedAt", "createdAt", "image", "name", "id"],
+                            "type": "object"
+                          }
+                        },
+                        "required": ["group"],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "role": {
+                            "$ref": "#/components/schemas/_36_Enums.Role"
+                          },
+                          "userImage": {
+                            "type": "string"
+                          },
+                          "userEmail": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "groupId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "userId": {
+                            "type": "number",
+                            "format": "double"
+                          }
+                        },
+                        "required": [
+                          "role",
+                          "userImage",
+                          "userEmail",
+                          "userName",
+                          "groupId",
+                          "userId"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/user/history": {
+      "get": {
+        "operationId": "ListDoneTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "tasksDone": {
+                      "items": {
+                        "properties": {
+                          "displayIndex": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "writerId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "userId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "deletedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "frequency": {
+                            "$ref": "#/components/schemas/_36_Enums.FrequencyType"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "recurringId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "doneAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "id": {
+                            "type": "number",
+                            "format": "double"
+                          }
+                        },
+                        "required": [
+                          "displayIndex",
+                          "writerId",
+                          "userId",
+                          "deletedAt",
+                          "frequency",
+                          "description",
+                          "name",
+                          "recurringId",
+                          "doneAt",
+                          "date",
+                          "updatedAt",
+                          "id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["tasksDone"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "완료한 작업 조회",
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/user/send-reset-password-email": {
+      "post": {
+        "operationId": "SendResetPasswordEmail",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "비밀번호 재설정 이메일 전송\n- {redirectUrl}/reset-password?token=${token}로 이동할 수 있는 링크를 이메일로 전송합니다.\n  e.g. \"https://coworkers.vercel.app/reset-password?token=1234567890\"",
+        "tags": ["User"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "\"email\": \"example@email.com\",\n\"redirectUrl\": \"http://localhost:3000\"\n}",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendResetPasswordEmailRequest",
+                "description": "\"email\": \"example@email.com\",\n\"redirectUrl\": \"http://localhost:3000\"\n}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/user/reset-password": {
+      "patch": {
+        "operationId": "ResetPassword",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "이메일로 전달받은 링크에서 비밀번호 초기화\n- POST user/send-reset-password-email 요청으로 발송한 메일의 링크에 담긴 토큰을 사용해야 합니다.",
+        "tags": ["User"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/user/password": {
+      "patch": {
+        "operationId": "UpdatePassword",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["User"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{id}": {
+      "get": {
+        "operationId": "GetTaskList",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "displayIndex": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "tasks": {
+                      "items": {
+                        "$ref": "#/components/schemas/Task"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "displayIndex",
+                    "groupId",
+                    "updatedAt",
+                    "createdAt",
+                    "name",
+                    "id",
+                    "tasks"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["TaskList"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DateString"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateTaskList",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "displayIndex": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["displayIndex", "groupId", "updatedAt", "createdAt", "name", "id"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["TaskList"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteTaskList",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "tags": ["TaskList"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists": {
+      "post": {
+        "operationId": "CreateTaskList",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "displayIndex": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["displayIndex", "groupId", "updatedAt", "createdAt", "name", "id"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["TaskList"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name"],
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{id}/order": {
+      "patch": {
+        "operationId": "UpdateTaskListOrder",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "description": "할일 목록의 순서를 변경합니다.",
+        "tags": ["TaskList"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "taskList의 displayIndex를 변경합니다. 해당 taskList가 기존 displayIndex를 버리고 넘어가면서, 그 빈 displayIndex는 \"한 자리씩 당겨지는 식\"으로 변경됩니다. [1,2,3,4] => (3을 0 인덱스로) => [3,1,2,4] => (4를 1 인덱스로) => [3,4,1,2]",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "displayIndex": {
+                    "$ref": "#/components/schemas/DisplayIndex"
+                  }
+                },
+                "required": ["displayIndex"],
+                "type": "object",
+                "description": "taskList의 displayIndex를 변경합니다. 해당 taskList가 기존 displayIndex를 버리고 넘어가면서, 그 빈 displayIndex는 \"한 자리씩 당겨지는 식\"으로 변경됩니다. [1,2,3,4] => (3을 0 인덱스로) => [3,1,2,4] => (4를 1 인덱스로) => [3,4,1,2]"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/tasks": {
+      "post": {
+        "operationId": "CreateRecurringTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "recurring": {
+                      "properties": {
+                        "writerId": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "groupId": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "taskListId": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "monthDay": {
+                          "type": "number",
+                          "format": "double"
+                        },
+                        "weekDays": {
+                          "items": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "type": "array"
+                        },
+                        "frequencyType": {
+                          "$ref": "#/components/schemas/_36_Enums.FrequencyType"
+                        },
+                        "startDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      },
+                      "required": [
+                        "writerId",
+                        "groupId",
+                        "taskListId",
+                        "monthDay",
+                        "weekDays",
+                        "frequencyType",
+                        "startDate",
+                        "updatedAt",
+                        "createdAt",
+                        "description",
+                        "name",
+                        "id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["recurring"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "DEPRECATED: 여전히 동작합니다. 새로운 반복일정 생성 API를 제공합니다. \\\n아래 /{teamId}/groups/{groupId}/task-lists/{taskListId}/recurring 를 참고하세요\n\n(반복)일정을 생성합니다.\\\n일종의 정책으로, 반복정책을 정하면, 해당 정책에 따라 할일이 생성됩니다.\n\n할일(task)는 반복일정에 지정한 frequencyType에 따라 다르게 생성됩니다. \\\nONCE: 한 번만 생성 (해당 일 조회시, 할일 존재) \\\nDAILY: 매일 생성 (시작일(startDate) 이후 어느 날짜를 조회해도 존재함) \\\nWEEKLY: 매주 생성 (시작일(startDate) 이후 해당 조건에 따라 존재) \\\nMONTHLY: 매월 생성 (시작일(startDate) 이후 해당 조건에 따라 존재)",
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskListId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRecurringCreateDto"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "ListTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "특정 일자, 특정 할일 리스트의 할일 리스트",
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskListId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DateString"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/tasks/{taskId}": {
+      "get": {
+        "operationId": "GetTask",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateTask",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "displayIndex": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "writerId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "userId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "deletedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "frequency": {
+                      "$ref": "#/components/schemas/_36_Enums.FrequencyType"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "recurringId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "doneAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": [
+                    "displayIndex",
+                    "writerId",
+                    "userId",
+                    "deletedAt",
+                    "frequency",
+                    "description",
+                    "name",
+                    "recurringId",
+                    "doneAt",
+                    "date",
+                    "updatedAt",
+                    "id"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskUpdateDto"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteTask",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "description": "특정 할일 삭제",
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "할일 id",
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/tasks/{id}/order": {
+      "patch": {
+        "operationId": "UpdateTaskOrder",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskListId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "displayIndex": {
+                    "$ref": "#/components/schemas/DisplayIndex"
+                  }
+                },
+                "required": ["displayIndex"],
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/tasks/{taskId}/recurring/{recurringId}": {
+      "delete": {
+        "operationId": "DeleteRecurringTask",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "description": "반복할일 삭제",
+        "tags": ["Task"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "반복할일 id (task 객체의 recurringId 필드, 반복설정으로 생성된 할일이 아닌, 반복설정 자체를 삭제)",
+            "in": "path",
+            "name": "recurringId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/recurring": {
+      "post": {
+        "operationId": "CreateRecurringTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "writerId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "taskListId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "monthDay": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "weekDays": {
+                      "items": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "type": "array"
+                    },
+                    "frequencyType": {
+                      "$ref": "#/components/schemas/_36_Enums.FrequencyType"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": [
+                    "writerId",
+                    "groupId",
+                    "taskListId",
+                    "monthDay",
+                    "weekDays",
+                    "frequencyType",
+                    "startDate",
+                    "updatedAt",
+                    "createdAt",
+                    "description",
+                    "name",
+                    "id"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "(반복)일정을 생성합니다.\\\n일종의 정책으로, 반복정책을 정하면, 해당 정책에 따라 할일이 생성됩니다.\n\n할일(task)는 반복일정에 지정한 frequencyType에 따라 다르게 생성됩니다. \\\nONCE: 한 번만 생성 (해당 일 조회시, 할일 존재) \\\nDAILY: 매일 생성 (시작일(startDate) 이후 어느 날짜를 조회해도 존재함) \\\nWEEKLY: 매주 생성 (시작일(startDate) 이후 해당 조건에 따라 존재) \\\nMONTHLY: 매월 생성 (시작일(startDate) 이후 해당 조건에 따라 존재)",
+        "tags": ["Recurring"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskListId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRecurringCreateDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{groupId}/task-lists/{taskListId}/recurring/{recurringId}": {
+      "patch": {
+        "operationId": "UpdateRecurringTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "writerId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "taskListId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "monthDay": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "weekDays": {
+                      "items": {
+                        "type": "number",
+                        "format": "double"
+                      },
+                      "type": "array"
+                    },
+                    "frequencyType": {
+                      "$ref": "#/components/schemas/_36_Enums.FrequencyType"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": [
+                    "writerId",
+                    "groupId",
+                    "taskListId",
+                    "monthDay",
+                    "weekDays",
+                    "frequencyType",
+                    "startDate",
+                    "updatedAt",
+                    "createdAt",
+                    "description",
+                    "name",
+                    "id"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "반복 일정을 수정합니다.\\\n반복 일정의 이름, 설명, 시작 날짜, 빈도 타입 등을 수정할 수 있습니다.",
+        "tags": ["Recurring"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskListId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "description": "수정할 반복 일정의 ID",
+            "in": "path",
+            "name": "recurringId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "수정할 정보 (모든 필드는 선택사항)",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskRecurringUpdateDto",
+                "description": "수정할 정보 (모든 필드는 선택사항)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/oauthApps": {
+      "post": {
+        "operationId": "UpsertOauthApp",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OauthApp"
+                }
+              }
+            }
+          }
+        },
+        "description": "간편 로그인 App 등록/수정<br/>\nGoogle, Kakao 간편 로그인을 위한 App 을 등록하거나 수정합니다.<br/>\n이미 등록된 앱이 있을 경우 덮어씌워집니다.\n\n## Google\n* appKey: <b>\"클라이언트 id\"</b>\n* appSecret: 필요하지 않음\n\n---\n\n## Kakao\n* appKey: <b>\"REST API 키\"</b>\n* appSecret: 필요하지 않음\n\n---\n\n실습을 위해 발급받은 키를 등록해주세요. 실제 서비스에서 사용 하는 키를 등록해서는 안됩니다.",
+        "tags": ["Oauth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertOauthAppRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/images/upload": {
+      "post": {
+        "operationId": "ImageUpload",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["url"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "이미지 업로드,\n프로젝트에 저장하는 이미지들은 이 엔드포인트를 통해 업로드한 후 URL을 획득하여 사용합니다.",
+        "tags": ["Image"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "이미지 파일, 최대 용량은 10MB입니다."
+                  }
+                },
+                "required": ["image"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{id}": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "teamId": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "members": {
+                      "items": {
+                        "properties": {
+                          "role": {
+                            "$ref": "#/components/schemas/_36_Enums.Role"
+                          },
+                          "userImage": {
+                            "type": "string"
+                          },
+                          "userEmail": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "groupId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "userId": {
+                            "type": "number",
+                            "format": "double"
+                          }
+                        },
+                        "required": [
+                          "role",
+                          "userImage",
+                          "userEmail",
+                          "userName",
+                          "groupId",
+                          "userId"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "taskLists": {
+                      "items": {
+                        "properties": {
+                          "displayIndex": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "groupId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "tasks": {
+                            "items": {},
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "displayIndex",
+                          "groupId",
+                          "updatedAt",
+                          "createdAt",
+                          "name",
+                          "id",
+                          "tasks"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "teamId",
+                    "updatedAt",
+                    "createdAt",
+                    "image",
+                    "name",
+                    "id",
+                    "members",
+                    "taskLists"
+                  ],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "teamId": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["teamId", "updatedAt", "createdAt", "image", "name", "id"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupUpdateBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["name", "image", "updatedAt", "createdAt", "id"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroupBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{id}/member/{memberUserId}": {
+      "get": {
+        "operationId": "GetMember",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "role": {
+                      "$ref": "#/components/schemas/_36_Enums.Role"
+                    },
+                    "userImage": {
+                      "type": "string"
+                    },
+                    "userEmail": {
+                      "type": "string"
+                    },
+                    "userName": {
+                      "type": "string"
+                    },
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "userId": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["role", "userImage", "userEmail", "userName", "groupId", "userId"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "그룹에 소속된 유저 조회\n그룹 조회(GET /groups/:id)시, 멤버로 가입된 유저 목록도 함께 조회됨.",
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "memberUserId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteMember",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "memberUserId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/{id}/invitation": {
+      "get": {
+        "operationId": "GetInvitation",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "초대 링크용 토큰 생성\n- 초대 링크에 토큰을 포함시켜서, 초대 링크를 받은 사용자가 접속시, 토큰을 사용해서 초대를 수락하여 스스로를 그룹에 포함시키게 됨.",
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/groups/accept-invitation": {
+      "post": {
+        "operationId": "AcceptInvitation",
+        "responses": {
+          "200": {
+            "description": "초대를 수락한 그룹의 id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "groupId": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["groupId"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "- GET {id}/invitation으로 생성한 토큰으로, 초대를 수락하는 엔드포인트",
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "token은 초대 링크에 포함되어있는 토큰, userEmail은 초대를 수락하는 유저의 이메일",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userEmail": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["userEmail", "token"],
+                "type": "object",
+                "description": "token은 초대 링크에 포함되어있는 토큰, userEmail은 초대를 수락하는 유저의 이메일"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{id}/member": {
+      "post": {
+        "operationId": "InviteMember",
+        "responses": {
+          "204": {
+            "description": "No content"
+          }
+        },
+        "description": "초대 링크없이 그룹에 유저를 추가하는 엔드포인트",
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "userEmail": {
+                    "type": "string"
+                  }
+                },
+                "required": ["userEmail"],
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/groups/{id}/tasks": {
+      "get": {
+        "operationId": "ListGroupTasks",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "특정 일자, 특정 할일 리스트의 할일 리스트",
+        "tags": ["Group"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DateString"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/tasks/{taskId}/comments": {
+      "get": {
+        "operationId": "GetByTaskId",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "allOf": [
+                      {
+                        "properties": {
+                          "user": {
+                            "properties": {
+                              "image": {
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "number",
+                                "format": "double"
+                              }
+                            },
+                            "required": ["image", "nickname", "id"],
+                            "type": "object"
+                          }
+                        },
+                        "required": ["user"],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "userId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "taskId": {
+                            "type": "number",
+                            "format": "double"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "content": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "number",
+                            "format": "double"
+                          }
+                        },
+                        "required": ["userId", "taskId", "updatedAt", "createdAt", "content", "id"],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [404],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          }
+        },
+        "tags": ["Comment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PostComment",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "user": {
+                      "properties": {
+                        "image": {
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      },
+                      "required": ["image", "nickname", "id"],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["content", "updatedAt", "createdAt", "id", "user"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [404],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          }
+        },
+        "tags": ["Comment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "taskId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/tasks/{taskId}/comments/{commentId}": {
+      "patch": {
+        "operationId": "UpdateComment",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    },
+                    "user": {
+                      "properties": {
+                        "image": {
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "number",
+                          "format": "double"
+                        }
+                      },
+                      "required": ["image", "nickname", "id"],
+                      "type": "object"
+                    }
+                  },
+                  "required": ["content", "updatedAt", "createdAt", "id", "user"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [403],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [404],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          }
+        },
+        "tags": ["Comment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommentDto"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteComment",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "403": {
+            "description": "댓글 작성자만 삭제할 수 있습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [403],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "enum": [404],
+                  "nullable": false
+                },
+                "examples": {
+                  "Example 1": {}
+                }
+              }
+            },
+            "headers": {
+              "message": {
+                "schema": {
+                  "type": "string"
+                },
+                "required": true
+              }
+            }
+          }
+        },
+        "tags": ["Comment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/auth/signUp": {
+      "post": {
+        "operationId": "SignUp",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignUpResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "accessToken": "accessToken",
+                      "refreshToken": "refreshToken",
+                      "user": {
+                        "id": 123,
+                        "email": "example@email.com",
+                        "nickname": "example",
+                        "updatedAt": "2026-02-18T14:41:25.683Z",
+                        "createdAt": "2026-02-18T14:41:25.683Z",
+                        "image": null,
+                        "teamId": "teamId"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "회원가입",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequestBody"
+              },
+              "example": {
+                "email": "example@email.com",
+                "nickname": "nickname",
+                "password": "password",
+                "passwordConfirmation": "password"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/auth/signIn": {
+      "post": {
+        "operationId": "SignIn",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInResponse"
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "accessToken": "accessToken",
+                      "refreshToken": "refresh",
+                      "user": {
+                        "id": 123,
+                        "email": "example@email.com",
+                        "nickname": "example",
+                        "updatedAt": "2026-02-18T14:41:25.685Z",
+                        "createdAt": "2026-02-18T14:41:25.685Z",
+                        "image": null,
+                        "teamId": "teamId"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "로그인",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequestBody"
+              },
+              "example": {
+                "email": "example@email.com",
+                "password": "password"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/auth/refresh-token": {
+      "post": {
+        "operationId": "RefreshToken",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["accessToken"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "액세스토큰 새로 받기",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": ["refreshToken"],
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/auth/signIn/{provider}": {
+      "post": {
+        "operationId": "SignInWithOauth",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "간편 로그인\n\n가입되어있지 않을 경우엔 가입됩니다.",
+        "tags": ["Auth"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OauthProvider"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInWithOauthRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{teamId}/articles/{articleId}/comments": {
+      "post": {
+        "operationId": "CreateArticleComment",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글의 댓글 작성",
+        "tags": ["ArticleComment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentBody"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "ListArticleComments",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursorBasedPaginationResponse_CommentType_"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글의 댓글 목록 조회",
+        "tags": ["ArticleComment"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/comments/{commentId}": {
+      "patch": {
+        "operationId": "UpdateComment",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentType"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "댓글 수정",
+        "tags": ["ArticleComment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommentBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteComment",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["id"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "댓글 삭제",
+        "tags": ["ArticleComment"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "commentId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/articles": {
+      "post": {
+        "operationId": "CreateArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleListType"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateArticleBody"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "ListArticles",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OffsetBasedPaginationResponse_ArticleListType_"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 목록 조회",
+        "tags": ["Article"],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "페이지 번호",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "description": "페이지 당 게시글 수",
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "format": "double",
+              "type": "number"
+            }
+          },
+          {
+            "description": "정렬 기준",
+            "in": "query",
+            "name": "orderBy",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ListArticleOrder"
+            }
+          },
+          {
+            "description": "검색 키워드",
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/articles/{articleId}": {
+      "get": {
+        "operationId": "RetrieveArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 상세 조회",
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": ["public"]
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "UpdateArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailType"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 수정",
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateArticleBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "DeleteArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  },
+                  "required": ["id"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 삭제",
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    },
+    "/{teamId}/articles/{articleId}/like": {
+      "post": {
+        "operationId": "LikeArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 좋아요",
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "UnlikeArticle",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailType"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"],
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "description": "게시글 좋아요 취소",
+        "tags": ["Article"],
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "teamId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "articleId",
+            "required": true,
+            "schema": {
+              "format": "double",
+              "type": "number"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://fe-project-cowokers.vercel.app"
+    }
+  ]
+}
