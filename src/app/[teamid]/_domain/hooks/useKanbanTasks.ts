@@ -1,14 +1,33 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import type { KanbanTask, KanbanStatus, TaskItem } from '../interfaces/team';
 import type { TaskList } from '../apis/types';
 import { taskListQueryOptions } from '../queries/useTaskListQuery';
 import { useCreateTaskListMutation } from '../queries/useCreateTaskListMutation';
 import { useDeleteTaskListMutation } from '../queries/useDeleteTaskListMutation';
+import { updateTask } from '../apis/task';
+import { taskListKeys } from '../queries/queryKeys';
 
 function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
+}
+
+// localStorage에 컬럼 위치를 저장하여 새로고침 후에도 유지
+function getStoredStatus(groupId: number, taskListId: number): KanbanStatus | null {
+  try {
+    const stored = localStorage.getItem(`kanban-status-${groupId}-${taskListId}`);
+    if (stored === 'todo' || stored === 'inProgress' || stored === 'done') return stored;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredStatus(groupId: number, taskListId: number, status: KanbanStatus): void {
+  try {
+    localStorage.setItem(`kanban-status-${groupId}-${taskListId}`, status);
+  } catch {}
 }
 
 function deriveStatus(items: TaskItem[]): KanbanStatus {
@@ -25,6 +44,7 @@ export function useKanbanTasks(
   taskLists: Omit<TaskList, 'tasks'>[],
 ) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const today = getTodayDateString();
 
   // 각 할 일 목록의 태스크를 병렬로 조회
@@ -44,11 +64,13 @@ export function useKanbanTasks(
         text: task.name,
         checked: task.doneAt !== null,
       }));
+      // localStorage 저장값 우선, 없으면 item 완료 비율로 파생
+      const storedStatus = getStoredStatus(groupId, tl.id);
       return {
         id: String(tl.id),
         title: tl.name,
         items,
-        status: deriveStatus(items),
+        status: storedStatus ?? deriveStatus(items),
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,6 +140,46 @@ export function useKanbanTasks(
   // 수정 기능은 할 일 목록 상세 페이지에서 처리
   const handleUpdateTask = useCallback(() => {}, []);
 
+  // 드래그로 컬럼 이동 시 컬럼 위치를 저장하고, 완료/할 일 이동 시 API로 완료 상태 동기화
+  const handleStatusChange = useCallback(
+    async (taskId: string, fromStatus: KanbanStatus, toStatus: KanbanStatus) => {
+      if (fromStatus === toStatus) return;
+
+      const task = tasks.find((t) => t.id === taskId);
+      const taskListId = Number(taskId);
+
+      // 항목 유무와 관계없이 컬럼 위치를 localStorage에 저장
+      setStoredStatus(groupId, taskListId, toStatus);
+
+      // 진행중으로 이동하거나 항목이 없으면 API 호출 없이 종료 (위치는 이미 저장됨)
+      if (!task || task.items.length === 0 || toStatus === 'inProgress') return;
+
+      try {
+        if (toStatus === 'done') {
+          // 모든 항목 완료 처리
+          await Promise.all(
+            task.items.map((item) =>
+              updateTask(groupId, taskListId, Number(item.id), { done: true }),
+            ),
+          );
+        } else if (toStatus === 'todo') {
+          // 모든 항목 미완료 처리
+          await Promise.all(
+            task.items.map((item) =>
+              updateTask(groupId, taskListId, Number(item.id), { done: false }),
+            ),
+          );
+        }
+      } finally {
+        // 성공/실패 관계없이 쿼리를 무효화하여 실제 서버 상태로 동기화
+        await queryClient.invalidateQueries({
+          queryKey: taskListKeys.detail(groupId, taskListId, today),
+        });
+      }
+    },
+    [tasks, groupId, today, queryClient],
+  );
+
   return {
     tasks,
     setTasks,
@@ -127,6 +189,7 @@ export function useKanbanTasks(
     handleCardClick,
     handleDeleteTask,
     handleUpdateTask,
+    handleStatusChange,
     handleAddTask,
     handleAddListSubmit,
     handleAddListClose,

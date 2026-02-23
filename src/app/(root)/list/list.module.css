@@ -73,7 +73,7 @@
   display: none;
 }
 
-/* ✅ 1024px 이상에서는 데스크탑 Sidebar가 보이도록 강제 (Sidebar 컴포넌트의 1199px 이하 숨김을 override) */
+/* ✅ 1024px 이상에서는 데스크탑 Sidebar가 보이도록 강제 */
 @media (min-width: 1024px) and (max-width: 1199px) {
   .desktopSidebar {
     display: flex !important;
@@ -320,7 +320,7 @@
   color: #64748b;
 }
 
-/* ✅ 모바일/태블릿: 투두카드 폭 고정(모바일 180 / 태블릿 240) + 버튼 같은 줄 */
+/* ✅ 모바일/태블릿: 투두카드 폭 고정 */
 @media (max-width: 1024px) {
   .mobileTodoRow {
     display: flex !important;
@@ -329,7 +329,6 @@
     min-width: 0 !important;
   }
 
-  /* ✅ 한 줄 컨테이너 */
   .mobileTodoInlineCard {
     display: flex !important;
     align-items: center !important;
@@ -338,15 +337,13 @@
     min-width: 0 !important;
   }
 
-  /* ✅ 투두카드 영역: 모바일 기본 180 고정 */
   .todoCardWrap {
     width: 180px !important;
-    flex: 0 0 180px !important; /* grow=0, shrink=0 */
+    flex: 0 0 180px !important;
     min-width: 180px !important;
     max-width: 180px !important;
   }
 
-  /* ✅ 버튼은 오른쪽 고정 */
   .mobileAddBtnWrap {
     margin-left: auto !important;
     width: 112px !important;
@@ -354,7 +351,6 @@
   }
 }
 
-/* ✅ 태블릿만: 투두카드 폭 240 고정 */
 @media (min-width: 744px) and (max-width: 1024px) {
   .todoCardWrap {
     width: 240px !important;
@@ -364,7 +360,6 @@
   }
 }
 
-/* ✅ TodoCard 자체는 부모폭 100% */
 @media (max-width: 1024px) {
   .todoCardShell,
   .todoCardShellInner {
@@ -416,7 +411,7 @@
   .stage {
     width: 100%;
     max-width: 1024px;
-    margin-top: 32px; /* ✅ 요청 */
+    margin-top: 32px;
   }
 
   .body {
@@ -424,7 +419,7 @@
     gap: 0;
     justify-content: flex-start;
     align-items: stretch;
-    margin-top: 15px; /* ✅ 요청 */
+    margin-top: 15px;
   }
 
   .leftCol {
@@ -455,7 +450,7 @@
     max-width: 1024px;
     flex: 0 0 auto;
     background: #ffffff;
-    border-radius: 0; /* ✅ 요청: 테블릿 radius 제거 */
+    border-radius: 0;
     overflow: visible;
     min-width: 0;
   }
@@ -480,15 +475,6 @@
   .weekBar {
     margin-top: 16px;
     margin-bottom: 38px;
-  }
-}
-
-@media (min-width: 744px) and (max-width: 1024px) {
-  .mobileTodoInlineCard {
-    width: clamp(220px, 35vw, 270px);
-    flex: 0 0 clamp(220px, 35vw, 270px);
-    min-width: 220px;
-    max-width: 270px;
   }
 }
 
@@ -668,36 +654,30 @@
   padding: 28px;
 }
 
-/* ✅ TaskDetailCard header 레이아웃을 “X 단독 / 제목+케밥 한줄”로 강제 */
+/* ✅ TaskDetailCard header 레이아웃 */
 .detailOverlay :global([class*='TaskDetailCard-module__'][class*='header']) {
   display: grid !important;
   grid-template-columns: 1fr auto !important;
   grid-template-rows: auto auto !important;
-  grid-template-areas:
-    'close close'
-    'title kebab' !important;
+  grid-template-areas: 'close close' 'title kebab' !important;
   align-items: center !important;
 }
 
-/* X 버튼 */
 .detailOverlay :global([class*='TaskDetailCard-module__'][class*='closeButton']) {
   grid-area: close !important;
   justify-self: start !important;
   align-self: start !important;
 }
 
-/* 제목 */
 .detailOverlay :global([class*='TaskDetailCard-module__'][class*='title']) {
   grid-area: title !important;
 }
 
-/* 케밥 */
 .detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
   grid-area: kebab !important;
   justify-self: end !important;
 }
 
-/* 간격: PC/태블릿 74px, 모바일 20px */
 @media (min-width: 744px) {
   .detailOverlay :global([class*='TaskDetailCard-module__'][class*='title']),
   .detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
@@ -710,6 +690,12 @@
   .detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
     margin-top: 20px !important;
   }
+}
+
+/* ✅ 완료 시 TaskDetailCard title 줄+톤다운 (TaskDetailCard 안 건드림) */
+.detailInner[data-done='true'] :global([class*='TaskDetailCard-module__'][class*='title']) {
+  text-decoration: line-through !important;
+  opacity: 0.45 !important;
 }
 
 /* ✅ 모바일/태블릿: 애니메이션 제거 + 전체 화면 */
@@ -740,10 +726,6 @@
   }
 }
 
-:global(.TaskDetailCard-module__8btaCa__title) {
-  margin: 0 !important;
-}
-
 @media (max-width: 1024px) {
   .taskMenu {
     top: 52px !important;
@@ -752,86 +734,137 @@
   }
 }
 
-/* ===== Sidebar Team Select wrapper (PC/Drawer) ===== */
-.sidebarTeamSelectWrap {
-  position: relative;
+/* ✅ dropdown option disabled 스타일 */
+.todoListOption:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Mobile/Tablet Sidebar label overflow fix
+   =========================== */
+
+.drawerFixWrap {
   width: 100%;
+  min-width: 0;
 }
 
-.drawerTeamSelectWrap {
-  position: relative;
+.drawerFixWrap :global(button),
+.drawerFixWrap :global(a) {
+  min-width: 0;
+}
+
+.drawerFixWrap :global(span),
+.drawerFixWrap :global(p),
+.drawerFixWrap :global(div) {
+  min-width: 0;
+}
+
+.drawerFixWrap :global([class*='label']),
+.drawerFixWrap :global([class*='text']),
+.drawerFixWrap :global([class*='name']) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawerFixWrap :global(button:hover) *,
+.drawerFixWrap :global(button[aria-current='page']) *,
+.drawerFixWrap :global(button[aria-selected='true']) * {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== TeamHeader (settingBig 클릭 메뉴) ===== */
+.teamMenu {
+  position: absolute;
+  right: 12px;
+  top: 56px;
+  z-index: 60;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.teamMenuItem {
   width: 100%;
-  padding-bottom: 8px;
-}
-/* ✅ 모바일/태블릿: 투두카드 + "할일 추가" 한 줄로 (구조 변경 없이 CSS만) */
-@media (max-width: 1024px) {
-  /* 한 줄 컨테이너 */
-  .mobileTodoRow {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
+  padding: 10px 12px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  text-align: center;
+  cursor: pointer;
 }
 
-/* ✅ 모바일/태블릿: (1번처럼) 투두카드 + "할일 추가" 같은 줄 */
+.teamMenuItem:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+/* ===== 모바일/태블릿: 팀선택(hover) 시 내용이 박스 밖으로 튀는 문제 방지 ===== */
 @media (max-width: 1024px) {
-  /* row는 그냥 100% */
-  .mobileTodoRow {
-    width: 100% !important;
-    min-width: 0 !important;
+  :global([class*='SidebarTeamSelect-module__'] *),
+  :global([class*='SidebarButton-module__'] *),
+  :global([class*='SidebarAddButton-module__'] *) {
+    max-width: 100%;
   }
 
-  /* ✅ 여기서 핵심: 버튼이 같은 줄에 오도록 flex 컨테이너로 만든다 */
-  .mobileTodoInlineCard {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-
-    width: 100% !important;
-    flex: 1 1 auto !important;
-
-    /* 기존 clamp 고정폭 제거 */
-    min-width: 0 !important;
-    max-width: none !important;
+  :global([class*='SidebarTeamSelect-module__'] button),
+  :global([class*='SidebarTeamSelect-module__'] a),
+  :global([class*='SidebarButton-module__'] button),
+  :global([class*='SidebarButton-module__'] a) {
+    overflow: hidden;
   }
 
-  /* 투두카드 영역은 남는 공간 전부 먹게 */
-  .todoCardWrap {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-  }
-
-  .todoCardShell,
-  .todoCardShellInner {
-    width: 100% !important;
-  }
-
-  /* 버튼은 고정폭 유지하면서 오른쪽 */
-  .mobileAddBtnWrap {
-    margin-left: 0 !important;
-    flex: 0 0 112px !important;
-    width: 112px !important;
+  :global([class*='SidebarTeamSelect-module__'] span),
+  :global([class*='SidebarButton-module__'] span) {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
-@media (max-width: 1024px) {
-  /* ✅ 여기 폭 고정(clamp) 전부 무력화: row 전체 폭을 먹게 */
-  .mobileTodoInlineCard {
-    width: 100% !important;
-    max-width: none !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
 
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
+/* ✅ calendar popover */
+.calendarPopover {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  z-index: 80;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  padding: 10px;
+}
+
+/* ✅ 모바일/태블릿: 케밥 "버튼은 유지", 아이콘만 숨김 (드롭다운은 클릭으로 뜸) */
+@media (max-width: 1024px) {
+  /* TodoCard / TaskListItem 케밥 버튼 내부의 svg/img만 투명 */
+  :global([class*='TodoCard-module__'] svg),
+  :global([class*='TodoCard-module__'] img),
+  :global([class*='TaskListItem-module__'] svg),
+  :global([class*='TaskListItem-module__'] img) {
+    /* 전체를 죽이면 다른 아이콘도 죽을 수 있으니 아래 범위를 더 좁힘 */
   }
 
-  /* ✅ 버튼을 진짜 맨 오른쪽으로 */
-  .mobileAddBtnWrap {
-    margin-left: auto !important;
-    flex: 0 0 112px !important;
-    width: 112px !important;
+  :global([class*='TodoCard-module__'] [aria-label*='더보기'] svg),
+  :global([class*='TodoCard-module__'] [aria-label*='더보기'] img),
+  :global([class*='TodoCard-module__'] [aria-label*='kebab'] svg),
+  :global([class*='TodoCard-module__'] [aria-label*='kebab'] img),
+  :global([class*='TodoCard-module__'] [aria-label*='Kebab'] svg),
+  :global([class*='TodoCard-module__'] [aria-label*='Kebab'] img),
+  :global([class*='TaskListItem-module__'] [aria-label*='더보기'] svg),
+  :global([class*='TaskListItem-module__'] [aria-label*='더보기'] img),
+  :global([class*='TaskListItem-module__'] [aria-label*='kebab'] svg),
+  :global([class*='TaskListItem-module__'] [aria-label*='kebab'] img),
+  :global([class*='TaskListItem-module__'] [aria-label*='Kebab'] svg),
+  :global([class*='TaskListItem-module__'] [aria-label*='Kebab'] img) {
+    opacity: 0 !important;
   }
 }

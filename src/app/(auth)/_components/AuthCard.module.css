@@ -1,0 +1,46 @@
+.wrapper {
+  width: 100%;
+  max-width: 550px;
+}
+
+.card {
+  width: 100%;
+  background-color: var(--color-background-primary);
+  border-radius: 20px;
+  /* figma 시안: top 72px, right 45px, bottom 70px, left 45px */
+  padding: 72px 45px 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* PC/태블릿: logoLarge 표시 */
+.logoLarge {
+  display: block;
+}
+
+/* 모바일: logoSmall 표시 */
+.logoSmall {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .logoLarge {
+    display: none;
+  }
+
+  .logoSmall {
+    display: block;
+  }
+
+  .card {
+    padding: 48px 22px 40px;
+  }
+}

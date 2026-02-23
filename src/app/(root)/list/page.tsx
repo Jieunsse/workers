@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import styles from './list.module.css';
 
@@ -13,6 +14,7 @@ import MobileDrawer from '@/components/sidebar/MobileDrawer';
 
 import SidebarButton from '@/components/sidebar/SidebarButton';
 import SidebarAddButton from '@/components/sidebar/SidebarAddButton';
+import SidebarTeamSelect from '@/components/sidebar/SidebarTeamSelect';
 
 import WeekDateBar from '@/components/calendar/CalendarButton/WeekDateBar';
 
@@ -37,6 +39,8 @@ import type { CalenderModalSubmitPayload } from '@/components/Modal/domain/compo
 
 import AddTodoList from '@/components/Modal/domain/components/AddTodoList/AddTodoList';
 
+import Calendar from '@/components/calendar/Calendar';
+
 import {
   type ApiFrequency,
   type Task,
@@ -53,7 +57,6 @@ import {
   useUpdateTaskList,
 } from '@/app/(root)/list/hooks/queries';
 
-/** ✅ 체크박스/케밥/버튼 클릭이면 디테일 오픈 금지 */
 function isOpenDetailBlockedTarget(target: HTMLElement | null) {
   if (!target) return false;
 
@@ -86,34 +89,121 @@ function isOpenDetailBlockedTarget(target: HTMLElement | null) {
   return false;
 }
 
+function isKebabTrigger(target: HTMLElement | null) {
+  if (!target) return false;
+
+  const labeled = target.closest('[aria-label]') as HTMLElement | null;
+  if (labeled) {
+    const v = (labeled.getAttribute('aria-label') ?? '').toLowerCase();
+    if (v.includes('kebab') || v.includes('더보기') || v.includes('케밥')) return true;
+  }
+
+  const cls = (target.className ?? '').toString().toLowerCase();
+  if (cls.includes('kebab') || cls.includes('more')) return true;
+
+  if (target.tagName.toLowerCase() === 'svg' || target.tagName.toLowerCase() === 'path') {
+    const p = target.parentElement;
+    if (p && isKebabTrigger(p)) return true;
+  }
+
+  return false;
+}
+
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
 }
-
 function addMonths(base: Date, diff: number) {
   const d = new Date(base);
   d.setMonth(d.getMonth() + diff);
   return d;
 }
-
 function toDateKey(d: Date) {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
 }
-
-function toIsoAtStartOfDay(date: Date) {
+function pad2(n: number) {
+  return String(n).padStart(2, '0');
+}
+function tzOffsetString(date: Date) {
+  const offsetMin = -date.getTimezoneOffset();
+  const sign = offsetMin >= 0 ? '+' : '-';
+  const abs = Math.abs(offsetMin);
+  const hh = Math.floor(abs / 60);
+  const mm = abs % 60;
+  return `${sign}${pad2(hh)}:${pad2(mm)}`;
+}
+function toIsoWithOffset(date: Date) {
+  const y = date.getFullYear();
+  const m = pad2(date.getMonth() + 1);
+  const d = pad2(date.getDate());
+  const hh = pad2(date.getHours());
+  const mm = pad2(date.getMinutes());
+  const ss = pad2(date.getSeconds());
+  return `${y}-${m}-${d}T${hh}:${mm}:${ss}${tzOffsetString(date)}`;
+}
+function toLocalNoonIso(date: Date) {
   const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString();
+  d.setHours(12, 0, 0, 0);
+  return toIsoWithOffset(d);
 }
 
-function frequencyLabel(freq?: ApiFrequency) {
-  if (freq === 'DAILY') return '매일반복';
-  if (freq === 'WEEKLY') return '매주반복';
-  if (freq === 'MONTHLY') return '매월반복';
-  return undefined;
+function formatKoreanDateOnly(isoOrKey?: string) {
+  const raw = (isoOrKey ?? '').trim();
+  if (!raw) return '';
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const [y, m, d] = raw.split('-').map((v) => Number(v));
+    if (Number.isFinite(y) && Number.isFinite(m) && Number.isFinite(d))
+      return `${y}년 ${m}월 ${d}일`;
+    return raw;
+  }
+
+  const dt = new Date(raw);
+  if (Number.isNaN(dt.getTime())) return raw;
+
+  return `${dt.getFullYear()}년 ${dt.getMonth() + 1}월 ${dt.getDate()}일`;
+}
+
+function formatHHmmFromIso(iso?: string) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function parseTimeToHM(input?: string): { hh: number; mm: number } {
+  const raw = (input ?? '').trim();
+  if (!raw) return { hh: 9, mm: 0 };
+
+  const ko = raw.match(/(오전|오후)\s*(\d{1,2})\s*:\s*(\d{2})/);
+  if (ko) {
+    const ap = ko[1];
+    let h = Number(ko[2]);
+    const m = Number(ko[3]);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return { hh: 9, mm: 0 };
+    if (ap === '오후' && h < 12) h += 12;
+    if (ap === '오전' && h === 12) h = 0;
+    return { hh: h, mm: m };
+  }
+
+  const plain = raw.match(/(\d{1,2})\s*:\s*(\d{2})/);
+  if (plain) {
+    const h = Number(plain[1]);
+    const m = Number(plain[2]);
+    if (Number.isFinite(h) && Number.isFinite(m)) return { hh: h, mm: m };
+  }
+
+  return { hh: 9, mm: 0 };
+}
+
+type UiFrequency = 'ONCE' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
+function toUiFrequency(freq?: ApiFrequency): UiFrequency {
+  if (freq === 'DAILY') return 'DAILY';
+  if (freq === 'WEEKLY') return 'WEEKLY';
+  if (freq === 'MONTHLY') return 'MONTHLY';
+  return 'ONCE';
 }
 
 function safeDateFromPayload(v: unknown, fallback: Date) {
@@ -126,14 +216,193 @@ function safeDateFromPayload(v: unknown, fallback: Date) {
 }
 
 type TodoCardData = {
-  id: number; // taskListId
-  key: string; // `taskList-${id}`
+  id: number;
+  key: string;
   title: string;
   expanded: boolean;
   items: TodoItem[];
 };
 
+type ApiWeekDay =
+  | 'MONDAY'
+  | 'TUESDAY'
+  | 'WEDNESDAY'
+  | 'THURSDAY'
+  | 'FRIDAY'
+  | 'SATURDAY'
+  | 'SUNDAY';
+
+function toApiWeekDays(input: unknown): ApiWeekDay[] | undefined {
+  if (!Array.isArray(input)) return undefined;
+
+  const map: Record<string, ApiWeekDay> = {
+    mon: 'MONDAY',
+    monday: 'MONDAY',
+    '1': 'MONDAY',
+    월: 'MONDAY',
+    월요일: 'MONDAY',
+
+    tue: 'TUESDAY',
+    tuesday: 'TUESDAY',
+    '2': 'TUESDAY',
+    화: 'TUESDAY',
+    화요일: 'TUESDAY',
+
+    wed: 'WEDNESDAY',
+    wednesday: 'WEDNESDAY',
+    '3': 'WEDNESDAY',
+    수: 'WEDNESDAY',
+    수요일: 'WEDNESDAY',
+
+    thu: 'THURSDAY',
+    thursday: 'THURSDAY',
+    '4': 'THURSDAY',
+    목: 'THURSDAY',
+    목요일: 'THURSDAY',
+
+    fri: 'FRIDAY',
+    friday: 'FRIDAY',
+    '5': 'FRIDAY',
+    금: 'FRIDAY',
+    금요일: 'FRIDAY',
+
+    sat: 'SATURDAY',
+    saturday: 'SATURDAY',
+    '6': 'SATURDAY',
+    토: 'SATURDAY',
+    토요일: 'SATURDAY',
+
+    sun: 'SUNDAY',
+    sunday: 'SUNDAY',
+    '0': 'SUNDAY',
+    '7': 'SUNDAY',
+    일: 'SUNDAY',
+    일요일: 'SUNDAY',
+  };
+
+  const out: ApiWeekDay[] = [];
+  for (const v of input) {
+    if (typeof v !== 'string' && typeof v !== 'number') continue;
+    const s = String(v).trim();
+    const lower = s.toLowerCase();
+    const mapped = map[lower] ?? map[s];
+    if (mapped && !out.includes(mapped)) out.push(mapped);
+  }
+  return out.length > 0 ? out : undefined;
+}
+
+function getTaskIso(task: Task | null | undefined) {
+  const t = task as unknown as
+    | { date?: string; startDate?: string; startAt?: string; scheduledAt?: string }
+    | null
+    | undefined;
+  return t?.startDate ?? t?.date ?? t?.startAt ?? t?.scheduledAt ?? '';
+}
+
+function normalizeFreq(v: unknown): ApiFrequency {
+  const raw = typeof v === 'string' ? v.trim().toUpperCase() : '';
+  if (raw === 'DAILY') return 'DAILY';
+  if (raw === 'WEEKLY') return 'WEEKLY';
+  if (raw === 'MONTHLY') return 'MONTHLY';
+  return 'ONCE';
+}
+
+function getTaskFrequency(task: Task | null | undefined): ApiFrequency {
+  const t = task as unknown as
+    | {
+        frequency?: unknown;
+        frequencyType?: unknown;
+        repeatType?: unknown;
+      }
+    | null
+    | undefined;
+
+  return normalizeFreq(t?.frequencyType ?? t?.frequency ?? t?.repeatType);
+}
+
+function getTaskWeekDays(task: Task | null | undefined): ApiWeekDay[] | undefined {
+  const t = task as unknown as
+    | {
+        weekDays?: ApiWeekDay[];
+        repeatDays?: unknown;
+        repeatWeekDays?: ApiWeekDay[];
+      }
+    | null
+    | undefined;
+
+  if (Array.isArray(t?.weekDays) && t?.weekDays.length) return t.weekDays;
+  if (Array.isArray(t?.repeatWeekDays) && t?.repeatWeekDays.length) return t.repeatWeekDays;
+  const fromModalLike = toApiWeekDays(t?.repeatDays);
+  return fromModalLike;
+}
+
+function getTaskMonthDay(task: Task | null | undefined): number | undefined {
+  const t = task as unknown as { monthDay?: number; repeatMonthDay?: number } | null | undefined;
+  return t?.monthDay ?? t?.repeatMonthDay;
+}
+
+function normalizeIsoForUi(isoLike: string, fallbackDateKey: string) {
+  const raw = (isoLike ?? '').trim();
+  if (!raw) return toIsoWithOffset(new Date(`${fallbackDateKey}T09:00:00`));
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return toIsoWithOffset(new Date(`${raw}T09:00:00`));
+  return raw;
+}
+
+function weekDayKor(d: ApiWeekDay) {
+  if (d === 'MONDAY') return '월';
+  if (d === 'TUESDAY') return '화';
+  if (d === 'WEDNESDAY') return '수';
+  if (d === 'THURSDAY') return '목';
+  if (d === 'FRIDAY') return '금';
+  if (d === 'SATURDAY') return '토';
+  return '일';
+}
+
+function frequencyLabelFromTask(task: Task | null | undefined, fallbackDateKey: string) {
+  const freq = getTaskFrequency(task);
+
+  if (freq === 'DAILY') return '매일 반복';
+
+  if (freq === 'WEEKLY') {
+    const days = getTaskWeekDays(task);
+    if (days && days.length > 0) return `매주 반복(${days.map(weekDayKor).join(',')})`;
+    return '매주 반복';
+  }
+
+  if (freq === 'MONTHLY') {
+    const md = getTaskMonthDay(task);
+    if (typeof md === 'number' && Number.isFinite(md)) return `매월 반복(${md}일)`;
+
+    const iso = normalizeIsoForUi(getTaskIso(task), fallbackDateKey);
+    const d = new Date(iso);
+    if (!Number.isNaN(d.getTime())) return `매월 반복(${d.getDate()}일)`;
+    return '매월 반복';
+  }
+
+  return undefined;
+}
+
+function toModalRepeatDays(days?: ApiWeekDay[]) {
+  if (!days || days.length === 0) return [];
+  const map: Record<ApiWeekDay, string> = {
+    MONDAY: 'mon',
+    TUESDAY: 'tue',
+    WEDNESDAY: 'wed',
+    THURSDAY: 'thu',
+    FRIDAY: 'fri',
+    SATURDAY: 'sat',
+    SUNDAY: 'sun',
+  };
+  return days.map((d) => map[d]).filter(Boolean);
+}
+
+const ADD_TEAM_PATH = '/teams/new';
+const EDIT_TEAM_PATH = (groupId: number) => `/teams/${groupId}/edit`;
+
+type CreateTaskListResult = { id: number };
+
 export default function ListPage() {
+  const router = useRouter();
   const qc = useQueryClient();
   const desktopSidebarRef = useRef<HTMLDivElement | null>(null);
 
@@ -165,7 +434,6 @@ export default function ListPage() {
   const toggleDrawer = () => setDrawerOpen((p) => !p);
   const closeDrawer = () => setDrawerOpen(false);
 
-  /** ===== me -> groups ===== */
   const { data: me } = useMe();
 
   const groups = useMemo(() => {
@@ -176,7 +444,6 @@ export default function ListPage() {
     return list;
   }, [me?.memberships]);
 
-  /** ===== active group (effect 없이 fallback) ===== */
   const [activeGroupIdState, setActiveGroupIdState] = useState<number | undefined>(undefined);
   const activeGroupId = activeGroupIdState ?? groups[0]?.id ?? 0;
 
@@ -185,19 +452,28 @@ export default function ListPage() {
     [groups, activeGroupId],
   );
 
-  /** ===== group detail ===== */
-  const { data: groupDetail } = useGroupDetail(activeGroupId);
+  const groupDetailQuery = useGroupDetail(activeGroupId) as unknown as {
+    data?: { taskLists?: Array<{ id: number; name: string; displayIndex: number }> };
+    isLoading?: boolean;
+    isFetching?: boolean;
+  };
+  const groupDetail = groupDetailQuery.data;
+  const isGroupDetailLoading = !!groupDetailQuery.isLoading;
+  const isGroupDetailFetching = !!groupDetailQuery.isFetching;
 
+  const isGroupDetailReady = !!groupDetail && !isGroupDetailLoading && !isGroupDetailFetching;
   const taskLists = useMemo(() => groupDetail?.taskLists ?? [], [groupDetail?.taskLists]);
-  // const members = useMemo(() => groupDetail?.members ?? [], [groupDetail?.members]); // 필요시 사용
 
-  /** ===== dates ===== */
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const selectedDateKey = useMemo(() => toDateKey(selectedDate), [selectedDate]);
-  const selectedDateIso = useMemo(() => toIsoAtStartOfDay(selectedDate), [selectedDate]);
+  const selectedDateIso = useMemo(() => toLocalNoonIso(selectedDate), [selectedDate]);
 
-  /** ===== selected taskList (effect 없이 fallback) ===== */
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarWrapRef = useRef<HTMLDivElement | null>(null);
+  const toggleCalendar = () => setCalendarOpen((p) => !p);
+  const closeCalendar = () => setCalendarOpen(false);
+
   const firstTaskListId = useMemo(() => {
     const sorted = [...taskLists].sort((a, b) => a.displayIndex - b.displayIndex);
     return sorted[0]?.id ?? 0;
@@ -206,22 +482,37 @@ export default function ListPage() {
   const [selectedTaskListIdState, setSelectedTaskListIdState] = useState<number | undefined>(
     undefined,
   );
+
+  useEffect(() => {
+    queueMicrotask(() => setSelectedTaskListIdState(undefined));
+  }, [activeGroupId]);
+
   const selectedTaskListId = selectedTaskListIdState ?? firstTaskListId;
+  const selectedTodoKey = selectedTaskListId ? `taskList-${selectedTaskListId}` : 'taskList-0';
 
-  const selectedTodoKey = selectedTaskListId ? `taskList-${selectedTaskListId}` : '';
-
-  /** ===== tasks by date ===== */
   const { data: taskListByDate } = useTaskListByDate({
     groupId: activeGroupId,
     taskListId: selectedTaskListId,
     dateIso: selectedDateIso,
   });
-
   const tasks = useMemo(() => taskListByDate?.tasks ?? [], [taskListByDate?.tasks]);
 
-  /** ===== TodoCard preview (선택된 리스트만 3개 preview) ===== */
   const todoCardsWithPreview: TodoCardData[] = useMemo(() => {
+    if (!isGroupDetailReady) return [];
+
     const sorted = [...taskLists].sort((a, b) => a.displayIndex - b.displayIndex);
+
+    if (sorted.length === 0) {
+      return [
+        {
+          id: 0,
+          key: 'taskList-0',
+          title: '제목 없음',
+          expanded: false,
+          items: [],
+        },
+      ];
+    }
 
     return sorted.map((tl) => {
       const isSelected = tl.id === selectedTaskListId;
@@ -240,15 +531,30 @@ export default function ListPage() {
         items: preview,
       };
     });
-  }, [taskLists, tasks, selectedTaskListId]);
+  }, [taskLists, tasks, selectedTaskListId, isGroupDetailReady]);
 
-  const selectedTodo = useMemo(
-    () => todoCardsWithPreview.find((c) => c.key === selectedTodoKey) ?? todoCardsWithPreview[0],
-    [todoCardsWithPreview, selectedTodoKey],
-  );
+  const selectedTodo = useMemo(() => {
+    if (!isGroupDetailReady)
+      return { id: 0, key: 'taskList-0', title: '', expanded: false, items: [] };
 
-  /** ===== selected task (effect 없이 안전 fallback) ===== */
+    return (
+      todoCardsWithPreview.find((c) => c.key === selectedTodoKey) ??
+      todoCardsWithPreview[0] ?? {
+        id: 0,
+        key: 'taskList-0',
+        title: '제목 없음',
+        expanded: false,
+        items: [],
+      }
+    );
+  }, [todoCardsWithPreview, selectedTodoKey, isGroupDetailReady]);
+
   const [selectedTaskIdState, setSelectedTaskIdState] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    queueMicrotask(() => setSelectedTaskIdState(undefined));
+  }, [selectedTaskListId, selectedDateIso]);
+
   const selectedTaskId =
     selectedTaskIdState && tasks.some((t) => t.id === selectedTaskIdState)
       ? selectedTaskIdState
@@ -259,17 +565,19 @@ export default function ListPage() {
     [tasks, selectedTaskId],
   );
 
-  /** ===== modals: taskList ===== */
   const [addTodoOpen, setAddTodoOpen] = useState(false);
   const [todoEditTarget, setTodoEditTarget] = useState<TodoCardData | null>(null);
+  const [todoNameDraft, setTodoNameDraft] = useState('');
 
   const openTodoCreate = () => {
     setTodoEditTarget(null);
+    setTodoNameDraft('');
     setAddTodoOpen(true);
   };
 
   const openTodoEdit = (card: TodoCardData) => {
     setTodoEditTarget(card);
+    setTodoNameDraft(card.title === '제목 없음' ? '' : card.title);
     setAddTodoOpen(true);
   };
 
@@ -278,16 +586,14 @@ export default function ListPage() {
   const deleteTaskList = useDeleteTaskList();
 
   const handleSubmitTodoModal = async () => {
-    const input = document.querySelector<HTMLInputElement>('input[name="todo"]');
-    const name = (input?.value ?? '').trim();
+    const name = todoNameDraft.trim();
     if (!name) return;
-
     if (!activeGroupId) return;
 
-    if (!todoEditTarget) {
-      const created = await createTaskList.mutateAsync({ groupId: activeGroupId, name });
-      // 생성 후 그 리스트로 선택
-      setSelectedTaskListIdState(created.id);
+    if (!todoEditTarget || todoEditTarget.id === 0) {
+      const createdUnknown = await createTaskList.mutateAsync({ groupId: activeGroupId, name });
+      const created = createdUnknown as unknown as CreateTaskListResult;
+      if (created?.id) setSelectedTaskListIdState(created.id);
     } else {
       await updateTaskList.mutateAsync({
         groupId: activeGroupId,
@@ -299,9 +605,9 @@ export default function ListPage() {
 
     setAddTodoOpen(false);
     setTodoEditTarget(null);
+    setTodoNameDraft('');
   };
 
-  /** ===== modals: task ===== */
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [taskEditTarget, setTaskEditTarget] = useState<Task | null>(null);
 
@@ -346,10 +652,14 @@ export default function ListPage() {
     );
 
     const start = new Date(base);
-    const time = (payload.startTime ?? '09:00').split(':');
-    const hh = Number(time[0] ?? 9);
-    const mm = Number(time[1] ?? 0);
-    start.setHours(Number.isFinite(hh) ? hh : 9, Number.isFinite(mm) ? mm : 0, 0, 0);
+    const { hh, mm } = parseTimeToHM(payload.startTime);
+    start.setHours(hh, mm, 0, 0);
+
+    const rawRepeatDays = (payload as unknown as { repeatDays?: unknown }).repeatDays;
+    const weekDays = freq === 'WEEKLY' ? toApiWeekDays(rawRepeatDays) : undefined;
+    const monthDay = freq === 'MONTHLY' ? start.getDate() : undefined;
+
+    const startIso = toIsoWithOffset(start);
 
     if (!taskEditTarget) {
       await createTask.mutateAsync({
@@ -357,24 +667,32 @@ export default function ListPage() {
         taskListId: selectedTaskListId,
         name: title,
         description: memo,
-        startDate: start.toISOString(),
+        startDate: startIso,
         frequencyType: freq,
+        weekDays,
+        monthDay,
       });
+
       await invalidateCurrentList();
       setCalendarModalOpen(false);
       setTaskEditTarget(null);
       return;
     }
 
+    const body = {
+      name: title,
+      description: memo,
+      startDate: startIso,
+      frequencyType: freq,
+      weekDays,
+      monthDay,
+    };
+
     await patchTask.mutateAsync({
       groupId: activeGroupId,
       taskListId: selectedTaskListId,
       taskId: taskEditTarget.id,
-      body: {
-        name: title,
-        description: memo,
-        date: start.toISOString(),
-      },
+      body: body as unknown as never,
     });
 
     await invalidateCurrentList();
@@ -382,37 +700,63 @@ export default function ListPage() {
     setTaskEditTarget(null);
   };
 
-  /** ===== kebab close outside ===== */
   const [openedTaskMenuId, setOpenedTaskMenuId] = useState<number | null>(null);
   const [openedTodoMenuKey, setOpenedTodoMenuKey] = useState<string | null>(null);
   const [todoListDropdownOpen, setTodoListDropdownOpen] = useState(false);
+
+  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
 
   useEffect(() => {
     const onDoc = (ev: globalThis.MouseEvent) => {
       const t = ev.target as HTMLElement | null;
       if (!t) return;
 
-      if (openedTaskMenuId !== null && !t.closest(`.${styles.taskMenu}`)) setOpenedTaskMenuId(null);
-      if (openedTodoMenuKey !== null && !t.closest(`.${styles.kebabMenu}`))
-        setOpenedTodoMenuKey(null);
-      if (todoListDropdownOpen && !t.closest(`.${styles.todoListDropdown}`))
+      if (calendarOpen) {
+        if (t.closest(`.${styles.calendarPopover}`) || t.closest(`.${styles.calendarBtn}`)) {
+          // no-op
+        } else {
+          setCalendarOpen(false);
+        }
+      }
+
+      if (t.closest(`.${styles.taskMenu}`) || t.closest(`.${styles.kebabMenu}`)) return;
+      if (isKebabTrigger(t)) return;
+
+      if (openedTaskMenuId !== null) setOpenedTaskMenuId(null);
+      if (openedTodoMenuKey !== null) setOpenedTodoMenuKey(null);
+
+      if (todoListDropdownOpen) {
+        if (t.closest(`.${styles.todoListDropdown}`)) return;
+
+        const labeled = t.closest('[aria-label]') as HTMLElement | null;
+        const label = (labeled?.getAttribute('aria-label') ?? '').toLowerCase();
+        if (label.includes('할 일 목록 열기')) return;
+
         setTodoListDropdownOpen(false);
+      }
+
+      if (teamMenuOpen) {
+        if (t.closest(`.${styles.teamMenu}`)) return;
+        if (t.closest('[class*="TeamHeader-module__"][class*="settingBig"]')) return;
+        setTeamMenuOpen(false);
+      }
     };
 
     document.addEventListener('click', onDoc);
     return () => document.removeEventListener('click', onDoc);
-  }, [openedTaskMenuId, openedTodoMenuKey, todoListDropdownOpen]);
+  }, [openedTaskMenuId, openedTodoMenuKey, todoListDropdownOpen, teamMenuOpen, calendarOpen]);
 
   const handleSelectTodoList = (key: string) => {
     const id = Number(key.replace('taskList-', ''));
     if (!Number.isFinite(id) || id <= 0) return;
+
     setSelectedTaskListIdState(id);
     setTodoListDropdownOpen(false);
     setOpenedTodoMenuKey(null);
-    // task 선택은 fallback 로직이 자동 처리
+    setOpenedTaskMenuId(null);
+    setSelectedTaskIdState(undefined);
   };
 
-  /** ===== detail overlay ===== */
   const [detailMounted, setDetailMounted] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
 
@@ -450,6 +794,11 @@ export default function ListPage() {
   };
 
   const handleOpenDetail = (taskId: number) => {
+    if (!taskId) return;
+
+    setOpenedTaskMenuId(null);
+    setOpenedTodoMenuKey(null);
+
     if (detailMounted && detailOpen && taskId === selectedTaskId) {
       closeDetail();
       return;
@@ -458,7 +807,6 @@ export default function ListPage() {
     openDetail();
   };
 
-  /** ===== detail comments ===== */
   const { data: detailComments = [] } = useTaskComments(selectedTaskId);
   const createComment = useCreateTaskComment();
 
@@ -470,7 +818,6 @@ export default function ListPage() {
     };
   }, [me]);
 
-  /** ===== profile image (no <img>) ===== */
   const profile40 = useMemo(() => {
     const url = me?.image || '';
     return (
@@ -505,14 +852,11 @@ export default function ListPage() {
     );
   }, [me?.image]);
 
-  /** ===== handlers ===== */
   const handleSelectGroup = (groupId: number) => {
     setActiveGroupIdState(groupId);
-    // 그룹 변경 시 selection state 초기화 (effect 없이)
-    setSelectedTaskListIdState(undefined);
-    setSelectedTaskIdState(undefined);
     setOpenedTaskMenuId(null);
     setOpenedTodoMenuKey(null);
+    setTeamMenuOpen(false);
     closeDrawer();
   };
 
@@ -523,9 +867,7 @@ export default function ListPage() {
       groupId: activeGroupId,
       taskListId: selectedTaskListId,
       taskId,
-      body: {
-        doneAt: nextDone ? new Date().toISOString() : null,
-      },
+      body: { doneAt: nextDone ? new Date().toISOString() : null } as unknown as never,
     });
 
     await invalidateCurrentList();
@@ -545,8 +887,122 @@ export default function ListPage() {
     if (detailMounted && selectedTaskId === taskId) closeDetail();
   };
 
+  const deleteGroup = async (groupId: number) => {
+    console.warn('TODO: deleteGroup API not wired', groupId);
+    await qc.invalidateQueries({ queryKey: ['me'] });
+  };
+
+  const handleClickTeamEdit = () => {
+    if (!activeGroupId) return;
+    setTeamMenuOpen(false);
+    router.push(EDIT_TEAM_PATH(activeGroupId));
+  };
+
+  const handleClickTeamDelete = async () => {
+    if (!activeGroupId) return;
+    setTeamMenuOpen(false);
+
+    const ok = window.confirm('정말 팀을 삭제할까요? (삭제 시 복구 불가)');
+    if (!ok) return;
+
+    await deleteGroup(activeGroupId);
+
+    const first = groups[0]?.id;
+    if (first) handleSelectGroup(first);
+  };
+
+  const drawerContent = (
+    <>
+      <SidebarTeamSelect
+        icon={<Image src={chessSmall} alt="" width={20} height={20} />}
+        label="팀 선택"
+        isSelected={false}
+      />
+
+      {groups.map((g) => (
+        <SidebarButton
+          key={g.id}
+          icon={<Image src={chessSmall} alt="" width={20} height={20} />}
+          label={g.name}
+          isActive={g.id === activeGroupId}
+          onClick={() => handleSelectGroup(g.id)}
+        />
+      ))}
+
+      <SidebarAddButton
+        label="팀 추가하기"
+        onClick={() => {
+          closeDrawer();
+          router.push(ADD_TEAM_PATH);
+        }}
+      />
+
+      <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
+
+      <SidebarButton
+        icon={<Image src={boardSmall} alt="" width={20} height={20} />}
+        label="자유게시판"
+        onClick={() => {}}
+      />
+    </>
+  );
+
+  const hasRealTaskList = isGroupDetailReady && taskLists.length > 0;
+
+  const selectedIso = normalizeIsoForUi(getTaskIso(selectedTask), selectedDateKey);
+  const selectedFreq = getTaskFrequency(selectedTask);
+
+  const handleTeamHeaderClickCapture = (e: ReactMouseEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (!t) return;
+
+    if (t.closest('[class*="TeamHeader-module__"][class*="settingBig"]')) {
+      e.preventDefault();
+      e.stopPropagation();
+      setTeamMenuOpen((p) => !p);
+    }
+  };
+
+  const calendarInitialValues = useMemo(() => {
+    if (!taskEditTarget) {
+      return {
+        startDate: selectedDate,
+        startTime: '09:00',
+        repeatType: 'none',
+        repeatDays: [],
+      };
+    }
+
+    const iso = normalizeIsoForUi(getTaskIso(taskEditTarget), selectedDateKey);
+    const dt = new Date(iso);
+    const freq = getTaskFrequency(taskEditTarget);
+    const startDate = Number.isNaN(dt.getTime()) ? selectedDate : dt;
+
+    return {
+      todoTitle: taskEditTarget.name ?? '',
+      memo: taskEditTarget.description ?? '',
+      startDate,
+      startTime: formatHHmmFromIso(iso) || '09:00',
+      repeatType:
+        freq === 'DAILY'
+          ? 'daily'
+          : freq === 'WEEKLY'
+            ? 'weekly'
+            : freq === 'MONTHLY'
+              ? 'monthly'
+              : 'none',
+      repeatDays: freq === 'WEEKLY' ? toModalRepeatDays(getTaskWeekDays(taskEditTarget)) : [],
+    };
+  }, [taskEditTarget, selectedDate, selectedDateKey]);
+
   return (
     <main className={styles.page}>
+      <style jsx global>{`
+        .TaskDetailCard-module__8btaCa__title {
+          margin: 0 !important;
+        }
+      `}</style>
+
       {isPc ? (
         <div ref={desktopSidebarRef} className={styles.desktopSidebar}>
           <Sidebar
@@ -554,39 +1010,66 @@ export default function ListPage() {
             profileName={me?.nickname ?? ''}
             profileTeam={activeGroup?.name ?? ''}
             profileImage={profile40}
-          >
-            {(isCollapsed) => (
+            teamSelect={(isCollapsed) =>
+              !isCollapsed ? (
+                <SidebarTeamSelect
+                  icon={<Image src={chessSmall} alt="" width={20} height={20} />}
+                  label="팀 선택"
+                  isSelected={false}
+                />
+              ) : null
+            }
+            addButton={(isCollapsed) => (
               <>
-                {groups.map((g) => (
-                  <SidebarButton
-                    key={g.id}
-                    icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                    label={g.name}
-                    iconOnly={isCollapsed}
-                    isActive={g.id === activeGroupId}
-                    onClick={() => handleSelectGroup(g.id)}
-                  />
-                ))}
-
                 {!isCollapsed ? (
                   <SidebarAddButton
                     label="팀 추가하기"
-                    onClick={() => {
-                      /* 라우팅 필요하면 여기 */
-                    }}
+                    onClick={() => router.push(ADD_TEAM_PATH)}
                   />
                 ) : null}
 
                 <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
 
                 <SidebarButton
-                  icon={<Image src={boardSmall} alt="" width={20} height={20} />}
+                  icon={
+                    <Image
+                      src={boardSmall}
+                      alt=""
+                      width={isCollapsed ? 24 : 20}
+                      height={isCollapsed ? 24 : 20}
+                    />
+                  }
                   label="자유게시판"
                   iconOnly={isCollapsed}
                   onClick={() => {}}
                 />
               </>
             )}
+          >
+            {(isCollapsed) =>
+              !isCollapsed ? (
+                groups.map((g) => (
+                  <SidebarButton
+                    key={g.id}
+                    icon={<Image src={chessSmall} alt="" width={20} height={20} />}
+                    label={g.name}
+                    isActive={g.id === activeGroupId}
+                    onClick={() => handleSelectGroup(g.id)}
+                  />
+                ))
+              ) : (
+                <SidebarButton
+                  icon={<Image src={chessSmall} alt="" width={24} height={24} />}
+                  label={activeGroup?.name ?? ''}
+                  isActive
+                  iconOnly
+                  onClick={() => {
+                    const first = groups[0]?.id;
+                    if (first) handleSelectGroup(first);
+                  }}
+                />
+              )
+            }
           </Sidebar>
         </div>
       ) : null}
@@ -604,37 +1087,35 @@ export default function ListPage() {
 
       {isMobileUi ? (
         <MobileDrawer isOpen={drawerOpen} onClose={closeDrawer}>
-          <>
-            {groups.map((g) => (
-              <SidebarButton
-                key={g.id}
-                icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                label={g.name}
-                isActive={g.id === activeGroupId}
-                onClick={() => handleSelectGroup(g.id)}
-              />
-            ))}
-
-            <SidebarAddButton label="팀 추가하기" onClick={closeDrawer} />
-
-            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-
-            <SidebarButton
-              icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-              label="자유게시판"
-              onClick={closeDrawer}
-            />
-          </>
+          {drawerContent}
         </MobileDrawer>
       ) : null}
 
       <section className={styles.mainContents}>
         <div className={styles.stage}>
-          <div className={styles.teamHeaderPad}>
+          <div
+            className={styles.teamHeaderPad}
+            style={{ position: 'relative' }}
+            onClickCapture={handleTeamHeaderClickCapture}
+          >
             <TeamHeader variant="list" teamName={activeGroup?.name ?? ''} settingsHref="" />
+
+            {teamMenuOpen ? (
+              <div className={styles.teamMenu} role="menu" aria-label="팀 설정 메뉴">
+                <button type="button" className={styles.teamMenuItem} onClick={handleClickTeamEdit}>
+                  수정하기
+                </button>
+                <button
+                  type="button"
+                  className={styles.teamMenuItem}
+                  onClick={handleClickTeamDelete}
+                >
+                  삭제하기
+                </button>
+              </div>
+            ) : null}
           </div>
 
-          {/* Mobile Todo dropdown */}
           <section className={styles.mobileTodoSection} aria-label="할 일 목록">
             <span className={styles.mobileTodoLabel}>할 일</span>
 
@@ -648,6 +1129,7 @@ export default function ListPage() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setTodoListDropdownOpen((prev) => !prev);
+                      setOpenedTodoMenuKey(null);
                     }}
                   >
                     <Image src={downArrowSmall} alt="" width={16} height={16} />
@@ -657,17 +1139,59 @@ export default function ListPage() {
                     <div
                       className={`${styles.todoCardShellInner} ${styles.todoCardShellCollapsed}`}
                     >
-                      {selectedTodo ? (
-                        <TodoCard
-                          title={selectedTodo.title}
-                          items={selectedTodo.items}
-                          expanded={false}
-                          onKebabClick={() => {}}
-                          onItemCheckedChange={() => {}}
-                        />
-                      ) : null}
+                      <TodoCard
+                        title={selectedTodo.title}
+                        items={selectedTodo.items}
+                        expanded={false}
+                        onKebabClick={() => {
+                          if (selectedTodo.id === 0) {
+                            openTodoCreate();
+                            return;
+                          }
+                          setOpenedTodoMenuKey((prev) =>
+                            prev === selectedTodo.key ? null : selectedTodo.key,
+                          );
+                          setTodoListDropdownOpen(false);
+                        }}
+                        onItemCheckedChange={() => {}}
+                      />
                     </div>
                   </div>
+
+                  {openedTodoMenuKey === selectedTodo.key && selectedTodo.id !== 0 ? (
+                    <div className={styles.kebabMenu} role="menu" aria-label="할 일 목록 메뉴">
+                      <button
+                        type="button"
+                        className={styles.kebabItem}
+                        onClick={() => {
+                          setOpenedTodoMenuKey(null);
+                          openTodoEdit(selectedTodo);
+                        }}
+                      >
+                        수정하기
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.kebabItem}
+                        onClick={async () => {
+                          setOpenedTodoMenuKey(null);
+                          if (!activeGroupId) return;
+
+                          await deleteTaskList.mutateAsync({
+                            groupId: activeGroupId,
+                            taskListId: selectedTodo.id,
+                          });
+
+                          if (selectedTaskListId === selectedTodo.id) {
+                            setSelectedTaskListIdState(undefined);
+                            setSelectedTaskIdState(undefined);
+                          }
+                        }}
+                      >
+                        삭제하기
+                      </button>
+                    </div>
+                  ) : null}
 
                   {todoListDropdownOpen ? (
                     <div
@@ -682,7 +1206,14 @@ export default function ListPage() {
                           role="option"
                           className={styles.todoListOption}
                           aria-selected={c.key === selectedTodoKey}
-                          onClick={() => handleSelectTodoList(c.key)}
+                          onClick={() => {
+                            if (c.id === 0) {
+                              openTodoCreate();
+                              setTodoListDropdownOpen(false);
+                              return;
+                            }
+                            handleSelectTodoList(c.key);
+                          }}
                         >
                           {c.title}
                         </button>
@@ -699,7 +1230,6 @@ export default function ListPage() {
           </section>
 
           <div className={styles.body}>
-            {/* LEFT (PC) */}
             <section className={styles.leftCol} aria-label="할 일 목록(PC)">
               <h3 className={styles.leftTitle}>할 일</h3>
 
@@ -708,22 +1238,36 @@ export default function ListPage() {
                   <div key={card.key} className={styles.todoCardWrap}>
                     <div
                       className={styles.todoCardShell}
-                      onClick={() => handleSelectTodoList(card.key)}
+                      onClick={(e: ReactMouseEvent<HTMLDivElement>) => {
+                        const t = e.target as HTMLElement | null;
+                        if (!t) return;
+                        if (isKebabTrigger(t)) return;
+
+                        if (card.id === 0) {
+                          openTodoCreate();
+                          return;
+                        }
+                        handleSelectTodoList(card.key);
+                      }}
                     >
                       <div className={styles.todoCardShellInner}>
                         <TodoCard
                           title={card.title}
                           items={card.items}
                           expanded={card.expanded}
-                          onKebabClick={() =>
-                            setOpenedTodoMenuKey((prev) => (prev === card.key ? null : card.key))
-                          }
+                          onKebabClick={() => {
+                            if (card.id === 0) {
+                              openTodoCreate();
+                              return;
+                            }
+                            setOpenedTodoMenuKey((prev) => (prev === card.key ? null : card.key));
+                          }}
                           onItemCheckedChange={() => {}}
                         />
                       </div>
                     </div>
 
-                    {openedTodoMenuKey === card.key ? (
+                    {openedTodoMenuKey === card.key && card.id !== 0 ? (
                       <div className={styles.kebabMenu} role="menu" aria-label="할 일 목록 메뉴">
                         <button
                           type="button"
@@ -741,12 +1285,12 @@ export default function ListPage() {
                           onClick={async () => {
                             setOpenedTodoMenuKey(null);
                             if (!activeGroupId) return;
+
                             await deleteTaskList.mutateAsync({
                               groupId: activeGroupId,
                               taskListId: card.id,
                             });
 
-                            // 삭제한 리스트가 선택중이면 selection reset
                             if (selectedTaskListId === card.id) {
                               setSelectedTaskListIdState(undefined);
                               setSelectedTaskIdState(undefined);
@@ -768,12 +1312,11 @@ export default function ListPage() {
               </div>
             </section>
 
-            {/* RIGHT */}
             <section className={styles.rightWrap} aria-label="선택된 목록의 할 일">
               <div className={styles.rightPanel}>
                 <div className={styles.panelHeader}>
                   <h2 className={styles.panelTitle}>
-                    {selectedTodo?.title ?? '할 일을 입력해주세요..'}
+                    {isGroupDetailReady ? selectedTodo.title : ''}
                   </h2>
 
                   <div className={styles.panelControls}>
@@ -792,9 +1335,31 @@ export default function ListPage() {
                       />
                     </div>
 
-                    <button type="button" className={styles.calendarBtn} aria-label="달력">
-                      <Image src={calendarIcon} alt="" width={16} height={16} />
-                    </button>
+                    <div ref={calendarWrapRef} style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        className={styles.calendarBtn}
+                        aria-label="달력"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCalendar();
+                        }}
+                      >
+                        <Image src={calendarIcon} alt="" width={16} height={16} />
+                      </button>
+
+                      {calendarOpen ? (
+                        <div className={styles.calendarPopover} role="dialog" aria-modal="false">
+                          <Calendar
+                            value={selectedDate}
+                            onChange={(v) => {
+                              if (v) setSelectedDate(v);
+                              closeCalendar();
+                            }}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
 
@@ -806,69 +1371,101 @@ export default function ListPage() {
                   />
                 </div>
 
-                <div className={styles.taskList}>
-                  {tasks.length === 0 ? (
-                    <div className={styles.emptyTasks}>선택한 날짜에 할 일이 없습니다.</div>
-                  ) : (
-                    tasks.map((task) => (
+                {!isGroupDetailReady ? (
+                  <div className={styles.taskList}>
+                    <div style={{ padding: 12, opacity: 0.5 }}>불러오는 중...</div>
+                  </div>
+                ) : (
+                  <div className={styles.taskList}>
+                    {!hasRealTaskList || tasks.length === 0 ? (
                       <div
-                        key={task.id}
                         className={styles.taskRowClick}
-                        onClick={(e: MouseEvent) => {
-                          const t = e.target as HTMLElement | null;
-                          if (isOpenDetailBlockedTarget(t)) return;
-                          handleOpenDetail(task.id);
-                        }}
+                        onClick={() => (hasRealTaskList ? openTaskCreate() : openTodoCreate())}
+                        role="button"
+                        tabIndex={0}
                       >
-                        <div style={{ position: 'relative' }}>
-                          <TaskListItem
-                            title={task.name}
-                            date={selectedDateKey}
-                            checked={!!task.doneAt}
-                            isSelected={task.id === selectedTaskId}
-                            commentCount={task.commentCount}
-                            frequency={frequencyLabel(task.frequency)}
-                            onCheckedChange={async (checked) => {
-                              await handleToggleDone(task.id, checked);
-                            }}
-                            onKebabClick={() =>
-                              setOpenedTaskMenuId((prev) => (prev === task.id ? null : task.id))
-                            }
-                          />
-
-                          {openedTaskMenuId === task.id ? (
-                            <ul className={styles.taskMenu} role="menu" aria-label="할 일 메뉴">
-                              <li>
-                                <button
-                                  type="button"
-                                  className={styles.taskMenuItem}
-                                  onClick={() => {
-                                    setOpenedTaskMenuId(null);
-                                    openTaskEdit(task);
-                                  }}
-                                >
-                                  수정하기
-                                </button>
-                              </li>
-                              <li>
-                                <button
-                                  type="button"
-                                  className={styles.taskMenuItem}
-                                  onClick={async () => {
-                                    setOpenedTaskMenuId(null);
-                                    await handleDeleteTask(task.id);
-                                  }}
-                                >
-                                  삭제하기
-                                </button>
-                              </li>
-                            </ul>
-                          ) : null}
-                        </div>
+                        <TaskListItem
+                          title={
+                            hasRealTaskList
+                              ? '할 일을 추가해 주세요'
+                              : '할 일 목록을 먼저 만들어 주세요'
+                          }
+                          date={formatKoreanDateOnly(selectedDateKey)}
+                          checked={false}
+                          isSelected={false}
+                          commentCount={0}
+                          frequency={undefined}
+                          onCheckedChange={() => {}}
+                          onKebabClick={() => {}}
+                        />
                       </div>
-                    ))
-                  )}
-                </div>
+                    ) : (
+                      tasks.map((task) => {
+                        const taskIso = normalizeIsoForUi(getTaskIso(task), selectedDateKey);
+
+                        return (
+                          <div
+                            key={task.id}
+                            className={styles.taskRowClick}
+                            onClick={(e: ReactMouseEvent<HTMLDivElement>) => {
+                              const t = e.target as HTMLElement | null;
+                              if (isOpenDetailBlockedTarget(t)) return;
+                              handleOpenDetail(task.id);
+                            }}
+                          >
+                            <div style={{ position: 'relative' }}>
+                              <TaskListItem
+                                title={task.name}
+                                date={formatKoreanDateOnly(taskIso)}
+                                checked={!!task.doneAt}
+                                isSelected={task.id === selectedTaskId}
+                                commentCount={task.commentCount}
+                                frequency={frequencyLabelFromTask(task, selectedDateKey)}
+                                onCheckedChange={async (checked) => {
+                                  await handleToggleDone(task.id, checked);
+                                }}
+                                onKebabClick={() => {
+                                  setOpenedTaskMenuId((prev) =>
+                                    prev === task.id ? null : task.id,
+                                  );
+                                }}
+                              />
+
+                              {openedTaskMenuId === task.id ? (
+                                <ul className={styles.taskMenu} role="menu" aria-label="할 일 메뉴">
+                                  <li>
+                                    <button
+                                      type="button"
+                                      className={styles.taskMenuItem}
+                                      onClick={() => {
+                                        setOpenedTaskMenuId(null);
+                                        openTaskEdit(task);
+                                      }}
+                                    >
+                                      수정하기
+                                    </button>
+                                  </li>
+                                  <li>
+                                    <button
+                                      type="button"
+                                      className={styles.taskMenuItem}
+                                      onClick={async () => {
+                                        setOpenedTaskMenuId(null);
+                                        await handleDeleteTask(task.id);
+                                      }}
+                                    >
+                                      삭제하기
+                                    </button>
+                                  </li>
+                                </ul>
+                              ) : null}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className={styles.fab}>
@@ -878,7 +1475,6 @@ export default function ListPage() {
           </div>
         </div>
 
-        {/* ✅ Detail Overlay */}
         {detailMounted && selectedTask ? (
           <div
             className={`${styles.detailOverlay} ${detailOpen ? styles.detailOpen : styles.detailClose}`}
@@ -891,14 +1487,14 @@ export default function ListPage() {
                 id={selectedTask.id}
                 name={selectedTask.name}
                 description={selectedTask.description ?? ''}
-                date={selectedTask.date}
-                frequency={selectedTask.frequency}
+                date={selectedIso}
+                frequency={toUiFrequency(selectedFreq)}
                 writer={{
                   id: selectedTask.writer?.id ?? meWriter.id,
                   nickname: selectedTask.writer?.nickname ?? meWriter.nickname,
                   image: selectedTask.writer?.image ?? meWriter.image,
                 }}
-                doneAt={selectedTask.doneAt}
+                doneAt={(selectedTask.doneAt as string | null) ?? null}
                 comments={detailComments}
                 onComplete={async () => {
                   await handleToggleDone(selectedTask.id, !selectedTask.doneAt);
@@ -925,12 +1521,20 @@ export default function ListPage() {
           onClose={() => {
             setAddTodoOpen(false);
             setTodoEditTarget(null);
+            setTodoNameDraft('');
           }}
           onSubmit={handleSubmitTodoModal}
           text={{
             title: '할 일 목록',
-            submitLabel: todoEditTarget ? '수정하기' : '만들기',
+            submitLabel: todoEditTarget && todoEditTarget.id !== 0 ? '수정하기' : '만들기',
             inputPlaceholder: '할 일을 입력하세요',
+          }}
+          input={{
+            props: {
+              value: todoNameDraft,
+              onChange: (e) => setTodoNameDraft(e.target.value),
+              autoFocus: true,
+            },
           }}
           closeOptions={{ overlayClick: true, escape: true }}
         />
@@ -946,23 +1550,7 @@ export default function ListPage() {
             title: taskEditTarget ? '할 일 수정하기' : '할 일 만들기',
             submitLabel: taskEditTarget ? '수정하기' : '만들기',
           }}
-          initialValues={
-            taskEditTarget
-              ? {
-                  todoTitle: taskEditTarget.name ?? '',
-                  memo: taskEditTarget.description ?? '',
-                  startDate: selectedDate,
-                  startTime: '09:00',
-                  repeatType: 'none',
-                  repeatDays: [],
-                }
-              : {
-                  startDate: selectedDate,
-                  startTime: '09:00',
-                  repeatType: 'none',
-                  repeatDays: [],
-                }
-          }
+          initialValues={calendarInitialValues as unknown as never}
           closeOptions={{ overlayClick: true, escape: true }}
         />
       </section>

@@ -1,0 +1,270 @@
+/* ============================================================
+   FeatureSection.module.css
+
+   section이 100vh, display:flex, flex-direction:row
+   copy / media 가 section 직속 자식
+
+   figma PC (1920px 기준, Sidebar 72px):
+   2번: copy x:180 y:192 / image x:563 (상하 중앙)
+   3번: image x:165 (하단) / copy x:1264 y:266 (order로 좌우 반전)
+   4번: copy x:180 y:192 / image x:705 (하단)
+   ============================================================ */
+
+/* ── 배경 ── */
+.bgSlate {
+  background: var(--color-slate-50);
+}
+.bgBrand {
+  background: var(--color-brand-primary);
+}
+
+/* ── 섹션 ── */
+.section {
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 1200px) {
+  .section {
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+/* ============================================================
+   copy 공통
+   ============================================================ */
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 48px 24px 32px;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .copy {
+    padding: 48px 40px 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .copy {
+    flex-shrink: 0;
+    gap: 18px;
+    justify-content: flex-start;
+  }
+}
+
+/* ── 2번 copy ── */
+
+@media (min-width: 1200px) {
+  .copyLeft {
+    width: 560px;
+    padding-left: calc(72px + 108px);
+    padding-right: 60px;
+    padding-top: 192px;
+    padding-bottom: 0;
+  }
+}
+
+/* ── 4번 copy ── */
+
+@media (min-width: 1200px) {
+  .copyLeftWide {
+    width: 705px;
+    padding-left: calc(72px + 108px);
+    padding-right: 60px;
+    padding-top: 192px;
+    padding-bottom: 0;
+  }
+}
+
+/* ── 3번 copy: order:2로 우측에 배치 ── */
+
+@media (min-width: 1200px) {
+  .copyRight {
+    order: 2;
+    width: 560px;
+    padding-left: 60px;
+    padding-right: calc(72px + 108px);
+    padding-top: 192px;
+    padding-bottom: 0;
+  }
+}
+
+/* ============================================================
+   텍스트 내부
+   ============================================================ */
+.icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  flex-shrink: 0;
+}
+
+@media (min-width: 1200px) {
+  .icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 1200px) {
+  .textGroup {
+    gap: 18px;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3125;
+  white-space: pre-line;
+  word-break: keep-all;
+  color: var(--color-brand-primary);
+}
+
+@media (min-width: 1200px) {
+  .title {
+    font-size: 32px;
+  }
+}
+
+.bgBrand .title {
+  color: var(--color-text-inverse);
+}
+
+.desc {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: pre-line;
+  word-break: keep-all;
+  color: var(--color-slate-400);
+}
+
+@media (min-width: 1200px) {
+  .desc {
+    font-size: 16px;
+  }
+}
+
+.bgBrand .desc {
+  color: var(--color-blue-100);
+}
+
+/* ============================================================
+   media 공통
+   ============================================================ */
+.media {
+  display: flex;
+  /*
+   * 태블릿/모바일 기본값
+   * justify-content: flex-end → 이미지가 우측 끝에 붙음
+   * align-items: flex-end → 이미지가 하단에 붙음
+   */
+  justify-content: flex-end;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+@media (min-width: 1200px) {
+  .media {
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+/* ── 2번 media ── */
+
+@media (min-width: 1200px) {
+  .mediaTwo {
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+/* ── 3번 media: order:1로 좌측 배치, padding-top으로 이미지 높이 제한 ── */
+/*
+ * 3번 SVG는 투명 여백이 없어서 height:100% 시 섹션 전체를 차지함
+ * padding-top: 230px으로 이미지 시작점을 내려 실질 높이 제한
+ * order:1 → copyRight(order:2)보다 앞에 → 시각적으로 좌측
+ */
+
+@media (min-width: 1200px) {
+  .mediaThree {
+    order: 1;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-top: 230px;
+  }
+}
+
+/* ── 4번 media ── */
+
+@media (min-width: 1200px) {
+  .mediaFour {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+}
+
+/* ============================================================
+   반응형 이미지 분기
+   ============================================================ */
+.imgPc {
+  display: none;
+}
+.imgTablet {
+  display: none;
+}
+
+.imgMobile {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* SVG 자체 여백 보정 */
+  margin-bottom: -10px;
+  margin-right: -20px;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .imgMobile {
+    display: none;
+  }
+  .imgTablet {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* 태블릿: 이미지가 우측 하단에 자연스럽게 붙도록 max-width 제거 */
+    margin-bottom: -10px;
+    margin-right: -20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .imgMobile {
+    display: none;
+  }
+  .imgTablet {
+    display: none;
+  }
+  .imgPc {
+    display: block;
+    height: 100%;
+    width: auto;
+    /* SVG 자체 하단 여백 보정 */
+    margin-bottom: -10px;
+  }
+}

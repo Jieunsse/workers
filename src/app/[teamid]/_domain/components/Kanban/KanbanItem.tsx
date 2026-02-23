@@ -40,7 +40,6 @@ function KanbanItem({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
   };
 
   // 메뉴 외부 클릭 시 닫기
@@ -101,11 +100,14 @@ function KanbanItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={styles.item}
+      className={`${styles.item} ${isDragging ? styles.itemDragging : ''}`}
       onClick={handleContainerClick}
       {...(isEditing ? {} : listeners)}
     >
-      <div ref={containerRef} className={styles.cardWrapper}>
+      <div
+        ref={containerRef}
+        className={`${styles.cardWrapper} ${isDragging ? styles.cardWrapperDragging : ''}`}
+      >
         {isEditing ? (
           <div className={styles.editCard}>
             <input

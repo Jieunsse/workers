@@ -1,0 +1,218 @@
+/* ============================================================
+   HeroSection.module.css
+
+   PC (≥1200px):
+   - section: flex row
+   - copy: 좌측, padding-left로 Sidebar 오프셋, padding-top/bottom으로 상하 위치
+   - visual: 우측, flex:1, 이미지가 섹션 높이 꽉 차게
+
+   태블릿 (768~1199px) / 모바일 (<768px):
+   - section: block, normal flow
+   - copy: 텍스트 + 버튼 상단
+   - visual: 이미지 하단
+   ============================================================ */
+
+/* ── 섹션 ── */
+.section {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-background-secondary);
+}
+
+@media (min-width: 1200px) {
+  .section {
+    height: 100vh;
+    min-height: 760px;
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+/* ── copy: 텍스트 + 버튼 ── */
+.copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 24px 0;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .copy {
+    padding: 48px 40px 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .copy {
+    /* Sidebar 72px + 좌측 여백으로 figma x:260 맞추기 */
+    padding-left: 260px;
+    padding-right: 40px;
+    padding-top: 208px;
+    padding-bottom: 228px;
+    /* 버튼을 하단으로 밀기 */
+    justify-content: space-between;
+    gap: 0;
+    /* copy가 내용 너비만큼만 차지하도록 */
+    flex-shrink: 0;
+    width: 580px; /* 260px 오프셋 + 텍스트 영역 약 320px */
+  }
+}
+
+/* ── topGroup: 아이콘 + textGroup ── */
+.topGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 아이콘 ── */
+.icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 768px) {
+  .icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 4px;
+  }
+}
+
+/* ── textGroup ── */
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (min-width: 1200px) {
+  /* figma: 아이콘(x:76) 대비 텍스트(x:105) → 29px 들여쓰기 */
+  .textGroup {
+    padding-left: 29px;
+  }
+}
+
+/* ── kicker ── */
+.kicker {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-slate-400);
+}
+
+@media (min-width: 768px) {
+  .kicker {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .kicker {
+    font-size: 20px;
+  }
+}
+
+/* ── title ── */
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.19;
+  color: var(--color-brand-primary);
+  word-break: keep-all;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .title {
+    font-size: 48px;
+  }
+}
+
+/* ── ctaLink: 버튼 ── */
+.ctaLink {
+  display: block;
+  text-decoration: none;
+  width: 160px;
+}
+
+@media (min-width: 1200px) {
+  .ctaLink {
+    /* textGroup과 같은 들여쓰기 */
+    margin-left: 29px;
+    width: 160px;
+  }
+}
+
+/* ── visual: 이미지 영역 ── */
+.visual {
+  display: block;
+}
+
+@media (min-width: 1200px) {
+  .visual {
+    /* copy 우측 남은 공간 전부 차지 */
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+/* 반응형 이미지 분기 */
+.imgPc {
+  display: none;
+}
+.imgTablet {
+  display: none;
+}
+.imgMobile {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .imgMobile {
+    display: none;
+  }
+  .imgTablet {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .imgMobile {
+    display: none;
+  }
+  .imgTablet {
+    display: none;
+  }
+  .imgPc {
+    display: block;
+    /* 섹션 높이에 맞게 꽉 차도록 */
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: auto;
+  }
+}

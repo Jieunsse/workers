@@ -1,0 +1,97 @@
+.toast {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 16px;
+  box-sizing: border-box;
+  background: var(--Color-Brand-Primary, #5189fa);
+  color: #ffffff;
+
+  /* 기본부터 중앙 정렬 — 깜빡임 없이 처음부터 올바른 위치에 렌더링 */
+  top: calc(50% - 420px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 57px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.message {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.enter {
+  animation: toast-pop-in 600ms ease-out;
+}
+
+.exit {
+  animation: toast-fade-out 600ms ease-in forwards;
+}
+
+@keyframes toast-pop-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px) scale(0.98);
+  }
+}
+
+/* 태블릿 */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .toast {
+    top: calc(50% - 420px);
+    width: 432px;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+  .toast {
+    top: 16px;
+    bottom: 24px; /* 음수 방지 */
+    width: calc(100% - 48px);
+    max-width: 375px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .exit {
+    animation: none;
+  }
+}

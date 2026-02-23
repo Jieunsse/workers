@@ -44,4 +44,11 @@
   --color-icon-primary: #64748b;
   --color-icon-inverse: #f8fafc;
   --color-icon-brand: #74a1fb;
+
+  /* Slate - 피그마 Color/slate 계열 */
+  --color-slate-50: #f8fafc;
+  --color-slate-400: #94a3b8;
+
+  /* Blue - 피그마 Color/blue 계열 */
+  --color-blue-100: #c9dafd;
 }

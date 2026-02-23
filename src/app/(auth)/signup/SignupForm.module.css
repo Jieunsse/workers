@@ -1,0 +1,128 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.rootError {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-status-danger);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.loginPrompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.promptText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.loginLink {
+  font-size: 16px;
+  font-weight: 500;
+  /* Color/blue/400 = --color-brand-primary (#5189FA) */
+  color: var(--color-brand-primary);
+  text-decoration: none;
+}
+
+.loginLink:hover {
+  text-decoration: underline;
+}
+
+/* ─── OR 구분선 ─── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-background-tertiary);
+}
+
+.dividerText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* ─── 간편 회원가입 ─── */
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.socialLabel {
+  font-size: 16px;
+  font-weight: 500;
+  /* Text/Default (#64748B) */
+  color: var(--color-text-default);
+}
+
+.kakaoButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kakaoButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+  .label {
+    font-size: 14px;
+  }
+
+  .promptText,
+  .loginLink {
+    font-size: 14px;
+  }
+
+  .socialLabel {
+    font-size: 14px;
+  }
+}

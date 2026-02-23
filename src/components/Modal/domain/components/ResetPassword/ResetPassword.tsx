@@ -18,14 +18,6 @@ import {
 import type { ResetPasswordProps } from './ResetPassword.types';
 export type { ResetPasswordProps } from './ResetPassword.types';
 
-/**
- * @param props.isOpen 모달 표시 여부를 boolean으로 전달합니다.
- * @param props.onClose 모달을 닫을 때 실행할 함수를 전달합니다.
- * @param props.onSubmit 링크 보내기 제출 시 실행할 함수를 전달합니다.
- * @param props.text 제목과 버튼 문구와 안내 문구 같은 텍스트 옵션을 객체로 전달합니다.
- * @param props.input 이메일 입력창에 적용할 옵션을 객체로 전달합니다.
- * @param props.closeOptions 오버레이 클릭과 Escape 닫힘 옵션을 객체로 전달합니다.
- */
 export default function ResetPassword({
   isOpen,
   onClose,
@@ -53,6 +45,8 @@ export default function ResetPassword({
       onClose={onClose}
       ariaLabelledby={TITLE_ID}
       ariaDescribedby={DESCRIPTION_ID}
+      // 모바일에서 오버레이를 하단 정렬로 변경하는 클래스 주입
+      className={styles.mobileOverlay}
       contentClassName={styles.modalContent}
       closeOnOverlayClick={closeOnOverlayClick}
       closeOnEscape={closeOnEscape}

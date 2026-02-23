@@ -34,6 +34,7 @@ export default function KanbanBoard({ groupId, teamId, taskLists }: KanbanBoardP
     handleCardClick,
     handleDeleteTask,
     handleUpdateTask,
+    handleStatusChange,
     handleAddTask,
     handleAddListSubmit,
     handleAddListClose,
@@ -44,6 +45,7 @@ export default function KanbanBoard({ groupId, teamId, taskLists }: KanbanBoardP
     tasks,
     setTasks,
     COLUMN_IDS,
+    handleStatusChange,
   );
 
   return (

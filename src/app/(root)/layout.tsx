@@ -23,9 +23,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { data: user } = useCurrentUser();
+  const { data: user, isPending } = useCurrentUser();
 
-  const isLoggedIn = user !== null && user !== undefined;
+  // isPending: 최초 로딩 중 (undefined)
+  // user === null: 로딩 완료 후 비로그인
+  // user !== null: 로그인
+  const isLoggedIn = !isPending && user !== null && user !== undefined;
   const isLanding = pathname === '/';
   const firstGroup = user?.memberships?.[0]?.group;
 
@@ -100,26 +103,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             )
           ) : null
         }
-        addButton={(isCollapsed: boolean) => (
-          <>
-            {!isCollapsed && <SidebarAddButton label="팀 추가하기" onClick={() => {}} />}
-            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-            <SidebarButton
-              icon={
-                <Image
-                  src={isCollapsed ? boardLarge : boardSmall}
-                  alt=""
-                  width={isCollapsed ? 24 : 20}
-                  height={isCollapsed ? 24 : 20}
-                />
-              }
-              label="자유게시판"
-              isActive
-              iconOnly={isCollapsed}
-              href="/boards"
-            />
-          </>
-        )}
+        addButton={
+          isLoggedIn
+            ? (isCollapsed: boolean) => (
+                <>
+                  {!isCollapsed && <SidebarAddButton label="팀 추가하기" onClick={() => {}} />}
+                  <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
+                  <SidebarButton
+                    icon={
+                      <Image
+                        src={isCollapsed ? boardLarge : boardSmall}
+                        alt=""
+                        width={isCollapsed ? 24 : 20}
+                        height={isCollapsed ? 24 : 20}
+                      />
+                    }
+                    label="자유게시판"
+                    isActive
+                    iconOnly={isCollapsed}
+                    href="/boards"
+                  />
+                </>
+              )
+            : undefined
+        }
       />
       <MobileHeader
         isLoggedIn={isLoggedIn}

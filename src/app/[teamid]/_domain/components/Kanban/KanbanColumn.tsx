@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { useDroppable } from '@dnd-kit/core';
+import { useDroppable, useDndContext } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import KanbanItem from './KanbanItem';
@@ -34,7 +34,20 @@ function KanbanColumn({
   onUpdateTask,
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
+  const { active, over } = useDndContext();
   const itemIds = tasks.map((t) => t.id);
+
+  // 현재 컬럼의 아이템이 드래그 중인지 확인
+  const isActiveFromThisColumn = active ? tasks.some((t) => t.id === String(active.id)) : false;
+
+  // 다른 컬럼 아이템을 이 컬럼의 기존 아이템 위로 드래그 중인지 확인
+  const isOverThisColumnItem = over ? tasks.some((t) => t.id === String(over.id)) : false;
+
+  // 다른 컬럼에서 이 컬럼으로 드래그 진입 시 드롭 가이드 표시
+  const showDropGuide = !!active && !isActiveFromThisColumn && (isOver || isOverThisColumnItem);
+
+  // 드래그 중인 아이템의 초기 높이 (가이드 크기를 아이템과 동일하게 맞추기 위함)
+  const draggedItemHeight = active?.rect.current.initial?.height ?? 54;
 
   return (
     <div className={styles.column}>
@@ -63,6 +76,9 @@ function KanbanColumn({
               onUpdateTask={onUpdateTask}
             />
           ))}
+          {showDropGuide && (
+            <div className={styles.dropGuide} style={{ height: draggedItemHeight }} />
+          )}
         </div>
       </SortableContext>
     </div>

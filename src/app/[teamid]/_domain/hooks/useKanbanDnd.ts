@@ -16,6 +16,7 @@ export function useKanbanDnd(
   tasks: KanbanTask[],
   setTasks: React.Dispatch<React.SetStateAction<KanbanTask[]>>,
   columnIds: KanbanStatus[],
+  onStatusChange?: (taskId: string, fromStatus: KanbanStatus, toStatus: KanbanStatus) => void,
 ) {
   const [activeTask, setActiveTask] = useState<KanbanTask | null>(null);
 
@@ -41,9 +42,13 @@ export function useKanbanDnd(
     // over가 컬럼인 경우 (빈 컬럼에 드롭)
     const isOverColumn = columnIds.includes(overId as KanbanStatus);
     if (isOverColumn) {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === activeId ? { ...t, status: overId as KanbanStatus } : t)),
-      );
+      const activeTaskItem = tasks.find((t) => t.id === activeId);
+      if (activeTaskItem && activeTaskItem.status !== overId) {
+        const fromStatus = activeTaskItem.status;
+        const toStatus = overId as KanbanStatus;
+        setTasks((prev) => prev.map((t) => (t.id === activeId ? { ...t, status: toStatus } : t)));
+        onStatusChange?.(activeId, fromStatus, toStatus);
+      }
       return;
     }
 
@@ -63,9 +68,10 @@ export function useKanbanDnd(
       });
     } else {
       // 다른 컬럼으로 이동
-      setTasks((prev) =>
-        prev.map((t) => (t.id === activeId ? { ...t, status: overTaskItem.status } : t)),
-      );
+      const fromStatus = activeTaskItem.status;
+      const toStatus = overTaskItem.status;
+      setTasks((prev) => prev.map((t) => (t.id === activeId ? { ...t, status: toStatus } : t)));
+      onStatusChange?.(activeId, fromStatus, toStatus);
     }
   };
 
