@@ -1,0 +1,92 @@
+.button {
+  /* ✅ 핵심: 고정 width 버리고, 7개가 가로폭을 나눠먹게 */
+  flex: 1 1 0;
+  min-width: 0;
+
+  height: 68px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: var(--color-background-inverse, #ffffff);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  cursor: pointer;
+  box-sizing: border-box;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.weekday {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-default, #64748b);
+}
+
+.day {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text-primary, #1e293b);
+}
+
+/* ✅ 선택 상태 */
+.selected {
+  background: var(--color-text-primary, #1e293b);
+  border-color: var(--color-text-primary, #1e293b);
+}
+
+.selected .weekday,
+.selected .day {
+  color: #ffffff;
+}
+
+.button:not(.selected):hover {
+  background: var(--color-background-secondary, #f1f5f9);
+}
+
+.button:focus-visible {
+  outline: 2px solid rgba(81, 137, 250, 0.6);
+  outline-offset: 2px;
+}
+
+/* ===== Tablet: 744 ~ 1279 ===== */
+@media (min-width: 744px) and (max-width: 1279px) {
+  .button {
+    height: 68px;
+  }
+
+  .weekday {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .day {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+/* ✅ Mobile: <= 767 (기존 743 끊김 말고 767로 맞춤) */
+@media (max-width: 767px) {
+  .button {
+    height: 49px;
+    border-radius: 12px;
+    gap: 4px;
+  }
+
+  .weekday {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .day {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}

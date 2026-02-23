@@ -1,0 +1,29 @@
+.container {
+  width: 100%;
+  height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* ✅ 버튼들이 자연스럽게 벌어지도록 */
+  gap: 8px;
+
+  box-sizing: border-box;
+}
+
+/* Tablet 이하에서 너무 길어지면 가운데 레이아웃 맞추려고 제한만 살짝 */
+@media (max-width: 1279px) {
+  .container {
+    height: 68px;
+    gap: 8px;
+  }
+}
+
+/* ✅ Mobile(<=767): 340 고정 금지. 100%로 늘어나게 */
+@media (max-width: 767px) {
+  .container {
+    height: 49px;
+    gap: 6px;
+  }
+}
