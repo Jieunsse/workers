@@ -64,16 +64,50 @@ export default function ArticleCard({
     return count.toString();
   };
 
+  if (isBest) {
+    return (
+      <article className={`${styles.card} ${styles.best}`} onClick={onClick}>
+        <div className={styles.badge}>
+          <Image src={bestIcon} alt="" width={16} height={16} />
+          <span>인기</span>
+        </div>
+
+        <div className={styles.bestBody}>
+          <div className={styles.bestText}>
+            <h3 className={styles.title}>{title}</h3>
+            {content && (
+              <p className={styles.preview}>
+                {content.length > 100 ? `${content.slice(0, 100)}...` : content}
+              </p>
+            )}
+          </div>
+          {image && (
+            <div className={styles.bestImageWrapper}>
+              <img src={image} alt="" className={styles.image} />
+            </div>
+          )}
+        </div>
+
+        <div className={styles.bestFooter}>
+          <div className={styles.meta}>
+            <span className={styles.writer}>{writer.nickname}</span>
+            <span className={styles.divider}>|</span>
+            <time className={styles.date} dateTime={createdAt}>
+              {formatDate(createdAt)}
+            </time>
+          </div>
+          <div className={styles.like}>
+            <Image src={emptyHeartIcon} alt="" width={16} height={16} />
+            <span>{formatLikeCount(likeCount)}</span>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article className={styles.card} onClick={onClick}>
       <div className={styles.content}>
-        {isBest && (
-          <div className={styles.badge}>
-            <Image src={bestIcon} alt="" width={16} height={16} />
-            <span>인기</span>
-          </div>
-        )}
-
         <h3 className={styles.title}>{title}</h3>
 
         {content && (

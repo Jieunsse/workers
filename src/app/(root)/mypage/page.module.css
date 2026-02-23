@@ -1,27 +1,6 @@
-.layout {
-  display: flex;
-  flex-direction: column;
+.page {
   min-height: 100vh;
   background-color: var(--color-background-secondary);
-}
-
-/* 모바일 헤더 - 모바일에서만 표시 */
-.mobileHeader {
-  display: none;
-}
-
-/* 사이드바 - 태블릿/데스크탑에서 표시 */
-.sidebar {
-  display: block;
-}
-
-/* 모바일 타이틀 - 모바일에서만 표시 */
-.mobileTitle {
-  display: none;
-}
-
-.main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -120,53 +99,16 @@
   width: 100%;
 }
 
-/* 태블릿/데스크탑 레이아웃 */
-@media (min-width: 768px) {
-  .layout {
-    flex-direction: row;
-  }
-}
-
-/* 태블릿 (767px 이하) */
-@media (max-width: 767px) {
-  .layout {
-    flex-direction: row;
-  }
-
-  .main {
+/* Tablet */
+@media (max-width: 1199px) {
+  .page {
     padding: 32px 24px;
   }
-
-  .card {
-    max-width: 100%;
-  }
 }
 
-/* 모바일 (375px 이하) */
-@media (max-width: 375px) {
-  .layout {
-    flex-direction: column;
-  }
-
-  .mobileHeader {
-    display: block;
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .mobileTitle {
-    display: block;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 16px;
-    align-self: flex-start;
-  }
-
-  .main {
-    flex: 1;
+/* Mobile */
+@media (max-width: 767px) {
+  .page {
     justify-content: flex-start;
     padding: 24px 16px;
   }
@@ -177,7 +119,8 @@
   }
 
   .title {
-    display: none;
+    font-size: 18px;
+    margin-bottom: 24px;
   }
 
   .profileImageWrapper {
@@ -190,37 +133,5 @@
 
   .label {
     font-size: 12px;
-  }
-
-  /* 모바일 모달 - 하단 고정 */
-  :global(section[class*='overlay']) {
-    align-items: flex-end !important;
-  }
-
-  :global(section[class*='overlay'] > div[class*='contentsBox']) {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 12px 12px 0 0 !important;
-  }
-
-  :global([class*='modalContent']) {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-  }
-
-  :global([class*='field']) {
-    width: 100% !important;
-  }
-
-  :global([class*='actions']) {
-    width: 100% !important;
-  }
-
-  :global([class*='closeButton']),
-  :global([class*='submitButton']),
-  :global([class*='confirmButton']) {
-    flex: 1 !important;
-    width: auto !important;
   }
 }

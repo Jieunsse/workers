@@ -1,0 +1,254 @@
+.container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 400px;
+  height: 48px;
+  padding: 0 20px;
+  border: 2px solid var(--color-brand-primary);
+  border-radius: 24px;
+  background: var(--color-background-inverse);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-pretendard), 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-default);
+}
+
+/* Section Common */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.moreButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-pretendard), 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-default);
+  cursor: pointer;
+}
+
+.moreButton:hover {
+  color: var(--color-text-secondary);
+}
+
+/* Best Section */
+.bestSection {
+  margin-bottom: 48px;
+  background: var(--color-background-secondary);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.carouselContainer {
+  overflow: hidden;
+}
+
+.carouselTrack {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.bestCardWrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition:
+    width 0.3s ease,
+    background 0.2s ease;
+}
+
+.dotActive {
+  width: 20px;
+  background: var(--color-interaction-inactive);
+}
+
+.arrows {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arrowButton {
+  cursor: pointer;
+}
+
+/* All Section */
+.allSection {
+  margin-bottom: 40px;
+}
+
+.articleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Dropdown Override */
+.dropdownMenu {
+  min-height: auto;
+}
+
+/* Floating Button - 카드 영역 오른쪽에 떠있음 */
+.floatingButtonWrapper {
+  position: fixed;
+  bottom: 120px;
+  left: calc(72px + (100vw - 72px) / 2 + 600px + 24px);
+}
+
+/* Tablet */
+@media (max-width: 1199px) {
+  .container {
+    padding: 32px 24px 80px;
+  }
+
+  .searchWrapper {
+    width: 320px;
+  }
+
+  .bestSection {
+    margin-left: -24px;
+    margin-right: -24px;
+    border-radius: 0;
+  }
+
+  .bestCardWrapper {
+    flex: 0 0 100%;
+  }
+
+  .articleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .floatingButtonWrapper {
+    left: auto;
+    bottom: 32px;
+    right: 32px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .container {
+    padding: 24px 16px 80px;
+  }
+
+  .bestSection {
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+
+  .pageTitle {
+    font-size: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+
+  .carouselTrack {
+    gap: 12px;
+  }
+
+  .bestCardWrapper {
+    flex: 0 0 100%;
+  }
+
+  .articleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .floatingButtonWrapper {
+    left: auto;
+    bottom: 24px;
+    right: 24px;
+  }
+}

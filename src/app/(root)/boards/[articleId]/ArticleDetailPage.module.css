@@ -1,0 +1,338 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-background-secondary);
+  padding: 40px 24px 80px;
+}
+
+.layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+/* Card */
+.card {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-background-primary);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.kebabWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.kebabButton {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kebabMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-background-tertiary);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.kebabMenuItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
+.kebabMenuItem:hover {
+  background: var(--color-background-secondary);
+}
+
+.kebabMenuDanger {
+  color: var(--color-status-danger);
+}
+
+/* Author Row */
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.nickname {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.divider {
+  font-size: 14px;
+  color: var(--color-text-disabled);
+}
+
+.date {
+  font-size: 14px;
+  color: var(--color-text-disabled);
+}
+
+/* Separator */
+.separator {
+  border: none;
+  border-top: 1px solid var(--color-background-tertiary);
+  margin: 24px 0;
+}
+
+/* Body */
+.body {
+  margin-bottom: 40px;
+}
+
+.text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+}
+
+.imageWrapper {
+  margin-top: 24px;
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.articleImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Like Button - inline (hidden on desktop, shown on tablet/mobile) */
+.inlineLike {
+  display: none;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.likeButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-disabled);
+}
+
+/* Like Button - floating sidebar (hidden on tablet/mobile) */
+.floatingWrapper {
+  position: sticky;
+  top: 120px;
+  flex-shrink: 0;
+}
+
+/* Comment Section */
+.commentSection {
+  padding-top: 24px;
+}
+
+.commentTitle {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.commentCount {
+  color: var(--color-brand-primary);
+}
+
+.commentList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.commentItem {
+  position: relative;
+}
+
+.emptyComment {
+  margin: 40px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-disabled);
+}
+
+/* Comment Edit Form */
+.commentEditForm {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  position: relative;
+}
+
+.commentEditForm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 1px solid var(--color-background-tertiary);
+}
+
+.commentEditBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentEditTextarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid var(--color-background-tertiary);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  resize: vertical;
+  outline: none;
+}
+
+.commentEditTextarea:focus {
+  border-color: var(--color-brand-primary);
+}
+
+.commentEditActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.commentEditCancel {
+  padding: 8px 16px;
+  border: 1px solid var(--color-background-tertiary);
+  border-radius: 8px;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.commentEditSave {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-brand-primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+}
+
+.commentEditSave:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toast */
+.toastWrapper {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+/* Tablet */
+@media (max-width: 1199px) {
+  .page {
+    padding: 32px 24px 80px;
+  }
+
+  .inlineLike {
+    display: flex;
+  }
+
+  .floatingWrapper {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .page {
+    padding: 16px;
+  }
+
+  .card {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
+
+  .imageWrapper {
+    width: 160px;
+    height: 160px;
+  }
+
+  .commentTitle {
+    font-size: 16px;
+  }
+}

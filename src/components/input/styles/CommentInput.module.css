@@ -22,7 +22,8 @@
   flex-shrink: 0;
 }
 
-.textarea {
+.withProfile .textarea,
+.wrapper .textarea {
   border: none;
   border-radius: 0;
 }

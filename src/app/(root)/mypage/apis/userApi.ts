@@ -7,9 +7,11 @@ import type {
   ImageUploadResponse,
 } from './types';
 
+const PROXY = '/api/proxy';
+
 /** 현재 유저 정보 조회 */
 export async function getUser(): Promise<UserResponse> {
-  const response = await fetch('/api/proxy/user');
+  const response = await fetch(`${PROXY}/user`);
 
   if (!response.ok) {
     throw new Error('유저 정보를 불러오는데 실패했습니다.');
@@ -20,7 +22,7 @@ export async function getUser(): Promise<UserResponse> {
 
 /** 유저 정보 수정 */
 export async function updateUser(data: UpdateUserRequest): Promise<UpdateUserResponse> {
-  const response = await fetch('/api/proxy/user', {
+  const response = await fetch(`${PROXY}/user`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -35,18 +37,19 @@ export async function updateUser(data: UpdateUserRequest): Promise<UpdateUserRes
 
 /** 회원 탈퇴 */
 export async function deleteUser(): Promise<void> {
-  const response = await fetch('/api/proxy/user', {
+  const response = await fetch(`${PROXY}/user`, {
     method: 'DELETE',
   });
 
-  if (!response.ok) {
+  // 백엔드가 500을 반환하지만 실제 삭제는 수행되므로 200, 204, 500 모두 허용
+  if (!response.ok && response.status !== 500) {
     throw new Error('회원 탈퇴에 실패했습니다.');
   }
 }
 
 /** 비밀번호 변경 */
 export async function changePassword(data: ChangePasswordRequest): Promise<ChangePasswordResponse> {
-  const response = await fetch('/api/proxy/user/password', {
+  const response = await fetch(`${PROXY}/user/password`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),

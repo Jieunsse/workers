@@ -1,0 +1,15 @@
+.layout {
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: 72px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 1199px) {
+  .main {
+    margin-left: 0;
+  }
+}

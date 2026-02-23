@@ -18,7 +18,7 @@
 }
 
 .collapsed {
-  position: relative;
+  /* position: fixed 유지 — 접혀도 오버레이 방식 */
 }
 
 .header {

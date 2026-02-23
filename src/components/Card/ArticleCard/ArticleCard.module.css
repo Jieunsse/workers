@@ -1,12 +1,15 @@
 .card {
   display: flex;
+  justify-content: space-between;
   gap: 16px;
   padding: 20px;
+  height: 100%;
   background: var(--color-background-primary);
-  border: 1px solid var(--color-border-primary);
+  border: 1px solid var(--color-background-tertiary);
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.2s ease;
+  box-sizing: border-box;
 }
 
 .card:hover {
@@ -18,7 +21,7 @@
 }
 
 .content {
-  flex: 1;
+  flex: 0 0 70%;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -90,6 +93,7 @@
 
 .date {
   font-weight: 400;
+  color: var(--color-text-disabled);
 }
 
 .rightSection {
@@ -97,12 +101,13 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  min-height: 88px;
 }
 
 .imageWrapper {
   flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+  width: 88px;
+  height: 88px;
   border-radius: 8px;
   overflow: hidden;
   background: var(--color-background-secondary);
@@ -121,7 +126,45 @@
   margin-top: auto;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-disabled);
+}
+
+/* Best card */
+.best {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.bestBody {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.bestText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bestImageWrapper {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-background-secondary);
+}
+
+.bestFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
 }
 
 /* 태블릿 */
@@ -130,9 +173,13 @@
     padding: 16px;
   }
 
+  .rightSection {
+    min-height: 88px;
+  }
+
   .imageWrapper {
-    width: 100px;
-    height: 100px;
+    width: 88px;
+    height: 88px;
   }
 }
 
@@ -159,8 +206,12 @@
     font-size: 12px;
   }
 
+  .rightSection {
+    min-height: 72px;
+  }
+
   .imageWrapper {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
   }
 }
