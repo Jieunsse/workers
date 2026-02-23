@@ -1,0 +1,41 @@
+.page {
+  --layout-padding-desktop: 24px;
+  --layout-padding-mobile: 16px;
+  --create-card-width-desktop: min(90vw, 480px);
+  --create-card-width-mobile: min(100%, 343px);
+  --join-card-width-desktop: min(90vw, 550px);
+  --join-input-width-desktop: min(100%, 460px);
+  --control-height-desktop: 48px;
+  --control-height-mobile: 44px;
+
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background-secondary);
+}
+
+.mobileOnlyHeader {
+  display: none;
+}
+
+.mainContents {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--layout-padding-desktop);
+}
+
+@media (max-width: 767px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .mobileOnlyHeader {
+    display: block;
+  }
+
+  .mainContents {
+    width: 100%;
+    padding: var(--layout-padding-mobile);
+  }
+}

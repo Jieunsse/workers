@@ -119,3 +119,4 @@ scripts/refresh-dev-token.mjs
 coworkers-swagger.json
 .gitignore
 GEMINI.md
+src/app/api/dev/inject-session/route.ts

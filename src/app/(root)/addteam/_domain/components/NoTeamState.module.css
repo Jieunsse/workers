@@ -1,0 +1,58 @@
+.noTeamState {
+  width: min(90vw, 660px);
+}
+
+.noTeamIllustration {
+  width: min(100%, 660px);
+  height: auto;
+}
+
+.noTeamMessage {
+  margin: 20px 0 0;
+  color: var(--color-text-default);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 34px;
+  text-align: center;
+}
+
+.noTeamActions {
+  width: min(100%, 370px);
+  margin-top: 48px;
+  gap: 16px;
+}
+
+.noTeamActionButton {
+  height: var(--control-height-desktop);
+}
+
+@media (max-width: 767px) {
+  .noTeamState {
+    width: 100%;
+    max-width: 343px;
+  }
+
+  .noTeamIllustration {
+    width: min(100%, 343px);
+  }
+
+  .noTeamMessage {
+    margin-top: 16px;
+    color: var(--color-text-default);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  .noTeamActions {
+    width: 100%;
+    max-width: 343px;
+    margin-top: 40px;
+  }
+
+  .noTeamActionButton {
+    height: var(--control-height-mobile);
+    font-size: 14px;
+    line-height: 17px;
+  }
+}

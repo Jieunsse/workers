@@ -1,0 +1,99 @@
+.title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.joinLabel {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 19px;
+}
+
+.joinCard {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  width: var(--join-card-width-desktop);
+  height: 400px;
+  padding: 59px 45px 63px;
+  border-radius: 20px;
+  background: var(--color-background-inverse);
+}
+
+.joinInputSection {
+  width: var(--join-input-width-desktop);
+  margin-top: 40px;
+  gap: 8px;
+}
+
+.teamLinkInput {
+  width: 100%;
+  height: var(--control-height-desktop);
+}
+
+.joinSubmitButton {
+  width: var(--join-input-width-desktop);
+  height: var(--control-height-desktop);
+  margin-top: 40px;
+  border-radius: 12px;
+}
+
+.joinHelperText {
+  margin: 24px 0 0;
+  color: var(--color-text-default);
+  font-size: 16px;
+  line-height: 19px;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .joinCard {
+    align-items: stretch;
+    justify-content: flex-start;
+    width: var(--create-card-width-mobile);
+    min-height: 264px;
+    padding: 24px 22px 28px;
+    border-radius: 24px;
+  }
+
+  .joinInputSection {
+    width: 100%;
+    margin-top: 24px;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  .joinLabel {
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .teamLinkInput {
+    height: var(--control-height-mobile);
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .joinSubmitButton {
+    width: 100%;
+    height: var(--control-height-mobile);
+    margin-top: 40px;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .joinHelperText {
+    margin-top: 16px;
+    font-size: 12px;
+    line-height: 14px;
+  }
+}

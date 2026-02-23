@@ -1,0 +1,150 @@
+.card {
+  width: 100%;
+  background: var(--color-background-primary);
+  border-radius: 20px;
+  box-shadow: 0px 15px 50px -12px rgba(0, 0, 0, 0.05);
+  padding: 32px 26px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.teamName {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.167;
+  margin: 0;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 24px;
+  row-gap: 16px;
+}
+
+.row {
+  grid-column: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.progressLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-interaction-inactive);
+  line-height: 1.214;
+}
+
+.percent {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--color-brand-primary);
+  line-height: 1.193;
+}
+
+.statsGroup {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-interaction-inactive);
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-default);
+  line-height: 1.193;
+}
+
+.statValueDone {
+  color: var(--color-brand-primary);
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-background-tertiary);
+}
+
+.progressRow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+
+.progressBar {
+  min-width: 0;
+}
+
+.settingsWrapper {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.settingsButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: var(--color-background-secondary);
+}
+
+.dropdownItem:active {
+  background-color: var(--color-background-tertiary);
+}

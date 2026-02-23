@@ -1,0 +1,55 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 24px;
+  background-color: var(--color-background-tertiary);
+  border-radius: 12px;
+  height: 38px;
+}
+
+.columnTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.addButton {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 200px;
+  border-radius: 12px;
+  padding: 4px;
+  transition: background 0.15s;
+}
+
+.isOver {
+  background: var(--color-brand-secondary);
+}
+
+/* 드롭 가이드: 드래그 중인 아이템과 동일한 border-radius(12px)로 표시 */
+.dropGuide {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 2px var(--color-brand-primary);
+  background-color: var(--color-brand-secondary);
+  flex-shrink: 0;
+}
