@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createGroup } from '@/shared/apis/groups/group';
+import { acceptInvitation } from '@/shared/apis/groups/invitation';
 import { groupsKeys } from './queryKeys';
 import { currentUserKeys } from '@/shared/queries/user/useCurrentUserQuery';
 
-export function useCreateGroupMutation() {
+export function useAcceptInvitationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: groupsKeys.create(),
-    mutationFn: createGroup,
+    mutationKey: groupsKeys.acceptInvitation(),
+    mutationFn: acceptInvitation,
     onSuccess: (group) => {
       queryClient.setQueryData(groupsKeys.detail(group.id), group);
     },

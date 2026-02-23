@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# MCP 설정 (API 토큰 포함)
+.mcp.json
+
 # dependencies
 /node_modules
 /.pnp
@@ -41,7 +44,78 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
-# personal doc
-.documents/*
+# dev scripts
+scripts/refresh-dev-token.mjs
+.dev-session.json
+.documents/AI_RULES.md
+.documents/clean.md
 .documents/daily-report.md
+.documents/demands.md
+.documents/rules/_sections.md
+.documents/rules/_template.md
+.documents/rules/advanced-event-handler-refs.md
+.documents/rules/advanced-init-once.md
+.documents/rules/advanced-use-latest.md
+.documents/rules/async-api-routes.md
+.documents/rules/async-defer-await.md
+.documents/rules/async-dependencies.md
+.documents/rules/async-parallel.md
+.documents/rules/async-suspense-boundaries.md
+.documents/rules/bundle-barrel-imports.md
+.documents/rules/bundle-conditional.md
+.documents/rules/bundle-defer-third-party.md
+.documents/rules/bundle-dynamic-imports.md
+.documents/rules/bundle-preload.md
+.documents/rules/client-event-listeners.md
+.documents/rules/client-localstorage-schema.md
+.documents/rules/client-passive-event-listeners.md
+.documents/rules/client-swr-dedup.md
+.documents/rules/js-batch-dom-css.md
+.documents/rules/js-cache-function-results.md
+.documents/rules/js-cache-property-access.md
+.documents/rules/js-cache-storage.md
+.documents/rules/js-combine-iterations.md
+.documents/rules/js-early-exit.md
+.documents/rules/js-hoist-regexp.md
+.documents/rules/js-index-maps.md
+.documents/rules/js-length-check-first.md
+.documents/rules/js-min-max-loop.md
+.documents/rules/js-set-map-lookups.md
+.documents/rules/js-tosorted-immutable.md
+.documents/rules/rendering-activity.md
+.documents/rules/rendering-animate-svg-wrapper.md
+.documents/rules/rendering-conditional-render.md
+.documents/rules/rendering-content-visibility.md
+.documents/rules/rendering-hoist-jsx.md
+.documents/rules/rendering-hydration-no-flicker.md
+.documents/rules/rendering-hydration-suppress-warning.md
+.documents/rules/rendering-svg-precision.md
+.documents/rules/rendering-usetransition-loading.md
+.documents/rules/rerender-defer-reads.md
+.documents/rules/rerender-dependencies.md
+.documents/rules/rerender-derived-state-no-effect.md
+.documents/rules/rerender-derived-state.md
+.documents/rules/rerender-functional-setstate.md
+.documents/rules/rerender-lazy-state-init.md
+.documents/rules/rerender-memo-with-default-value.md
+.documents/rules/rerender-memo.md
+.documents/rules/rerender-move-effect-to-event.md
+.documents/rules/rerender-simple-expression-in-memo.md
+.documents/rules/rerender-transitions.md
+.documents/rules/rerender-use-ref-transient-values.md
+.documents/rules/server-after-nonblocking.md
+.documents/rules/server-auth-actions.md
+.documents/rules/server-cache-lru.md
+.documents/rules/server-cache-react.md
+.documents/rules/server-dedup-props.md
+.documents/rules/server-parallel-fetching.md
+.documents/rules/server-serialization.md
+.gitignore
+.claude/CLAUDE.md
+.claude/config.json
+.husky/pre-push
+.husky/pre-push
+.husky/pre-push
+coworkers-swagger.json
+.gitignore
+GEMINI.md

@@ -52,7 +52,8 @@ async function proxyRequest(
   const pathWithQuery = searchParams ? `${backendPath}?${searchParams}` : backendPath;
 
   const method = req.method;
-  const isBodyless = method === 'GET' || method === 'HEAD';
+  // const isBodyless = method === 'GET' || method === 'HEAD'
+  const isBodyless = method === 'GET' || method === 'HEAD' || method === 'DELETE'; // 수정 요청코드 1 (DELETE 추가)
   const contentType = req.headers.get('content-type') ?? '';
 
   const body = isBodyless ? undefined : await req.text();
@@ -128,13 +129,15 @@ async function handleProxy(req: NextRequest, params: { path: string[] }) {
     const response = await proxyRequest(req, backendPath, accessToken);
     const responseData = await response.text();
 
-    return new NextResponse(responseData, {
+    return new NextResponse(responseData || null, {
+      // 수정 요청 코드 2 (null 일때도 응답 반환)
       status: response.status,
       headers: {
         'Content-Type': response.headers.get('content-type') ?? 'application/json',
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('[proxy] 요청 처리 중 오류:', error); // 수정 요청 코드 3 (에러 내용 명시)
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });
   }
 }

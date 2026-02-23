@@ -12,6 +12,7 @@ export interface Group {
 }
 
 export interface AcceptInvitationBody {
+  userEmail: string;
   token: string;
 }
 

@@ -3,8 +3,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { getUser, updateUser, deleteUser, changePassword, uploadImage } from '@/shared/apis/user';
-import type { UserResponse } from '@/shared/apis/user';
+import {
+  getUser,
+  updateUser,
+  deleteUser,
+  changePassword,
+  uploadImage,
+} from '@/shared/apis/user/index';
+import type { UserResponse } from '@/shared/apis/user/index';
 
 export function useUser() {
   const router = useRouter();

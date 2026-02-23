@@ -1,0 +1,60 @@
+.section {
+  background: var(--color-background-primary);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 44px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.count {
+  color: var(--color-text-default);
+  font-weight: 400;
+}
+
+.inviteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  padding: 0;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.inviteButton:hover {
+  color: var(--color-interaction-hover);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toast 컴포넌트를 화면 상단 중앙에 위치시키기 위한 오버라이드 */
+.toastCenter {
+  left: calc(50% - 434px) !important;
+}
+
+@media (max-width: 768px) {
+  .toastCenter {
+    left: calc(50% - 172px) !important;
+  }
+}

@@ -23,7 +23,7 @@ export default function CreateTeamPage() {
       const group = await createTeam(teamName);
       setTeamName('');
       setCreateTeamFeedback({ type: 'success', message: CREATE_TEAM_MESSAGES.success });
-      router.push(`/teams/${group.id}`);
+      router.push(`/${group.id}`);
     } catch (error) {
       setCreateTeamFeedback({ type: 'error', message: getCreateTeamFailureMessage(error) });
     }

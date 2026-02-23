@@ -1,0 +1,130 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+/* 팀 선택 섹션 (트리거 + 팀 목록 + 추가 버튼) */
+.section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+/* 팀 선택 헤더 트리거 */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.triggerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.triggerLabel {
+  font-family: Pretendard, sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.1875;
+  color: var(--color-text-disabled);
+}
+
+.arrowOpen {
+  transform: rotate(180deg);
+}
+
+/* 개별 팀 항목 */
+.teamItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: Pretendard, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.1875;
+  color: var(--color-text-primary);
+  width: 100%;
+}
+
+.teamItem:hover {
+  background: var(--color-brand-secondary);
+}
+
+.active {
+  background: var(--color-brand-secondary);
+  color: var(--color-brand-primary);
+  font-weight: 600;
+}
+
+.active img {
+  filter: brightness(0) saturate(100%) invert(45%) sepia(85%) saturate(1500%) hue-rotate(208deg)
+    brightness(102%) contrast(97%);
+}
+
+/* 팀 추가하기 버튼 */
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-brand-primary);
+  background: transparent;
+  cursor: pointer;
+  font-family: Pretendard, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2143;
+  color: var(--color-brand-primary);
+  text-decoration: none;
+}
+
+.addIcon {
+  filter: brightness(0) saturate(100%) invert(45%) sepia(85%) saturate(1500%) hue-rotate(208deg)
+    brightness(102%) contrast(97%);
+}
+
+/* 구분선 */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-background-tertiary);
+  margin: 0;
+  width: 100%;
+}
+
+/* 자유게시판 */
+.boardItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: Pretendard, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.1875;
+  color: var(--color-text-primary);
+  width: 100%;
+}
+
+.boardItem:hover {
+  background: var(--color-brand-secondary);
+}
