@@ -376,14 +376,12 @@ export default function ArticleDetailPage({
       />
 
       {toastMessage && (
-        <div className={styles.toastWrapper}>
-          <Toast
-            isOpen
-            message={toastMessage}
-            actionLabel=""
-            onDismiss={() => setToastMessage(null)}
-          />
-        </div>
+        <Toast
+          isOpen
+          message={toastMessage}
+          actionLabel=""
+          onDismiss={() => setToastMessage(null)}
+        />
       )}
     </div>
   );

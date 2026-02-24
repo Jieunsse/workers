@@ -10,9 +10,10 @@ import styles from './TeamTabletHeader.module.css';
 
 type Props = {
   onMenuClick?: () => void;
+  onProfileClick?: () => void;
 };
 
-export default function TeamTabletHeader({ onMenuClick }: Props) {
+export default function TeamTabletHeader({ onMenuClick, onProfileClick }: Props) {
   const { data: currentUser } = useCurrentUserQuery();
 
   return (
@@ -28,9 +29,14 @@ export default function TeamTabletHeader({ onMenuClick }: Props) {
       <div className={styles.logo}>
         <Image src={logoLarge} alt="COWORKERS" width={120} height={24} />
       </div>
-      <div className={styles.profileArea}>
+      <button
+        type="button"
+        className={styles.profileArea}
+        onClick={onProfileClick}
+        aria-label="프로필"
+      >
         <ProfileImage src={currentUser?.image} size="sm" variant="profile" showBorder={false} />
-      </div>
+      </button>
     </header>
   );
 }

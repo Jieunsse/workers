@@ -1,6 +1,8 @@
 import { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 
 export type InputProps = ComponentPropsWithoutRef<'input'> & {
+  /** input DOM 참조 */
+  ref?: Ref<HTMLInputElement>;
   /** 입력 필드 하단에 표시할 에러 메시지 */
   errorMessage?: string;
   /** 에러 스타일 적용 여부 (errorMessage 없이 테두리만 빨갛게 할 때 사용) */

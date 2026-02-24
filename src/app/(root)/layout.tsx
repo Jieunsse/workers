@@ -32,6 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const isLanding = pathname === '/';
   const firstGroup = user?.memberships?.[0]?.group;
 
+  // [teamid] 페이지는 자체 모바일 헤더(TeamNavClient)를 사용하므로 root layout의 MobileHeader를 숨김
+  const knownPaths = ['/', '/addteam', '/boards', '/mypage', '/history', '/list'];
+  const isTeamIdPage = !knownPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
+
   const handleProfileClick = () => {
     if (isLoggedIn) {
       router.push('/mypage');
@@ -40,12 +44,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  };
+
   return (
     <div className={styles.layout}>
       <Sidebar
         defaultCollapsed={isLanding}
         isLoggedIn={isLoggedIn}
         onProfileClick={handleProfileClick}
+        onLogout={handleLogout}
+        onLogoClick={() => router.push('/addteam')}
         profileImage={
           user?.image ? (
             <Image
@@ -80,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 }
                 label={firstGroup.name}
                 isSelected
+                onClick={() => router.push(`/${firstGroup.id}`)}
               />
             ) : (
               <SidebarButton
@@ -99,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 label={firstGroup.name}
                 isActive
                 iconOnly
+                onClick={() => router.push(`/${firstGroup.id}`)}
               />
             )
           ) : null
@@ -107,7 +120,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           isLoggedIn
             ? (isCollapsed: boolean) => (
                 <>
-                  {!isCollapsed && <SidebarAddButton label="팀 추가하기" onClick={() => {}} />}
+                  {!isCollapsed && (
+                    <SidebarAddButton label="팀 추가하기" onClick={() => router.push('/addteam')} />
+                  )}
                   <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
                   <SidebarButton
                     icon={
@@ -128,31 +143,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             : undefined
         }
       />
-      <MobileHeader
-        isLoggedIn={isLoggedIn}
-        profileImage={
-          user?.image ? (
-            <Image
-              src={user.image}
-              alt=""
-              width={32}
-              height={32}
-              style={{ borderRadius: 8, objectFit: 'cover' }}
+      {!isTeamIdPage && (
+        <>
+          <MobileHeader
+            isLoggedIn={isLoggedIn}
+            profileImage={
+              user?.image ? (
+                <Image
+                  src={user.image}
+                  alt=""
+                  width={32}
+                  height={32}
+                  style={{ borderRadius: 8, objectFit: 'cover' }}
+                />
+              ) : undefined
+            }
+            onMenuClick={() => setIsDrawerOpen(true)}
+            onProfileClick={handleProfileClick}
+          />
+          <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
+            <SidebarButton
+              icon={<Image src={boardSmall} alt="" width={20} height={20} />}
+              label="자유게시판"
+              isActive
+              href="/boards"
+              onClick={() => setIsDrawerOpen(false)}
             />
-          ) : undefined
-        }
-        onMenuClick={() => setIsDrawerOpen(true)}
-        onProfileClick={handleProfileClick}
-      />
-      <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-        <SidebarButton
-          icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-          label="자유게시판"
-          isActive
-          href="/boards"
-          onClick={() => setIsDrawerOpen(false)}
-        />
-      </MobileDrawer>
+          </MobileDrawer>
+        </>
+      )}
       <main className={styles.main}>{children}</main>
     </div>
   );

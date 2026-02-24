@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from './ArticleCard.module.css';
 import bestIcon from '@/assets/icons/best/best.svg';
@@ -16,30 +18,26 @@ interface ArticleCardProps {
   likeCount: number;
   image?: string;
   isBest?: boolean;
-  onClick?: () => void;
+  href?: string;
 }
 
-/**
- * ArticleCard
- *
- * 자유게시판 게시글을 카드 형태로 표시하는 컴포넌트입니다.
- *
- * @remarks
- * - 목록 조회 API(ArticleListType)의 데이터 구조와 일치합니다.
- * - `isBest` prop은 페이지에서 계산하여 전달합니다 (좋아요 상위 N개).
- * - `content` 필드는 현재 API에 없지만, 추후 추가를 대비해 optional로 정의했습니다.
- * - 이미지가 있으면 우측에 표시되고, 없으면 텍스트가 전체 공간을 차지합니다.
- *
- * @example
- * ```tsx
- * <ArticleCard
- *   {...article}
- *   isBest={bestArticles.includes(article)}
- *   onClick={() => router.push(`/articles/${article.id}`)}
- * />
- * ```
- */
-export default function ArticleCard({
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}. ${month}. ${day}`;
+}
+
+function formatLikeCount(count: number): string {
+  if (count >= 1000) {
+    return '999+';
+  }
+  return count.toString();
+}
+
+function ArticleCard({
+  id,
   title,
   content,
   writer,
@@ -47,26 +45,13 @@ export default function ArticleCard({
   likeCount,
   image,
   isBest = false,
-  onClick,
+  href,
 }: ArticleCardProps) {
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}. ${month}. ${day}`;
-  };
-
-  const formatLikeCount = (count: number): string => {
-    if (count >= 1000) {
-      return '999+';
-    }
-    return count.toString();
-  };
+  const cardHref = href ?? `/boards/${id}`;
 
   if (isBest) {
     return (
-      <article className={`${styles.card} ${styles.best}`} onClick={onClick}>
+      <Link href={cardHref} className={`${styles.card} ${styles.best}`}>
         <div className={styles.badge}>
           <Image src={bestIcon} alt="" width={16} height={16} />
           <span>인기</span>
@@ -101,12 +86,12 @@ export default function ArticleCard({
             <span>{formatLikeCount(likeCount)}</span>
           </div>
         </div>
-      </article>
+      </Link>
     );
   }
 
   return (
-    <article className={styles.card} onClick={onClick}>
+    <Link href={cardHref} className={styles.card}>
       <div className={styles.content}>
         <h3 className={styles.title}>{title}</h3>
 
@@ -137,6 +122,8 @@ export default function ArticleCard({
           <span>{formatLikeCount(likeCount)}</span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
+
+export default memo(ArticleCard);

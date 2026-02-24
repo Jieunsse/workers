@@ -26,6 +26,7 @@ export default function Page() {
       bestArticles={bestArticles}
       articles={articles}
       hasMore={hasNextPage && !isFetchingNextPage}
+      isFetchingMore={isFetchingNextPage}
       onLoadMore={() => fetchNextPage()}
       onSearch={setKeyword}
       onSort={setOrderBy}

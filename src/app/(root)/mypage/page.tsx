@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 
 import { useUser } from './hooks';
@@ -35,8 +35,8 @@ export default function ProfilePage() {
   const [showToast, setShowToast] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const newPasswordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -55,14 +55,14 @@ export default function ProfilePage() {
   };
 
   const handlePasswordSubmit = async () => {
-    const result = await updatePassword({
-      password: newPassword,
-      passwordConfirmation: confirmPassword,
-    });
+    const password = newPasswordRef.current?.value ?? '';
+    const passwordConfirmation = confirmPasswordRef.current?.value ?? '';
+    if (!password || !passwordConfirmation) return;
+    const result = await updatePassword({ password, passwordConfirmation });
     if (result.success) {
       setIsPasswordModalOpen(false);
-      setNewPassword('');
-      setConfirmPassword('');
+      if (newPasswordRef.current) newPasswordRef.current.value = '';
+      if (confirmPasswordRef.current) confirmPasswordRef.current.value = '';
     }
   };
 
@@ -189,18 +189,16 @@ export default function ProfilePage() {
         isOpen={isPasswordModalOpen}
         onClose={() => {
           setIsPasswordModalOpen(false);
-          setNewPassword('');
-          setConfirmPassword('');
+          if (newPasswordRef.current) newPasswordRef.current.value = '';
+          if (confirmPasswordRef.current) confirmPasswordRef.current.value = '';
         }}
         onSubmit={handlePasswordSubmit}
         input={{
           newPassword: {
-            value: newPassword,
-            onChange: (e) => setNewPassword(e.target.value),
+            ref: newPasswordRef,
           },
           confirmPassword: {
-            value: confirmPassword,
-            onChange: (e) => setConfirmPassword(e.target.value),
+            ref: confirmPasswordRef,
           },
         }}
       />

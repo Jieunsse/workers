@@ -19,7 +19,6 @@ interface KanbanItemProps {
 function KanbanItem({
   task,
   onItemCheckedChange,
-  onCardClick,
   onDeleteTask,
   onEditTask,
   onUpdateTask,

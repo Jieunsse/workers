@@ -37,6 +37,7 @@
 
 .logo {
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .foldButton {
@@ -76,6 +77,11 @@
   align-items: center;
 }
 
+.footerWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .footer {
   display: flex;
   align-items: center;
@@ -85,6 +91,49 @@
   border-top: 1px solid var(--color-background-tertiary);
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.profileMenu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 16px;
+  right: 16px;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-background-tertiary);
+  border-radius: 8px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.profileMenuItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
+.profileMenuItem:hover {
+  background: var(--color-background-secondary);
+}
+
+.profileMenuRight {
+  bottom: auto;
+  top: 0;
+  left: calc(100% + 8px);
+  right: auto;
+  min-width: 140px;
+}
+
+.profileMenuDanger {
+  color: var(--color-status-danger);
 }
 
 .loginText {

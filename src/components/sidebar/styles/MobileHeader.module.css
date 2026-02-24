@@ -49,6 +49,11 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.profileWrapper {
+  position: relative;
 }
 
 .profileButton {
@@ -63,4 +68,39 @@
   cursor: pointer;
   padding: 0;
   overflow: hidden;
+}
+
+.profileMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-background-tertiary);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.profileMenuItem {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
+.profileMenuItem:hover {
+  background: var(--color-background-secondary);
+}
+
+.profileMenuDanger {
+  color: var(--color-status-danger);
 }

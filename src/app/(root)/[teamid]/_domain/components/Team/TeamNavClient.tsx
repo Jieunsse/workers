@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { MobileHeader, MobileDrawer } from '@/components/sidebar';
 import ProfileImage from '@/components/profile-img/ProfileImage';
@@ -12,15 +13,17 @@ import styles from './TeamNavClient.module.css';
 export default function TeamNavClient() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { data: currentUser } = useCurrentUserQuery();
+  const router = useRouter();
 
   const openDrawer = () => setIsDrawerOpen(true);
   const closeDrawer = () => setIsDrawerOpen(false);
+  const handleProfileClick = () => router.push('/mypage');
 
   return (
     <>
       {/* 태블릿 헤더 */}
       <div className={styles.tabletWrapper}>
-        <TeamTabletHeader onMenuClick={openDrawer} />
+        <TeamTabletHeader onMenuClick={openDrawer} onProfileClick={handleProfileClick} />
       </div>
 
       {/* 모바일 헤더 */}
@@ -31,6 +34,7 @@ export default function TeamNavClient() {
             <ProfileImage src={currentUser?.image} size="sm" variant="profile" showBorder={false} />
           }
           onMenuClick={openDrawer}
+          onProfileClick={handleProfileClick}
         />
       </div>
 

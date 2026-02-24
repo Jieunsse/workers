@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,6 +24,8 @@ type SidebarProps = {
   defaultCollapsed?: boolean;
   isLoggedIn?: boolean;
   onProfileClick?: () => void;
+  onLogout?: () => void;
+  onLogoClick?: () => void;
 };
 
 /**
@@ -44,8 +46,23 @@ export default function Sidebar({
   defaultCollapsed,
   isLoggedIn,
   onProfileClick,
+  onLogout,
+  onLogoClick,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed ?? false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showProfileMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileMenu]);
 
   const renderSlot = (slot: SlotNode) => {
     if (!slot) return null;
@@ -85,22 +102,48 @@ export default function Sidebar({
     }
 
     return (
-      <div className={styles.footer} onClick={onProfileClick}>
-        <div className={styles.profileImage}>{profileImage}</div>
-        <AnimatePresence>
-          {!isCollapsed && (
-            <motion.div
-              className={styles.profileInfo}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2 }}
+      <div className={styles.footerWrapper} ref={profileMenuRef}>
+        {showProfileMenu && (
+          <div className={clsx(styles.profileMenu, isCollapsed && styles.profileMenuRight)}>
+            <button
+              type="button"
+              className={styles.profileMenuItem}
+              onClick={() => {
+                setShowProfileMenu(false);
+                onProfileClick?.();
+              }}
             >
-              <span className={styles.profileName}>{profileName}</span>
-              <span className={styles.profileTeam}>{profileTeam}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              마이페이지
+            </button>
+            <button
+              type="button"
+              className={`${styles.profileMenuItem} ${styles.profileMenuDanger}`}
+              onClick={() => {
+                setShowProfileMenu(false);
+                onLogout?.();
+              }}
+            >
+              로그아웃
+            </button>
+          </div>
+        )}
+        <div className={styles.footer} onClick={() => setShowProfileMenu((prev) => !prev)}>
+          <div className={styles.profileImage}>{profileImage}</div>
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.div
+                className={styles.profileInfo}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <span className={styles.profileName}>{profileName}</span>
+                <span className={styles.profileTeam}>{profileTeam}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     );
   };
@@ -112,7 +155,12 @@ export default function Sidebar({
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       <div className={styles.header}>
-        <div className={styles.logo}>
+        <div
+          className={styles.logo}
+          onClick={onLogoClick}
+          role={onLogoClick ? 'button' : undefined}
+          tabIndex={onLogoClick ? 0 : undefined}
+        >
           <AnimatePresence mode="wait">
             {isCollapsed ? (
               <motion.div

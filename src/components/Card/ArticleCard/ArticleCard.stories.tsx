@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { fn } from 'storybook/test';
 import ArticleCard from './ArticleCard';
 
 const meta = {
@@ -54,9 +53,9 @@ ArticleCard는 자유게시판 게시글을 카드 형태로 표시하는 컴포
       control: 'boolean',
       description: '인기글 여부',
     },
-    onClick: {
-      action: 'clicked',
-      description: '클릭 이벤트 핸들러',
+    href: {
+      control: 'text',
+      description: '클릭 시 이동할 경로 (미전달 시 /boards/{id})',
     },
   },
 } satisfies Meta<typeof ArticleCard>;
@@ -78,7 +77,6 @@ export const Default: Story = {
     writer: mockWriter,
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 24,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -105,7 +103,6 @@ export const Best: Story = {
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 999,
     isBest: true,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -132,7 +129,6 @@ export const WithImage: Story = {
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 24,
     image: 'https://picsum.photos/400/400',
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -162,7 +158,6 @@ export const BestWithImageAndContent: Story = {
     likeCount: 999,
     image: 'https://picsum.photos/400/400',
     isBest: true,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -190,7 +185,6 @@ export const WithContent: Story = {
     writer: mockWriter,
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 24,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -217,7 +211,6 @@ export const LongTitle: Story = {
     writer: mockWriter,
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 5,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -244,7 +237,6 @@ export const HighLikes: Story = {
     createdAt: '2024-07-25T09:00:00Z',
     likeCount: 1234,
     isBest: true,
-    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -301,7 +293,7 @@ export const MultipleAll: Story = {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '523px' }}>
         {articles.map((article) => (
-          <ArticleCard key={article.id} {...article} onClick={fn()} />
+          <ArticleCard key={article.id} {...article} />
         ))}
       </div>
     );
@@ -361,7 +353,7 @@ export const MultipleBest: Story = {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '350px' }}>
         {articles.map((article) => (
-          <ArticleCard key={article.id} {...article} onClick={fn()} />
+          <ArticleCard key={article.id} {...article} />
         ))}
       </div>
     );

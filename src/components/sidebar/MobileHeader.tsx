@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import { type ReactNode, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 
@@ -17,6 +19,10 @@ type MobileHeaderProps = {
   onMenuClick?: () => void;
   /** 프로필 버튼 클릭 시 호출되는 콜백 */
   onProfileClick?: () => void;
+  /** 로그아웃 클릭 시 호출되는 콜백 */
+  onLogout?: () => void;
+  /** 로고 클릭 시 호출되는 콜백 */
+  onLogoClick?: () => void;
   /** 로고 너비 (기본값: 102) */
   logoWidth?: number;
   /** 로고 높이 (기본값: 20) */
@@ -33,13 +39,34 @@ export default function MobileHeader({
   profileImage,
   onMenuClick,
   onProfileClick,
+  onLogout,
+  onLogoClick,
   logoWidth = 102,
   logoHeight = 20,
 }: MobileHeaderProps) {
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showProfileMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileMenu]);
+
   if (!isLoggedIn) {
     return (
       <header className={styles.header}>
-        <div className={styles.logo}>
+        <div
+          className={styles.logo}
+          onClick={onLogoClick}
+          role={onLogoClick ? 'button' : undefined}
+          tabIndex={onLogoClick ? 0 : undefined}
+        >
           <Image src={logoSmall} alt="COWORKERS" width={logoWidth} height={logoHeight} />
         </div>
       </header>
@@ -57,18 +84,49 @@ export default function MobileHeader({
         >
           <Image src={hamburger} alt="" width={24} height={24} />
         </button>
-        <div className={styles.logo}>
+        <div
+          className={styles.logo}
+          onClick={onLogoClick}
+          role={onLogoClick ? 'button' : undefined}
+          tabIndex={onLogoClick ? 0 : undefined}
+        >
           <Image src={logoIcon} alt="COWORKERS" width={24} height={24} />
         </div>
       </div>
-      <button
-        type="button"
-        className={styles.profileButton}
-        onClick={onProfileClick}
-        aria-label="프로필"
-      >
-        {profileImage ?? <Image src={humanBig} alt="" width={32} height={32} />}
-      </button>
+      <div className={styles.profileWrapper} ref={profileMenuRef}>
+        <button
+          type="button"
+          className={styles.profileButton}
+          onClick={() => setShowProfileMenu((prev) => !prev)}
+          aria-label="프로필"
+        >
+          {profileImage ?? <Image src={humanBig} alt="" width={32} height={32} />}
+        </button>
+        {showProfileMenu && (
+          <div className={styles.profileMenu}>
+            <button
+              type="button"
+              className={styles.profileMenuItem}
+              onClick={() => {
+                setShowProfileMenu(false);
+                onProfileClick?.();
+              }}
+            >
+              마이페이지
+            </button>
+            <button
+              type="button"
+              className={`${styles.profileMenuItem} ${styles.profileMenuDanger}`}
+              onClick={() => {
+                setShowProfileMenu(false);
+                onLogout?.();
+              }}
+            >
+              로그아웃
+            </button>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

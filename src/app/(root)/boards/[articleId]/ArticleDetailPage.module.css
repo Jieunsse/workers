@@ -284,15 +284,6 @@
   cursor: not-allowed;
 }
 
-/* Toast */
-.toastWrapper {
-  position: fixed;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-}
-
 /* Tablet */
 @media (max-width: 1199px) {
   .page {

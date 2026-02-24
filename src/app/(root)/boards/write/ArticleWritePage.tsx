@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Input from '@/components/input/Input';
 import TextArea from '@/components/input/TextArea';
@@ -13,11 +13,17 @@ import styles from './ArticleWritePage.module.css';
 export default function ArticleWritePage() {
   const router = useRouter();
   const createArticleMutation = useCreateArticle();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const titleRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [isValid, setIsValid] = useState(false);
   const [images, setImages] = useState<string[]>([]);
 
-  const isValid = title.trim().length > 0 && content.trim().length > 0;
+  const checkValidity = () => {
+    const valid =
+      (titleRef.current?.value.trim().length ?? 0) > 0 &&
+      (contentRef.current?.value.trim().length ?? 0) > 0;
+    setIsValid((prev) => (prev !== valid ? valid : prev));
+  };
 
   const handleFileSelect = async (file: File) => {
     try {
@@ -33,11 +39,13 @@ export default function ArticleWritePage() {
   };
 
   const handleSubmit = () => {
-    if (!isValid || createArticleMutation.isPending) return;
+    const title = titleRef.current?.value.trim() ?? '';
+    const content = contentRef.current?.value.trim() ?? '';
+    if (!title || !content || createArticleMutation.isPending) return;
     createArticleMutation.mutate(
       {
-        title: title.trim(),
-        content: content.trim(),
+        title,
+        content,
         ...(images[0] ? { image: images[0] } : {}),
       },
       {
@@ -57,9 +65,10 @@ export default function ArticleWritePage() {
             제목 <span className={styles.required}>*</span>
           </label>
           <Input
+            ref={titleRef}
             placeholder="제목을 입력해주세요."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            defaultValue=""
+            onChange={checkValidity}
           />
         </div>
 
@@ -68,10 +77,11 @@ export default function ArticleWritePage() {
             내용 <span className={styles.required}>*</span>
           </label>
           <TextArea
+            ref={contentRef}
             className={styles.contentTextarea}
             placeholder="내용을 입력하세요"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            defaultValue=""
+            onChange={checkValidity}
           />
         </div>
 
