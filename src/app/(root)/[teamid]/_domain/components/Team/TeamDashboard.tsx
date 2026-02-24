@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import KanbanBoard from '../Kanban/KanbanBoard';
@@ -124,6 +125,9 @@ export default function TeamDashboard() {
         </div>
 
         <aside className={styles.rightPanel}>
+          <Link href={`/list?groupId=${teamid}`} className={styles.listLink}>
+            리스트 보기
+          </Link>
           <MemberSection
             members={group.members ?? []}
             isAdmin={isAdmin}

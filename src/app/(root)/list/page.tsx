@@ -1,9 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
+import {
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useInitialGroupId } from './_hooks/useInitialGroupId';
 
 import styles from './list.module.css';
 
@@ -401,7 +409,7 @@ const EDIT_TEAM_PATH = (groupId: number) => `/teams/${groupId}/edit`;
 
 type CreateTaskListResult = { id: number };
 
-export default function ListPage() {
+function ListPage() {
   const router = useRouter();
   const qc = useQueryClient();
   const desktopSidebarRef = useRef<HTMLDivElement | null>(null);
@@ -445,7 +453,10 @@ export default function ListPage() {
   }, [me?.memberships]);
 
   const [activeGroupIdState, setActiveGroupIdState] = useState<number | undefined>(undefined);
-  const activeGroupId = activeGroupIdState ?? groups[0]?.id ?? 0;
+  const urlGroupId = useInitialGroupId();
+
+  // URL 파라미터 → 유저 선택 → 첫 번째 그룹 순으로 활성 그룹 결정
+  const activeGroupId = activeGroupIdState ?? urlGroupId ?? groups[0]?.id ?? 0;
 
   const activeGroup = useMemo(
     () => groups.find((g) => g.id === activeGroupId) ?? null,
@@ -1555,5 +1566,13 @@ export default function ListPage() {
         />
       </section>
     </main>
+  );
+}
+
+export default function ListPageRoot() {
+  return (
+    <Suspense>
+      <ListPage />
+    </Suspense>
   );
 }

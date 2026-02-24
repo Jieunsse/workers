@@ -12,69 +12,7 @@
   background: var(--color-background-secondary, #f5f6f8);
   align-items: stretch;
   overflow-x: hidden;
-}
-
-/* ===== Desktop Sidebar ===== */
-.desktopSidebar {
-  flex-shrink: 0;
-  align-self: stretch;
-  display: flex;
-  height: auto;
-  min-height: 100%;
-}
-
-/* ✅ list 페이지와 동일: aside는 visible, 내용 영역만 hidden */
-:global([class*='Sidebar-module__'][class*='sidebar']) {
-  overflow: visible !important;
-}
-:global([class*='Sidebar-module__'][class*='content']) {
-  overflow: hidden !important;
-}
-
-/* ✅ 텍스트 줄바꿈/넘침 방지 (list 동일) */
-:global([class*='Sidebar-module__'] button),
-:global([class*='Sidebar-module__'] a),
-:global([class*='Sidebar-module__'] span),
-:global([class*='Sidebar-module__'] p) {
-  max-width: 100% !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-/* ===== Mobile GNB ===== */
-.mobileGnb {
-  display: none;
-}
-
-/* ✅ 1024~1199에서도 Sidebar 강제 표시 (list 동일) */
-@media (min-width: 1024px) and (max-width: 1199px) {
-  .desktopSidebar {
-    display: flex !important;
-  }
-  .mobileGnb {
-    display: none !important;
-  }
-  :global([class*='Sidebar-module__'][class*='sidebar']) {
-    display: flex !important;
-  }
-}
-
-/* ✅ 모바일/태블릿은 1023px 이하 */
-@media (max-width: 1023px) {
-  .desktopSidebar {
-    display: none;
-  }
-  .mobileGnb {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-background-inverse, #fff);
-    padding-top: env(safe-area-inset-top);
-    z-index: 5;
-  }
+  flex-direction: column;
 }
 
 /* ===== main ===== */
@@ -83,14 +21,13 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 120px 85px 80px;
+  padding: 120px 67px 80px;
   box-sizing: border-box;
 }
 
 @media (max-width: 1023px) {
   .main {
     padding: 0;
-    padding-top: calc(60px + env(safe-area-inset-top));
   }
 }
 
@@ -99,7 +36,10 @@
   width: 100%;
 }
 
-/* ✅ 모바일 패딩 18px + margin-top 17px */
+.teamHeaderRow {
+  position: relative;
+}
+
 @media (max-width: 767px) {
   .teamHeaderWrap {
     margin-top: 17px;
@@ -108,7 +48,6 @@
   }
 }
 
-/* ✅ 태블릿 패딩 26px + margin-top 32px */
 @media (min-width: 768px) and (max-width: 1023px) {
   .teamHeaderWrap {
     margin-top: 32px;
@@ -117,7 +56,6 @@
   }
 }
 
-/* ✅ PC에서는 TeamHeader 가운데 정렬만 */
 @media (min-width: 1024px) {
   :global(.TeamHeader-module__H3kcRq__container) {
     width: 100%;
@@ -125,6 +63,71 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
+}
+
+/*  TeamHeader 톱니 메뉴 */
+.teamMenu {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  width: 140px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  z-index: 15000;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 모바일/태블릿: top 대신 left:50px */
+@media (max-width: 1023px) {
+  .teamMenu {
+    top: auto;
+    right: auto;
+    left: 50px;
+  }
+}
+
+/* 모바일: width 100px */
+@media (max-width: 743px) {
+  .teamMenu {
+    width: 100px;
+  }
+}
+
+.teamMenuItem {
+  width: 100%;
+  height: 34px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.teamMenuItem:hover {
+  background: #f1f5f9;
+}
+
+.teamMenuItemDanger {
+  width: 100%;
+  height: 34px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #ef4444;
+}
+
+.teamMenuItemDanger:hover {
+  background: #fff1f2;
 }
 
 /* ===== body layout ===== */
@@ -137,14 +140,12 @@
   gap: 48px;
 }
 
-/* ✅ PC gap 76 */
 @media (min-width: 1024px) {
   .body {
     gap: 76px;
   }
 }
 
-/* 모바일/태블릿 */
 @media (max-width: 743px) {
   .body {
     margin-top: 25px;
@@ -154,6 +155,7 @@
     gap: 18px;
   }
 }
+
 @media (min-width: 744px) and (max-width: 1023px) {
   .body {
     margin-top: 25px;
@@ -164,7 +166,7 @@
   }
 }
 
-/* ===== PC Left ===== */
+/* ===== Left (PC only) ===== */
 .leftCol {
   width: 270px;
   flex-shrink: 0;
@@ -172,36 +174,53 @@
   flex-direction: column;
 }
 
+@media (max-width: 1023px) {
+  .leftCol {
+    display: none;
+  }
+}
+
+/* "내가 한 일" */
 .leftTitle {
-  margin: 0 0 22px 0;
-  font-size: 18px;
-  font-weight: 800;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
   color: #0f172a;
 }
 
+/* 스크롤 + margin-top 40 */
 .leftScroll {
   max-height: 768px;
   overflow: auto;
   padding-right: 10px;
   box-sizing: border-box;
+  margin-top: 40px;
 }
 
-.monthSection {
-  margin-bottom: 40px;
+/* 월별 묶음 간격 55px */
+.monthBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  margin-bottom: 55px;
 }
 
-.monthTitle {
-  font-size: 14px;
-  font-weight: 800;
+.monthBlockTitle {
+  font-size: 16px;
+  font-weight: 500;
   color: #0f172a;
-  margin-bottom: 12px;
-  cursor: pointer;
 }
 
 .cardStack {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.leftEmpty {
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 10px 0;
 }
 
 /* ===== Right ===== */
@@ -310,13 +329,6 @@
   top: 0px;
 }
 
-@media (min-width: 1024px) {
-  .calendarBtn {
-    right: 0px;
-    top: 0px;
-  }
-}
-
 .calendarPopover {
   position: absolute;
   top: calc(0px + 28px + 10px);
@@ -336,16 +348,43 @@
   }
 }
 
-/* Chip row */
+/* 모바일/태블릿 칩 라인 (PC 숨김) */
 .chipRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  box-sizing: border-box;
-  margin-top: 27px;
+  display: none;
+  margin-top: 16px;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+
+  width: 100%;
+  justify-content: center;
 }
 
-/* Body */
+@media (max-width: 1023px) {
+  .chipRow {
+    display: flex;
+  }
+}
+
+/*  Chip 크기: 모바일 86px */
+@media (max-width: 743px) {
+  :global(.Chip-module__j4Ti-q__chip.Chip-module__j4Ti-q__small) {
+    width: 87px !important;
+    height: 33px !important;
+    padding: 0 !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+}
+@media (min-width: 744px) and (max-width: 1023px) {
+  :global(.Chip-module__j4Ti-q__chip.Chip-module__j4Ti-q__small) {
+    width: 109px !important;
+    height: 43px !important;
+    padding: 0 14px !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+}
+
+/* body */
 .boxBody {
   flex: 1;
   overflow: auto;
@@ -404,16 +443,12 @@
   cursor: pointer;
 }
 
-/* ✅ Chip border (small) */
-:global(.Chip-module__j4Ti-q__chip.Chip-module__j4Ti-q__small) {
-  border: 1px solid var(--color-background-tertiary, #e2e8f0) !important;
-}
-
-/* ✅ 태블릿 large 보더 */
-@media (min-width: 744px) and (max-width: 1024px) {
-  :global(.Chip-module__j4Ti-q__chip.Chip-module__j4Ti-q__large) {
-    border: 1px solid var(--color-background-tertiary, #e2e8f0) !important;
-  }
+/* 히스토리니까 체크박스 눌리지 않게 */
+.taskRow :global([role='checkbox']),
+.taskRow :global(input[type='checkbox']),
+.taskRow :global([aria-checked]) {
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
 /* task kebab menu */
@@ -454,7 +489,13 @@
   background: #f1f5f9;
 }
 
-/* ===== Detail Overlay (history 원본 유지) ===== */
+.taskMenuItemDisabled {
+  pointer-events: none;
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===== Detail Overlay ===== */
 .detailOverlay {
   position: fixed;
   top: 0;
@@ -492,46 +533,6 @@
   padding: 28px;
 }
 
-/* ✅ TaskDetailCard header 레이아웃 강제 */
-.detailOverlay :global([class*='TaskDetailCard-module__'][class*='header']) {
-  display: grid !important;
-  grid-template-columns: 1fr auto !important;
-  grid-template-rows: auto auto !important;
-  grid-template-areas:
-    'close close'
-    'title kebab' !important;
-  align-items: center !important;
-}
-
-.detailOverlay :global([class*='TaskDetailCard-module__'][class*='closeButton']) {
-  grid-area: close !important;
-  justify-self: start !important;
-  align-self: start !important;
-}
-
-.detailOverlay :global([class*='TaskDetailCard-module__'][class*='title']) {
-  grid-area: title !important;
-}
-
-.detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
-  grid-area: kebab !important;
-  justify-self: end !important;
-}
-
-/* 간격: PC/태블릿 74px, 모바일 20px */
-@media (min-width: 744px) {
-  .detailOverlay :global([class*='TaskDetailCard-module__'][class*='title']),
-  .detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
-    margin-top: 74px !important;
-  }
-}
-@media (max-width: 767px) {
-  .detailOverlay :global([class*='TaskDetailCard-module__'][class*='title']),
-  .detailOverlay :global([class*='TaskDetailCard-module__'][class*='kebabWrapper']) {
-    margin-top: 20px !important;
-  }
-}
-
 @media (max-width: 1024px) {
   .detailOverlay {
     left: 0;
@@ -559,11 +560,23 @@
   }
 }
 
+/* TaskDetailCard 제목 마진 0 */
 :global(.TaskDetailCard-module__8btaCa__title) {
   margin: 0 !important;
+  padding-top: 72px !important;
+}
+@media (max-width: 1023px) {
+  :global(.TaskDetailCard-module__8btaCa__title) {
+    padding-top: 40px !important;
+  }
+}
+@media (max-width: 767px) {
+  :global(.TaskDetailCard-module__8btaCa__title) {
+    padding-top: 20px !important;
+  }
 }
 
-/* ✅ 히스토리라서 디테일 내부 inverse FilledRoundButton 클릭 금지 */
+/* 히스토리라서 디테일 내부 inverse FilledRoundButton 클릭 금지 */
 .detailOverlay
   :global(
     .ButtonBehavior-module__7wasrG__buttonBase.FilledRoundButton-module__5BYrQG__root.FilledRoundButton-module__5BYrQG__inverse.FilledRoundButton-module__5BYrQG__shadow

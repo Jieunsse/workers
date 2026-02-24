@@ -33,6 +33,7 @@ export default function ProfilePage() {
   } = useUser();
 
   const [showToast, setShowToast] = useState(false);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const newPasswordRef = useRef<HTMLInputElement>(null);
@@ -47,6 +48,7 @@ export default function ProfilePage() {
     const result = await updateProfile();
     if (result.success) {
       setShowToast(false);
+      setSuccessToast('이름이 변경되었습니다.');
     }
   };
 
@@ -63,6 +65,7 @@ export default function ProfilePage() {
       setIsPasswordModalOpen(false);
       if (newPasswordRef.current) newPasswordRef.current.value = '';
       if (confirmPasswordRef.current) confirmPasswordRef.current.value = '';
+      setSuccessToast('비밀번호가 변경되었습니다.');
     }
   };
 
@@ -171,8 +174,8 @@ export default function ProfilePage() {
           </form>
         </div>
 
-        {hasChanges && (
-          <div className={styles.toastWrapper}>
+        <div className={styles.toastWrapper}>
+          {hasChanges && (
             <Toast
               isOpen={showToast}
               message="저장하지 않은 변경사항이 있어요!"
@@ -181,8 +184,17 @@ export default function ProfilePage() {
               onDismiss={() => setShowToast(false)}
               className={styles.toast}
             />
-          </div>
-        )}
+          )}
+          {successToast && (
+            <Toast
+              isOpen
+              message={successToast}
+              actionLabel=""
+              onDismiss={() => setSuccessToast(null)}
+              className={styles.toast}
+            />
+          )}
+        </div>
       </div>
 
       <ChangePassword

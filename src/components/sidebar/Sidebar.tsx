@@ -1,7 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,9 +50,19 @@ export default function Sidebar({
   onLogout,
   onLogoClick,
 }: SidebarProps) {
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed ?? false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  const defaultLogout = useCallback(async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  }, [router]);
+
+  const handleLogout = onLogout ?? defaultLogout;
+  const handleProfileClick = onProfileClick ?? (() => router.push('/mypage'));
+  const handleLogoClick = onLogoClick ?? (() => router.push('/addteam'));
 
   useEffect(() => {
     if (!showProfileMenu) return;
@@ -72,7 +83,7 @@ export default function Sidebar({
   const renderFooter = () => {
     if (footer) {
       return (
-        <div className={styles.footer} onClick={onProfileClick}>
+        <div className={styles.footer} onClick={handleProfileClick}>
           {renderSlot(footer)}
         </div>
       );
@@ -80,7 +91,7 @@ export default function Sidebar({
 
     if (!isLoggedIn) {
       return (
-        <motion.div className={styles.footer} onClick={onProfileClick} layout>
+        <motion.div className={styles.footer} onClick={handleProfileClick} layout>
           <AnimatePresence>
             {!isCollapsed && (
               <motion.div
@@ -110,7 +121,7 @@ export default function Sidebar({
               className={styles.profileMenuItem}
               onClick={() => {
                 setShowProfileMenu(false);
-                onProfileClick?.();
+                handleProfileClick();
               }}
             >
               마이페이지
@@ -120,7 +131,7 @@ export default function Sidebar({
               className={`${styles.profileMenuItem} ${styles.profileMenuDanger}`}
               onClick={() => {
                 setShowProfileMenu(false);
-                onLogout?.();
+                handleLogout();
               }}
             >
               로그아웃
@@ -155,12 +166,7 @@ export default function Sidebar({
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
       <div className={styles.header}>
-        <div
-          className={styles.logo}
-          onClick={onLogoClick}
-          role={onLogoClick ? 'button' : undefined}
-          tabIndex={onLogoClick ? 0 : undefined}
-        >
+        <div className={styles.logo} onClick={handleLogoClick} role="button" tabIndex={0}>
           <AnimatePresence mode="wait">
             {isCollapsed ? (
               <motion.div

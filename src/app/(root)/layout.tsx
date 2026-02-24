@@ -1,28 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import {
-  Sidebar,
-  SidebarButton,
-  SidebarTeamSelect,
-  SidebarAddButton,
-  MobileHeader,
-  MobileDrawer,
-} from '@/components/sidebar';
-import boardSmall from '@/assets/icons/board/boardSmall.svg';
-import boardLarge from '@/assets/icons/board/boardLarge.svg';
-import chessSmall from '@/assets/icons/chess/chessSmall.svg';
-import chessBig from '@/assets/icons/chess/chessBig.svg';
+import { Sidebar, MobileHeader } from '@/components/sidebar';
+import TeamSidebarDropdown from './[teamid]/_domain/components/Team/TeamSidebarDropdown';
 import humanBig from '@/assets/buttons/human/humanBig.svg';
 import styles from './layout.module.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { data: user, isPending } = useCurrentUser();
 
   // isPending: 최초 로딩 중 (undefined)
@@ -30,11 +18,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // user !== null: 로그인
   const isLoggedIn = !isPending && user !== null && user !== undefined;
   const isLanding = pathname === '/';
-  const firstGroup = user?.memberships?.[0]?.group;
 
-  // [teamid] 페이지는 자체 모바일 헤더(TeamNavClient)를 사용하므로 root layout의 MobileHeader를 숨김
-  const knownPaths = ['/', '/addteam', '/boards', '/mypage', '/history', '/list'];
-  const isTeamIdPage = !knownPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
+  // 자체 사이드바가 없는 페이지에서만 root layout 사이드바 표시
+  const rootSidebarPaths = ['/', '/boards', '/mypage'];
+  const showRootSidebar = rootSidebarPaths.some(
+    (p) => pathname === p || pathname.startsWith(p + '/'),
+  );
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
@@ -51,126 +40,53 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={styles.layout}>
-      <Sidebar
-        defaultCollapsed={isLanding}
-        isLoggedIn={isLoggedIn}
-        onProfileClick={handleProfileClick}
-        onLogout={handleLogout}
-        onLogoClick={() => router.push('/addteam')}
-        profileImage={
-          user?.image ? (
-            <Image
-              src={user.image}
-              alt=""
-              width={40}
-              height={40}
-              style={{ borderRadius: 12, objectFit: 'cover' }}
-            />
-          ) : (
-            <Image src={humanBig} alt="" width={40} height={40} />
-          )
-        }
-        profileName={user?.nickname ?? '사용자'}
-        profileTeam={firstGroup?.name ?? ''}
-        teamSelect={(isCollapsed: boolean) =>
-          firstGroup ? (
-            !isCollapsed ? (
-              <SidebarTeamSelect
-                icon={
-                  firstGroup.image ? (
-                    <Image
-                      src={firstGroup.image}
-                      alt=""
-                      width={20}
-                      height={20}
-                      style={{ borderRadius: 4, objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <Image src={chessSmall} alt="" width={20} height={20} />
-                  )
-                }
-                label={firstGroup.name}
-                isSelected
-                onClick={() => router.push(`/${firstGroup.id}`)}
+      {showRootSidebar && (
+        <Sidebar
+          defaultCollapsed={isLanding}
+          isLoggedIn={isLoggedIn}
+          onProfileClick={handleProfileClick}
+          onLogout={handleLogout}
+          onLogoClick={() => router.push('/addteam')}
+          profileImage={
+            user?.image ? (
+              <Image
+                src={user.image}
+                alt=""
+                width={40}
+                height={40}
+                style={{ borderRadius: 12, objectFit: 'cover' }}
               />
             ) : (
-              <SidebarButton
-                icon={
-                  firstGroup.image ? (
-                    <Image
-                      src={firstGroup.image}
-                      alt=""
-                      width={24}
-                      height={24}
-                      style={{ borderRadius: 4, objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <Image src={chessBig} alt="" width={24} height={24} />
-                  )
-                }
-                label={firstGroup.name}
-                isActive
-                iconOnly
-                onClick={() => router.push(`/${firstGroup.id}`)}
-              />
+              <Image src={humanBig} alt="" width={40} height={40} />
             )
-          ) : null
-        }
-        addButton={
-          isLoggedIn
-            ? (isCollapsed: boolean) => (
-                <>
-                  {!isCollapsed && (
-                    <SidebarAddButton label="팀 추가하기" onClick={() => router.push('/addteam')} />
-                  )}
-                  <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-                  <SidebarButton
-                    icon={
-                      <Image
-                        src={isCollapsed ? boardLarge : boardSmall}
-                        alt=""
-                        width={isCollapsed ? 24 : 20}
-                        height={isCollapsed ? 24 : 20}
-                      />
-                    }
-                    label="자유게시판"
-                    isActive
-                    iconOnly={isCollapsed}
-                    href="/boards"
-                  />
-                </>
-              )
-            : undefined
-        }
-      />
-      {!isTeamIdPage && (
-        <>
-          <MobileHeader
-            isLoggedIn={isLoggedIn}
-            profileImage={
-              user?.image ? (
-                <Image
-                  src={user.image}
-                  alt=""
-                  width={32}
-                  height={32}
-                  style={{ borderRadius: 8, objectFit: 'cover' }}
-                />
-              ) : undefined
-            }
-            onMenuClick={() => setIsDrawerOpen(true)}
-            onProfileClick={handleProfileClick}
-          />
-          <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-            <SidebarButton
-              icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-              label="자유게시판"
-              isActive
-              href="/boards"
-              onClick={() => setIsDrawerOpen(false)}
-            />
-          </MobileDrawer>
-        </>
+          }
+          profileName={user?.nickname ?? '사용자'}
+          profileTeam={user?.memberships?.[0]?.group?.name ?? ''}
+          teamSelect={
+            isLoggedIn
+              ? (isCollapsed: boolean) => <TeamSidebarDropdown isCollapsed={isCollapsed} />
+              : undefined
+          }
+        />
+      )}
+      {showRootSidebar && (
+        <MobileHeader
+          isLoggedIn={isLoggedIn}
+          profileImage={
+            user?.image ? (
+              <Image
+                src={user.image}
+                alt=""
+                width={32}
+                height={32}
+                style={{ borderRadius: 8, objectFit: 'cover' }}
+              />
+            ) : undefined
+          }
+          onProfileClick={handleProfileClick}
+          onLogout={handleLogout}
+          drawerContent={<TeamSidebarDropdown />}
+        />
       )}
       <main className={styles.main}>{children}</main>
     </div>

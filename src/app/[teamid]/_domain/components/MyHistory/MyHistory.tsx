@@ -1,30 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
-import styles from './history.module.css';
-
-import Sidebar from '@/components/sidebar/Sidebar';
-import MobileHeader from '@/components/sidebar/MobileHeader';
-import MobileDrawer from '@/components/sidebar/MobileDrawer';
-
-import SidebarButton from '@/components/sidebar/SidebarButton';
-import SidebarAddButton from '@/components/sidebar/SidebarAddButton';
+import styles from './MyHistory.module.css';
 
 import TeamHeader from '@/components/team-header';
 import ArrowButton from '@/components/Button/domain/ArrowButton/ArrowButton';
-
 import TaskCard from '@/components/Card/TaskCard/TaskCard';
-import Chip from '@/components/Chip/Chip';
 import TaskListItem from '@/components/list/TaskListItem';
 import TaskDetailCard from '@/components/Card/TaskDetailCard/TaskDetailCard';
-
+import Chip from '@/components/Chip/Chip';
 import Calendar from '@/components/calendar/Calendar';
-
-import chessSmall from '@/assets/icons/chess/chessSmall.svg';
-import boardSmall from '@/assets/icons/board/boardSmall.svg';
 import calendarIcon from '@/assets/icons/calender/calenderSmall.svg';
 
 import {
@@ -37,20 +26,8 @@ import {
   useTaskComments,
   patchTaskDone,
   deleteTask,
-} from './hooks/queries';
-
-// ===== no setState in effect: media query =====
-function useMediaQuery(query: string) {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      const mql = window.matchMedia(query);
-      mql.addEventListener('change', onStoreChange);
-      return () => mql.removeEventListener('change', onStoreChange);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
-}
+  deleteTeam,
+} from '@/app/[teamid]/_domain/components/MyHistory/queries';
 
 type Writer = { id: number; nickname: string; image: string | null };
 type UiComment = {
@@ -63,15 +40,28 @@ type UiComment = {
   user: Writer;
 };
 
+function pad2(n: number) {
+  return String(n).padStart(2, '0');
+}
 function ymFromDate(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+}
+function parseYm(ym: string) {
+  const [y, m] = ym.split('-').map(Number);
+  return { y, m };
+}
+function addMonths(ym: string, delta: number) {
+  const { y, m } = parseYm(ym);
+  const d = new Date(y, m - 1, 1, 0, 0, 0, 0);
+  d.setMonth(d.getMonth() + delta);
+  return ymFromDate(d);
 }
 function formatYearMonthFromKey(ym: string) {
   const [y, m] = ym.split('-');
   return `${y}년 ${Number(m)}월`;
 }
-function formatKoreanDateFromIso(iso: string) {
-  const d = new Date(iso);
+function formatKoreanDateFromIso(isoLike: string) {
+  const d = new Date(isoLike);
   const yyyy = d.getFullYear();
   const mm = d.getMonth() + 1;
   const dd = d.getDate();
@@ -85,13 +75,21 @@ function frequencyLabel(freq?: ApiFrequency | null) {
   return undefined;
 }
 function monthRangeIso(ym: string) {
-  const [y, m] = ym.split('-').map(Number);
+  const { y, m } = parseYm(ym);
   const from = new Date(y, m - 1, 1, 0, 0, 0, 0);
-  const to = new Date(y, m, 1, 0, 0, 0, 0); // next month start
+  const to = new Date(y, m, 1, 0, 0, 0, 0);
   return { fromIso: from.toISOString(), toIso: to.toISOString() };
 }
+function dayKeyFromIso(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+function monthKeyFromIso(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+}
 
-/** ✅ 체크박스/케밥/버튼 클릭이면 디테일 오픈 금지 */
+/** 체크박스/케밥/버튼 클릭이면 디테일 오픈 금지 */
 function isOpenDetailBlockedTarget(target: HTMLElement | null) {
   if (!target) return false;
 
@@ -118,17 +116,11 @@ function isOpenDetailBlockedTarget(target: HTMLElement | null) {
   return false;
 }
 
-export default function HistoryPage() {
+export default function MyHistory() {
   const qc = useQueryClient();
-  const desktopSidebarRef = useRef<HTMLDivElement | null>(null);
-
-  const isPc = useMediaQuery('(min-width: 1025px)');
-  const isMobileUi = useMediaQuery('(max-width: 1024px)');
-
-  // mobile drawer
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const toggleDrawer = () => setDrawerOpen((p) => !p);
-  const closeDrawer = () => setDrawerOpen(false);
+  const router = useRouter();
+  const params = useParams<{ teamid?: string }>();
+  const teamId = params?.teamid ?? '';
 
   // ===== API =====
   const { data: me } = useMe();
@@ -138,17 +130,12 @@ export default function HistoryPage() {
     return arr.filter((g, idx) => arr.findIndex((x) => x.id === g.id) === idx);
   }, [me?.memberships]);
 
-  // ✅ 기본 group은 파생값, 유저 선택만 state
-  const [userSelectedGroupId, setUserSelectedGroupId] = useState<number | null>(null);
-  const defaultGroupId = useMemo(() => groups[0]?.id ?? 0, [groups]);
-  const activeGroupId = userSelectedGroupId ?? defaultGroupId;
-
+  const activeGroupId = groups[0]?.id ?? 0;
   const activeGroup = useMemo(
     () => groups.find((g) => g.id === activeGroupId) ?? null,
     [groups, activeGroupId],
   );
 
-  // group detail -> taskLists(=카테고리)
   const { data: groupDetail } = useGroupDetail(activeGroupId);
   const taskLists = useMemo(() => {
     return (groupDetail?.taskLists ?? []).slice().sort((a, b) => a.displayIndex - b.displayIndex);
@@ -156,32 +143,48 @@ export default function HistoryPage() {
 
   // ===== month =====
   const [userSelectedMonth, setUserSelectedMonth] = useState<string | null>(null);
-
-  // 기본 월: "현재월"로 두고, 월에 데이터가 없으면 empty state 유지 (list처럼 강제 세팅 X)
   const defaultMonth = useMemo(() => ymFromDate(new Date()), []);
   const selectedMonth = userSelectedMonth ?? defaultMonth;
 
-  const { fromIso, toIso } = useMemo(() => monthRangeIso(selectedMonth), [selectedMonth]);
+  const { fromIso: selectedFromIso, toIso: selectedToIso } = useMemo(
+    () => monthRangeIso(selectedMonth),
+    [selectedMonth],
+  );
 
-  // ===== done tasks (모든 taskList를 한번에 모아오기) =====
+  // ✅ 선택월 다음달 시작까지(=선택월 포함) 받아오기
+  const earliestFromIso = '2000-01-01T00:00:00.000Z';
+  const nextMonth = useMemo(() => addMonths(selectedMonth, 1), [selectedMonth]);
+  const { fromIso: toIso } = useMemo(() => monthRangeIso(nextMonth), [nextMonth]);
+
+  // ===== done tasks =====
   const taskListIds = useMemo(() => taskLists.map((t) => t.id), [taskLists]);
-  const { tasksDoneAll } = useDoneTasksForTaskLists({
+
+  const { tasksDoneAll, isLoading: isDoneLoading } = useDoneTasksForTaskLists({
     groupId: activeGroupId,
     taskListIds,
-    fromIso,
+    fromIso: earliestFromIso,
     toIso,
   });
 
-  // ===== category selection (taskList) =====
+  // ===== 선택 월만 추리기 =====
+  const selectedFromT = useMemo(() => new Date(selectedFromIso).getTime(), [selectedFromIso]);
+  const selectedToT = useMemo(() => new Date(selectedToIso).getTime(), [selectedToIso]);
+
+  const tasksDoneSelectedMonth = useMemo(() => {
+    return tasksDoneAll.filter((t: DoneTask) => {
+      const iso = t.doneAt ?? t.date ?? '';
+      if (!iso) return false;
+      const time = new Date(iso).getTime();
+      return time >= selectedFromT && time < selectedToT;
+    });
+  }, [tasksDoneAll, selectedFromT, selectedToT]);
+
+  // ===== category selection =====
   const [selectedTaskListId, setSelectedTaskListId] = useState<number | null>(null);
 
-  // "기본 카테고리"는 파생값(첫 taskList), effect로 setState 하지 않음
-  const effectiveTaskListId = selectedTaskListId ?? taskLists[0]?.id ?? null;
-
-  const categoriesInMonth = useMemo(() => {
-    // taskList별 완료개수
+  const categoriesInSelectedMonth = useMemo(() => {
     const map = new Map<number, number>();
-    tasksDoneAll.forEach((t) => {
+    tasksDoneSelectedMonth.forEach((t: DoneTask) => {
       const id = (t.taskListId ?? 0) as number;
       if (!id) return;
       map.set(id, (map.get(id) ?? 0) + 1);
@@ -192,35 +195,98 @@ export default function HistoryPage() {
       label: tl.name,
       count: map.get(tl.id) ?? 0,
     }));
-  }, [taskLists, tasksDoneAll]);
+  }, [taskLists, tasksDoneSelectedMonth]);
 
-  const filteredTasks = useMemo(() => {
+  const firstNonZeroTaskListId = useMemo(() => {
+    return categoriesInSelectedMonth.find((c) => c.count > 0)?.id ?? null;
+  }, [categoriesInSelectedMonth]);
+
+  const fallbackFirstTaskListId = useMemo(() => taskLists[0]?.id ?? null, [taskLists]);
+
+  const effectiveTaskListId = useMemo(() => {
+    if (selectedTaskListId != null && taskLists.some((t) => t.id === selectedTaskListId)) {
+      return selectedTaskListId;
+    }
+    return firstNonZeroTaskListId ?? fallbackFirstTaskListId;
+  }, [selectedTaskListId, taskLists, firstNonZeroTaskListId, fallbackFirstTaskListId]);
+
+  const filteredTasks = useMemo<DoneTask[]>(() => {
     if (!effectiveTaskListId) return [];
-    return tasksDoneAll.filter((t) => (t.taskListId ?? 0) === effectiveTaskListId);
-  }, [tasksDoneAll, effectiveTaskListId]);
+    return tasksDoneSelectedMonth.filter(
+      (t: DoneTask) => (t.taskListId ?? 0) === effectiveTaskListId,
+    );
+  }, [tasksDoneSelectedMonth, effectiveTaskListId]);
 
   const tasksByDate = useMemo(() => {
     const map = new Map<string, DoneTask[]>();
-    filteredTasks.forEach((t) => {
+
+    filteredTasks.forEach((t: DoneTask) => {
       const iso = t.doneAt ?? t.date ?? '';
-      const dayKey = iso ? iso.slice(0, 10) : '1970-01-01';
+      const dayKey = iso ? dayKeyFromIso(iso) : '1970-01-01';
       const arr = map.get(dayKey) ?? [];
       arr.push(t);
       map.set(dayKey, arr);
     });
 
-    const keys = Array.from(map.keys()).sort((a, b) => (a > b ? 1 : -1));
-    return keys.map((k) => ({ dayKey: k, tasks: map.get(k)! }));
+    const keys = Array.from(map.keys()).sort((a, b) => (a > b ? -1 : 1));
+
+    return keys.map((k) => {
+      const list = (map.get(k) ?? []).slice().sort((a, b) => {
+        const ai = a.doneAt ?? a.date ?? '';
+        const bi = b.doneAt ?? b.date ?? '';
+        return ai > bi ? -1 : 1;
+      });
+      return { dayKey: k, tasks: list };
+    });
   }, [filteredTasks]);
+
+  // ✅ PC 왼쪽: “데이터 있는 달만” 표시 (선택월 이하만)
+  const leftMonthBlocks = useMemo(() => {
+    const monthMap = new Map<string, Map<number, number>>();
+
+    tasksDoneAll.forEach((t) => {
+      const iso = t.doneAt ?? t.date ?? '';
+      const tlId = (t.taskListId ?? 0) as number;
+      if (!iso || !tlId) return;
+
+      const mk = monthKeyFromIso(iso);
+      if (mk > selectedMonth) return;
+
+      const inner = monthMap.get(mk) ?? new Map<number, number>();
+      inner.set(tlId, (inner.get(tlId) ?? 0) + 1);
+      monthMap.set(mk, inner);
+    });
+
+    const months = Array.from(monthMap.keys()).sort((a, b) => (a > b ? -1 : 1));
+
+    return months
+      .map((monthKey) => {
+        const inner = monthMap.get(monthKey) ?? new Map<number, number>();
+        const categories = taskLists.map((tl) => ({
+          id: tl.id,
+          label: tl.name,
+          count: inner.get(tl.id) ?? 0,
+        }));
+        const total = categories.reduce((acc, c) => acc + c.count, 0);
+
+        return {
+          monthKey,
+          monthLabel: formatYearMonthFromKey(monthKey),
+          categories,
+          total,
+        };
+      })
+      .filter((b) => b.total > 0);
+  }, [tasksDoneAll, taskLists, selectedMonth]);
 
   // ===== UI states =====
   const [openedTaskMenuId, setOpenedTaskMenuId] = useState<number | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
 
   // detail overlay
   const [detailMounted, setDetailMounted] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-
   const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
 
   const effectiveSelectedTaskId = useMemo(() => {
@@ -234,7 +300,6 @@ export default function HistoryPage() {
     return filteredTasks.find((t) => t.id === effectiveSelectedTaskId) ?? null;
   }, [filteredTasks, effectiveSelectedTaskId]);
 
-  // comments
   const { data: apiComments = [] } = useTaskComments(effectiveSelectedTaskId);
   const createComment = useCreateTaskComment(effectiveSelectedTaskId);
 
@@ -277,6 +342,7 @@ export default function HistoryPage() {
   }
 
   const handleOpenDetail = (taskId: number) => {
+    setOpenedTaskMenuId(null);
     if (detailMounted && detailOpen && taskId === effectiveSelectedTaskId) {
       closeDetail();
       return;
@@ -285,9 +351,8 @@ export default function HistoryPage() {
     openDetail();
   };
 
-  const invalidateCurrentMonth = async () => {
-    // 월 범위/카테고리 쿼리키 전부 무효화
-    await qc.invalidateQueries({ queryKey: ['doneTasks', activeGroupId] });
+  const invalidateCurrentRange = async () => {
+    await qc.invalidateQueries({ queryKey: ['doneTasks'] });
   };
 
   async function apiToggleDone(task: DoneTask, done: boolean) {
@@ -298,22 +363,59 @@ export default function HistoryPage() {
       taskId: task.id,
       done,
     });
-    await invalidateCurrentMonth();
+    await invalidateCurrentRange();
   }
 
   async function apiDelete(task: DoneTask) {
     if (!activeGroupId || !task.taskListId) return;
     await deleteTask({ groupId: activeGroupId, taskListId: task.taskListId, taskId: task.id });
-    await invalidateCurrentMonth();
+    await invalidateCurrentRange();
   }
 
-  // outside click close
+  const onPrevMonth = () => {
+    const prev = addMonths(selectedMonth, -1);
+    setUserSelectedMonth(prev);
+    setOpenedTaskMenuId(null);
+    setCalendarOpen(false);
+    setTeamMenuOpen(false);
+    closeDetailImmediate();
+  };
+
+  const onNextMonth = () => {
+    const next = addMonths(selectedMonth, 1);
+    setUserSelectedMonth(next);
+    setOpenedTaskMenuId(null);
+    setCalendarOpen(false);
+    setTeamMenuOpen(false);
+    closeDetailImmediate();
+  };
+
+  const monthLabel = formatYearMonthFromKey(selectedMonth);
+
+  // TeamHeader settingsLink 클릭 / outside close
+  const lastTeamMenuToggleAt = useRef<number>(0);
+
   useEffect(() => {
     const onDoc = (ev: globalThis.MouseEvent) => {
       const t = ev.target as HTMLElement | null;
       if (!t) return;
 
-      if (openedTaskMenuId !== null && !t.closest(`.${styles.taskMenu}`)) setOpenedTaskMenuId(null);
+      const settingsLink = t.closest(
+        '.TeamHeader-module__H3kcRq__settingsLink',
+      ) as HTMLElement | null;
+      if (settingsLink) {
+        ev.preventDefault?.();
+        ev.stopPropagation?.();
+        lastTeamMenuToggleAt.current = Date.now();
+        setTeamMenuOpen((p) => !p);
+        return;
+      }
+
+      const aria = (t.closest('[aria-label]')?.getAttribute('aria-label') ?? '').toLowerCase();
+      const isKebabClick = aria.includes('더보기') || aria.includes('kebab');
+      if (!isKebabClick && openedTaskMenuId !== null && !t.closest(`.${styles.taskMenu}`)) {
+        setOpenedTaskMenuId(null);
+      }
 
       if (
         calendarOpen &&
@@ -322,167 +424,98 @@ export default function HistoryPage() {
       ) {
         setCalendarOpen(false);
       }
+
+      if (teamMenuOpen) {
+        const justToggled = Date.now() - lastTeamMenuToggleAt.current < 120;
+        if (!justToggled && !t.closest(`.${styles.teamMenu}`)) {
+          setTeamMenuOpen(false);
+        }
+      }
     };
 
     document.addEventListener('click', onDoc);
     return () => document.removeEventListener('click', onDoc);
-  }, [openedTaskMenuId, calendarOpen]);
+  }, [openedTaskMenuId, calendarOpen, teamMenuOpen]);
 
-  // handlers
-  const changeTeam = (groupId: number) => {
-    setUserSelectedGroupId(groupId);
-
-    // 팀 바뀌면 선택 리셋 (effect로 setState 금지)
-    setSelectedTaskListId(null);
-    setOpenedTaskMenuId(null);
-    setCalendarOpen(false);
-    closeDetailImmediate();
+  const goTeamEditPage = () => {
+    setTeamMenuOpen(false);
+    if (teamId) router.push(`/${teamId}/team`);
+    else router.push(`/team`);
   };
 
-  const onPrevMonth = () => {
-    const base = new Date(`${selectedMonth}-01T00:00:00`);
-    base.setMonth(base.getMonth() - 1);
-    setUserSelectedMonth(ymFromDate(base));
-    setOpenedTaskMenuId(null);
-    setCalendarOpen(false);
-    closeDetailImmediate();
+  const doDeleteTeam = async () => {
+    setTeamMenuOpen(false);
+    const ok = window.confirm('팀을 삭제할까요? 삭제하면 되돌릴 수 없어요.');
+    if (!ok) return;
+    try {
+      await deleteTeam();
+      if (teamId) router.push(`/${teamId}`);
+      else router.push(`/`);
+    } catch {
+      alert('삭제에 실패했어요. (권한/로그인 상태를 확인해주세요)');
+    }
   };
 
-  const onNextMonth = () => {
-    const base = new Date(`${selectedMonth}-01T00:00:00`);
-    base.setMonth(base.getMonth() + 1);
-    setUserSelectedMonth(ymFromDate(base));
-    setOpenedTaskMenuId(null);
-    setCalendarOpen(false);
-    closeDetailImmediate();
+  const preventAll = (e: ReactMouseEvent | React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
-
-  const monthLabel = formatYearMonthFromKey(selectedMonth);
-  const chipSize = isMobileUi ? 'small' : 'large';
 
   return (
     <main className={styles.page}>
-      {/* PC Sidebar */}
-      {isPc ? (
-        <div ref={desktopSidebarRef} className={styles.desktopSidebar}>
-          <Sidebar
-            isLoggedIn
-            profileName={me?.nickname ?? ''}
-            profileTeam={activeGroup?.name ?? ''}
-            profileImage={
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: '#cbd5e1' }} />
-            }
-          >
-            {(isCollapsed) => (
-              <>
-                {groups.map((g) => (
-                  <SidebarButton
-                    key={g.id}
-                    icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                    label={g.name}
-                    iconOnly={isCollapsed}
-                    isActive={g.id === activeGroupId}
-                    onClick={() => changeTeam(g.id)}
-                  />
-                ))}
-
-                {!isCollapsed ? <SidebarAddButton label="팀 추가하기" onClick={() => {}} /> : null}
-
-                <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-
-                <SidebarButton
-                  icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-                  label="자유게시판"
-                  iconOnly={isCollapsed}
-                  onClick={() => {}}
-                />
-              </>
-            )}
-          </Sidebar>
-        </div>
-      ) : null}
-
-      {/* Mobile */}
-      {isMobileUi ? (
-        <div className={styles.mobileGnb}>
-          <MobileHeader
-            isLoggedIn
-            profileImage={
-              <div style={{ width: 32, height: 32, borderRadius: 12, background: '#cbd5e1' }} />
-            }
-            onMenuClick={toggleDrawer}
-            onProfileClick={() => {}}
-          />
-        </div>
-      ) : null}
-
-      {isMobileUi ? (
-        <MobileDrawer isOpen={drawerOpen} onClose={closeDrawer}>
-          <>
-            {groups.map((g) => (
-              <SidebarButton
-                key={g.id}
-                icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                label={g.name}
-                isActive={g.id === activeGroupId}
-                onClick={() => {
-                  changeTeam(g.id);
-                  closeDrawer();
-                }}
-              />
-            ))}
-
-            <SidebarAddButton label="팀 추가하기" onClick={closeDrawer} />
-
-            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-
-            <SidebarButton
-              icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-              label="자유게시판"
-              onClick={closeDrawer}
-            />
-          </>
-        </MobileDrawer>
-      ) : null}
-
-      {/* Main */}
       <section className={styles.main}>
         <div className={styles.teamHeaderWrap}>
-          <TeamHeader variant="list" teamName={activeGroup?.name ?? ''} settingsHref="" />
+          <div className={styles.teamHeaderRow}>
+            <TeamHeader variant="list" teamName={activeGroup?.name ?? ''} settingsHref="" />
+
+            {teamMenuOpen ? (
+              <div className={styles.teamMenu} role="menu" aria-label="팀 메뉴">
+                <button type="button" className={styles.teamMenuItem} onClick={goTeamEditPage}>
+                  수정하기
+                </button>
+                <button type="button" className={styles.teamMenuItemDanger} onClick={doDeleteTeam}>
+                  삭제하기
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className={styles.body}>
-          {/* LEFT: PC만 - taskList를 카드로 */}
-          {isPc ? (
-            <aside className={styles.leftCol} aria-label="할 일 목록(PC)">
-              <h2 className={styles.leftTitle}>할 일 목록</h2>
+          {/* LEFT (PC) */}
+          <aside className={styles.leftCol} aria-label="내가 한 일 목록">
+            <h2 className={styles.leftTitle}>내가 한 일</h2>
 
-              <div className={styles.leftScroll}>
-                {taskLists.map((tl) => {
-                  const count = categoriesInMonth.find((c) => c.id === tl.id)?.count ?? 0;
-                  return (
-                    <section key={tl.id} className={styles.monthSection} aria-label={tl.name}>
-                      <div
-                        className={styles.monthTitle}
-                        role="button"
-                        onClick={() => setSelectedTaskListId(tl.id)}
-                      >
-                        {tl.name}
-                      </div>
+            <div className={styles.leftScroll}>
+              {leftMonthBlocks.length === 0 ? (
+                <div className={styles.leftEmpty}>완료한 작업이 없어요.</div>
+              ) : (
+                leftMonthBlocks.map((block) => (
+                  <div key={block.monthKey} className={styles.monthBlock}>
+                    <div className={styles.monthBlockTitle}>{block.monthLabel}</div>
 
-                      <div className={styles.cardStack}>
-                        <TaskCard
-                          label="완료"
-                          count={count}
-                          onClick={() => setSelectedTaskListId(tl.id)}
-                        />
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-            </aside>
-          ) : null}
+                    <div className={styles.cardStack}>
+                      {block.categories
+                        .filter((c) => c.count > 0)
+                        .map((c) => (
+                          <TaskCard
+                            key={`${block.monthKey}-${c.id}`}
+                            label={c.label}
+                            count={c.count}
+                            onClick={() => {
+                              setUserSelectedMonth(block.monthKey);
+                              setSelectedTaskListId(c.id);
+                              setOpenedTaskMenuId(null);
+                              closeDetailImmediate();
+                            }}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </aside>
 
           {/* RIGHT */}
           <section className={styles.rightCol} aria-label="히스토리">
@@ -528,39 +561,39 @@ export default function HistoryPage() {
                   ) : null}
                 </div>
 
-                {/* Mobile: taskList를 Chip으로 */}
-                {!isPc ? (
-                  <div className={styles.chipRow} aria-label="할 일 목록 칩">
-                    {categoriesInMonth.map((c) => (
-                      <Chip
-                        key={c.id}
-                        label={c.label}
-                        count={c.count}
-                        size={chipSize as 'large' | 'small'}
-                        selected={c.id === effectiveTaskListId}
-                        onClick={() => setSelectedTaskListId(c.id)}
-                      />
-                    ))}
-                  </div>
-                ) : null}
+                {/* 모바일/태블릿 Chip row: 항상 렌더 (count=0도 표시) */}
+                <div className={styles.chipRow} aria-label="카테고리 선택">
+                  {categoriesInSelectedMonth.map((c) => (
+                    <Chip
+                      key={c.id}
+                      label={c.label}
+                      count={c.count}
+                      size="small"
+                      selected={effectiveTaskListId === c.id}
+                      onClick={() => {
+                        setSelectedTaskListId(c.id);
+                        setOpenedTaskMenuId(null);
+                        closeDetailImmediate();
+                      }}
+                    />
+                  ))}
+                </div>
 
                 <div className={styles.boxBody}>
-                  {filteredTasks.length === 0 ? (
-                    <div className={styles.emptyState}>
-                      아직 완료된 작업이 없어요.
-                      <br />
-                      하나씩 완료해가며 히스토리를 만들어보세요!
-                    </div>
+                  {isDoneLoading ? <div className={styles.emptyState}>불러오는 중…</div> : null}
+
+                  {!isDoneLoading && filteredTasks.length === 0 ? (
+                    <div className={styles.emptyState}>이 달에 완료된 작업이 없어요.</div>
                   ) : null}
 
-                  {filteredTasks.length > 0 ? (
+                  {!isDoneLoading && filteredTasks.length > 0 ? (
                     <div className={styles.taskGroupWrap}>
                       {tasksByDate.map((group) => (
                         <section key={group.dayKey} className={styles.daySection}>
                           <div className={styles.dateDivider}>
                             <span className={styles.dateDividerLine} />
                             <span className={styles.dateDividerText}>
-                              {formatKoreanDateFromIso(`${group.dayKey}T00:00:00.000Z`)}
+                              {formatKoreanDateFromIso(`${group.dayKey}T00:00:00`)}
                             </span>
                             <span className={styles.dateDividerLine} />
                           </div>
@@ -570,7 +603,7 @@ export default function HistoryPage() {
                               <div
                                 key={task.id}
                                 className={styles.taskRow}
-                                onClick={(e: MouseEvent) => {
+                                onClick={(e: ReactMouseEvent) => {
                                   const t = e.target as HTMLElement | null;
                                   if (isOpenDetailBlockedTarget(t)) return;
                                   handleOpenDetail(task.id);
@@ -579,14 +612,12 @@ export default function HistoryPage() {
                                 <div style={{ position: 'relative' }}>
                                   <TaskListItem
                                     title={task.name}
-                                    date={formatKoreanDateFromIso(`${group.dayKey}T00:00:00.000Z`)}
+                                    date={formatKoreanDateFromIso(`${group.dayKey}T00:00:00`)}
                                     checked={!!task.doneAt}
                                     isSelected={false}
                                     commentCount={task.commentCount ?? 0}
                                     frequency={frequencyLabel(task.frequency ?? null)}
-                                    onCheckedChange={async (checked) => {
-                                      await apiToggleDone(task, checked);
-                                    }}
+                                    onCheckedChange={undefined}
                                     onKebabClick={() =>
                                       setOpenedTaskMenuId((prev) =>
                                         prev === task.id ? null : task.id,
@@ -599,12 +630,14 @@ export default function HistoryPage() {
                                       className={styles.taskMenu}
                                       role="menu"
                                       aria-label="할 일 메뉴"
+                                      onClick={(e) => e.stopPropagation()}
                                     >
                                       <li>
                                         <button
                                           type="button"
                                           className={styles.taskMenuItem}
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.stopPropagation();
                                             setOpenedTaskMenuId(null);
                                             handleOpenDetail(task.id);
                                           }}
@@ -612,14 +645,13 @@ export default function HistoryPage() {
                                           상세보기
                                         </button>
                                       </li>
+
                                       <li>
                                         <button
                                           type="button"
-                                          className={styles.taskMenuItem}
-                                          onClick={async () => {
-                                            setOpenedTaskMenuId(null);
-                                            await apiDelete(task);
-                                          }}
+                                          className={`${styles.taskMenuItem} ${styles.taskMenuItemDisabled}`}
+                                          disabled
+                                          onClick={preventAll}
                                         >
                                           삭제하기
                                         </button>
@@ -673,7 +705,10 @@ export default function HistoryPage() {
                   closeDetail();
                 }}
                 onClose={closeDetail}
-                onCommentSubmit={(content) => createComment.mutate({ content })}
+                onCommentSubmit={(content) => {
+                  if (!effectiveSelectedTaskId) return;
+                  createComment.mutate({ content });
+                }}
               />
             </div>
           </div>
