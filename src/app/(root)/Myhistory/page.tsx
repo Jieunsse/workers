@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 
-import styles from './MyHistory.module.css';
+import styles from './page.module.css';
 
 import TeamHeader from '@/components/team-header';
 import ArrowButton from '@/components/Button/domain/ArrowButton/ArrowButton';
@@ -27,7 +27,7 @@ import {
   patchTaskDone,
   deleteTask,
   deleteTeam,
-} from '@/app/[teamid]/_domain/components/MyHistory/queries';
+} from './queries';
 
 type Writer = { id: number; nickname: string; image: string | null };
 type UiComment = {

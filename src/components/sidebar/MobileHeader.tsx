@@ -60,7 +60,7 @@ export default function MobileHeader({
 
   const handleLogout = onLogout ?? defaultLogout;
   const handleProfileClick = onProfileClick ?? (() => router.push('/mypage'));
-  const handleLogoClick = onLogoClick ?? (() => router.push('/addteam'));
+  const handleLogoClick = onLogoClick ?? (() => router.push('/'));
 
   useEffect(() => {
     if (!showProfileMenu) return;

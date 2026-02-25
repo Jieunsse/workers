@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 120px 67px 80px;
+  padding: 90px 91px 110px 91px;
   box-sizing: border-box;
 }
 
@@ -82,7 +82,7 @@
   gap: 6px;
 }
 
-/* 모바일/태블릿: top 대신 left:50px */
+/*  모바일/태블릿: top 대신 left:50px */
 @media (max-width: 1023px) {
   .teamMenu {
     top: auto;
@@ -91,7 +91,7 @@
   }
 }
 
-/* 모바일: width 100px */
+/*  모바일: width 100px */
 @media (max-width: 743px) {
   .teamMenu {
     width: 100px;
@@ -188,7 +188,7 @@
   color: #0f172a;
 }
 
-/* 스크롤 + margin-top 40 */
+/*  스크롤 + margin-top 40 */
 .leftScroll {
   max-height: 768px;
   overflow: auto;
@@ -197,7 +197,7 @@
   margin-top: 40px;
 }
 
-/* 월별 묶음 간격 55px */
+/*  월별 묶음 간격 55px */
 .monthBlock {
   display: flex;
   flex-direction: column;
@@ -348,7 +348,7 @@
   }
 }
 
-/* 모바일/태블릿 칩 라인 (PC 숨김) */
+/*  모바일/태블릿 칩 라인 (PC 숨김) */
 .chipRow {
   display: none;
   margin-top: 16px;
@@ -369,9 +369,9 @@
 /*  Chip 크기: 모바일 86px */
 @media (max-width: 743px) {
   :global(.Chip-module__j4Ti-q__chip.Chip-module__j4Ti-q__small) {
-    width: 87px !important;
+    width: 86px !important;
     height: 33px !important;
-    padding: 0 !important;
+    padding: 0 12px !important;
     border: 1px solid #e2e8f0 !important;
   }
 }

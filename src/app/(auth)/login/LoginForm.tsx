@@ -48,10 +48,14 @@ export default function LoginForm() {
         return;
       }
 
-      const { user } = await response.json();
-      // 소속 팀이 있으면 해당 팀 페이지로, 없으면 팀 추가 페이지로
-      if (user?.teamId) {
-        router.push(`/${user.teamId}`);
+      // 로그인 API는 teamId(프로젝트 식별자 문자열)만 반환하므로
+      // 실제 그룹 페이지 경로에 필요한 숫자 groupId를 얻기 위해
+      // 유저 정보를 한 번 더 조회한다
+      const userRes = await fetch('/api/proxy/user');
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        const groupId = userData?.memberships?.[0]?.group?.id;
+        router.push(groupId !== undefined ? `/${groupId}` : '/addteam');
       } else {
         router.push('/addteam');
       }

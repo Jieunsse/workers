@@ -133,7 +133,9 @@ export default function SignupForm() {
           type="button"
           className={styles.kakaoButton}
           aria-label="카카오톡으로 회원가입"
-          disabled
+          onClick={() => {
+            window.location.href = '/api/auth/kakao';
+          }}
         >
           <Image src={kakaotalkButton} alt="카카오톡 회원가입" width={42} height={42} />
         </button>

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-/** ===== helpers (프로젝트 proxy route 정책에 맞춤) ===== */
+/** ===== helpers (proxy route) ===== */
 function proxy(path: string) {
   const p = path.startsWith('/') ? path.slice(1) : path;
   return `/api/proxy/${p}`;
@@ -32,11 +32,22 @@ async function safeReadJson<T>(res: Response): Promise<T> {
   }
 }
 
-async function fetchJson<T>(path: string, init?: RequestInit, message = '요청 실패'): Promise<T> {
+function withTeam(teamId: string, path: string) {
+  const t = String(teamId ?? '').trim();
+  const p = path.startsWith('/') ? path.slice(1) : path;
+  return `${t}/${p}`;
+}
+
+async function fetchJson<T>(
+  teamId: string,
+  path: string,
+  init?: RequestInit,
+  message = '요청 실패',
+): Promise<T> {
   const method = (init?.method ?? 'GET').toUpperCase();
   const isBodyless = method === 'GET' || method === 'HEAD' || method === 'DELETE';
 
-  const res = await fetch(proxy(path), {
+  const res = await fetch(proxy(withTeam(teamId, path)), {
     ...init,
     method,
     body: isBodyless ? undefined : init?.body,
@@ -52,10 +63,15 @@ async function fetchJson<T>(path: string, init?: RequestInit, message = '요청 
   return await safeReadJson<T>(res);
 }
 
-async function fetchVoid(path: string, init?: RequestInit, message = '요청 실패'): Promise<void> {
+async function fetchVoid(
+  teamId: string,
+  path: string,
+  init?: RequestInit,
+  message = '요청 실패',
+): Promise<void> {
   const method = (init?.method ?? 'GET').toUpperCase();
 
-  const res = await fetch(proxy(path), {
+  const res = await fetch(proxy(withTeam(teamId, path)), {
     ...init,
     method,
     body: method === 'DELETE' || method === 'GET' || method === 'HEAD' ? undefined : init?.body,
@@ -67,14 +83,6 @@ async function fetchVoid(path: string, init?: RequestInit, message = '요청 실
 
 /** ===== types (swagger 기반 최소 필요 필드) ===== */
 export type ApiFrequency = 'ONCE' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
-export type ApiWeekDay =
-  | 'MONDAY'
-  | 'TUESDAY'
-  | 'WEDNESDAY'
-  | 'THURSDAY'
-  | 'FRIDAY'
-  | 'SATURDAY'
-  | 'SUNDAY';
 
 export type Group = {
   id: number;
@@ -128,29 +136,30 @@ export type Task = {
   name: string;
   description?: string | null;
 
-  /** 서버가 date/startDate/startAt/scheduledAt 중 무엇을 주든 UI에서 흡수 가능하게 optional */
-  date?: string; // ISO
-  startDate?: string; // ISO
+  date?: string;
+  startDate?: string;
   startAt?: string;
   scheduledAt?: string;
 
   doneAt?: string | null;
 
-  /** 서버가 frequency/frequencyType/repeatType 중 무엇을 주든 UI에서 흡수 가능 */
   frequency?: ApiFrequency;
   frequencyType?: ApiFrequency;
   repeatType?: ApiFrequency;
 
-  /** 주/월 반복 부가 */
-  weekDays?: ApiWeekDay[];
-  repeatWeekDays?: ApiWeekDay[];
-  repeatDays?: unknown; // 모달 포맷 들어올 수도 있어 방어
+  /** ✅ 서버는 number[] */
+  weekDays?: number[];
+  repeatWeekDays?: number[];
+  repeatDays?: unknown;
 
   monthDay?: number;
   repeatMonthDay?: number;
 
   commentCount: number;
   writer?: TaskWriter;
+
+  /** ✅ 반복 task면 존재 */
+  recurringId?: number;
 };
 
 export type TaskListByDateResponse = {
@@ -184,22 +193,29 @@ export type Comment = {
 };
 
 /** ===== queries ===== */
-export function useMe() {
+export function useMe(teamId: string) {
   return useQuery({
-    queryKey: ['me'],
+    queryKey: ['me', teamId],
+    enabled: !!teamId,
     queryFn: async () => {
-      return fetchJson<UserResponse>('user', undefined, '유저 정보를 불러오는데 실패했습니다.');
+      return fetchJson<UserResponse>(
+        teamId,
+        'user',
+        undefined,
+        '유저 정보를 불러오는데 실패했습니다.',
+      );
     },
     staleTime: 30_000,
   });
 }
 
-export function useGroupDetail(groupId: number) {
+export function useGroupDetail(teamId: string, groupId: number) {
   return useQuery({
-    queryKey: ['groupDetail', groupId],
-    enabled: groupId > 0,
+    queryKey: ['groupDetail', teamId, groupId],
+    enabled: !!teamId && groupId > 0,
     queryFn: async () => {
       return fetchJson<GroupDetailResponse>(
+        teamId,
         `groups/${groupId}`,
         undefined,
         '그룹 정보를 불러오는데 실패했습니다.',
@@ -210,17 +226,19 @@ export function useGroupDetail(groupId: number) {
 }
 
 export function useTaskListByDate(params: {
+  teamId: string;
   groupId: number;
   taskListId: number;
   dateIso: string;
 }) {
-  const { groupId, taskListId, dateIso } = params;
+  const { teamId, groupId, taskListId, dateIso } = params;
 
   return useQuery({
-    queryKey: ['taskListByDate', groupId, taskListId, dateIso],
-    enabled: groupId > 0 && taskListId > 0 && !!dateIso,
+    queryKey: ['taskListByDate', teamId, groupId, taskListId, dateIso],
+    enabled: !!teamId && groupId > 0 && taskListId > 0 && !!dateIso,
     queryFn: async () => {
       return fetchJson<TaskListByDateResponse>(
+        teamId,
         `groups/${groupId}/task-lists/${taskListId}?date=${encodeURIComponent(dateIso)}`,
         { cache: 'no-store' },
         '할 일 목록을 불러오는데 실패했습니다.',
@@ -229,12 +247,13 @@ export function useTaskListByDate(params: {
   });
 }
 
-export function useTaskComments(taskId: number) {
+export function useTaskComments(teamId: string, taskId: number) {
   return useQuery({
-    queryKey: ['taskComments', taskId],
-    enabled: taskId > 0,
+    queryKey: ['taskComments', teamId, taskId],
+    enabled: !!teamId && taskId > 0,
     queryFn: async () => {
       return fetchJson<Comment[]>(
+        teamId,
         `tasks/${taskId}/comments`,
         undefined,
         '댓글을 불러오는데 실패했습니다.',
@@ -244,68 +263,74 @@ export function useTaskComments(taskId: number) {
 }
 
 /** ===== mutations ===== */
-export function useCreateTaskList() {
+export function useCreateTaskList(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: { groupId: number; name: string }) => {
       return fetchJson<TaskList>(
+        teamId,
         `groups/${vars.groupId}/task-lists`,
         { method: 'POST', body: JSON.stringify({ name: vars.name }) },
         '할 일 목록 생성에 실패했습니다.',
       );
     },
     onSuccess: async (_, vars) => {
-      await qc.invalidateQueries({ queryKey: ['groupDetail', vars.groupId] });
+      await qc.invalidateQueries({ queryKey: ['groupDetail', teamId, vars.groupId] });
     },
   });
 }
 
-export function useUpdateTaskList() {
+export function useUpdateTaskList(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: { groupId: number; taskListId: number; name: string }) => {
       return fetchJson<TaskList>(
+        teamId,
         `groups/${vars.groupId}/task-lists/${vars.taskListId}`,
         { method: 'PATCH', body: JSON.stringify({ name: vars.name }) },
         '할 일 목록 수정에 실패했습니다.',
       );
     },
     onSuccess: async (_, vars) => {
-      await qc.invalidateQueries({ queryKey: ['groupDetail', vars.groupId] });
-      // dateIso까지 포함된 키도 같이 invalidate되도록 exact:false
+      await qc.invalidateQueries({ queryKey: ['groupDetail', teamId, vars.groupId] });
       await qc.invalidateQueries({
-        queryKey: ['taskListByDate', vars.groupId, vars.taskListId],
+        queryKey: ['taskListByDate', teamId, vars.groupId, vars.taskListId],
         exact: false,
       });
     },
   });
 }
 
-export function useDeleteTaskList() {
+export function useDeleteTaskList(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: { groupId: number; taskListId: number }) => {
       return fetchVoid(
+        teamId,
         `groups/${vars.groupId}/task-lists/${vars.taskListId}`,
         { method: 'DELETE' },
         '할 일 목록 삭제에 실패했습니다.',
       );
     },
     onSuccess: async (_, vars) => {
-      await qc.invalidateQueries({ queryKey: ['groupDetail', vars.groupId] });
+      await qc.invalidateQueries({ queryKey: ['groupDetail', teamId, vars.groupId] });
       await qc.invalidateQueries({
-        queryKey: ['taskListByDate', vars.groupId, vars.taskListId],
+        queryKey: ['taskListByDate', teamId, vars.groupId, vars.taskListId],
         exact: false,
       });
     },
   });
 }
 
-/** Task 생성 */
-export function useCreateTask() {
+/**
+ * ✅ (반복) 생성은 신규 API: /recurring
+ * - WEEKLY: weekDays number[]
+ * - MONTHLY: monthDay 필수
+ */
+export function useCreateTask(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
@@ -314,13 +339,15 @@ export function useCreateTask() {
       taskListId: number;
       name: string;
       description?: string;
-      startDate: string; // ISO
+      startDate: string;
       frequencyType: ApiFrequency;
-      weekDays?: ApiWeekDay[];
+      weekDays?: number[];
       monthDay?: number;
     }) => {
-      return fetchJson<Task>(
-        `groups/${vars.groupId}/task-lists/${vars.taskListId}/tasks`,
+      // ✅ 신규 recurring
+      return fetchJson<unknown>(
+        teamId,
+        `groups/${vars.groupId}/task-lists/${vars.taskListId}/recurring`,
         {
           method: 'POST',
           body: JSON.stringify({
@@ -337,14 +364,19 @@ export function useCreateTask() {
     },
     onSuccess: async (_, vars) => {
       await qc.invalidateQueries({
-        queryKey: ['taskListByDate', vars.groupId, vars.taskListId],
+        queryKey: ['taskListByDate', teamId, vars.groupId, vars.taskListId],
         exact: false,
       });
     },
   });
 }
 
-export function usePatchTask() {
+/**
+ * ✅ 수정:
+ * - recurringId 있으면: /recurring/{recurringId}
+ * - 없으면: /tasks/{taskId} (일반 task 수정/완료체크)
+ */
+export function usePatchTask(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
@@ -352,17 +384,42 @@ export function usePatchTask() {
       groupId: number;
       taskListId: number;
       taskId: number;
+      recurringId?: number;
       body: {
         name?: string;
         description?: string;
-        startDate?: string; //
+        startDate?: string;
         frequencyType?: ApiFrequency;
-        weekDays?: ApiWeekDay[];
+        weekDays?: number[];
         monthDay?: number;
         doneAt?: string | null;
       };
     }) => {
+      const isDonePatchOnly = Object.keys(vars.body).length === 1 && 'doneAt' in vars.body;
+
+      // ✅ doneAt은 무조건 tasks PATCH
+      if (isDonePatchOnly) {
+        return fetchJson<Task>(
+          teamId,
+          `groups/${vars.groupId}/task-lists/${vars.taskListId}/tasks/${vars.taskId}`,
+          { method: 'PATCH', body: JSON.stringify(vars.body) },
+          '할 일 수정에 실패했습니다.',
+        );
+      }
+
+      // ✅ recurring 수정
+      if (vars.recurringId) {
+        return fetchJson<unknown>(
+          teamId,
+          `groups/${vars.groupId}/task-lists/${vars.taskListId}/recurring/${vars.recurringId}`,
+          { method: 'PATCH', body: JSON.stringify(vars.body) },
+          '할 일 수정에 실패했습니다.',
+        );
+      }
+
+      // ✅ 일반 task 수정
       return fetchJson<Task>(
+        teamId,
         `groups/${vars.groupId}/task-lists/${vars.taskListId}/tasks/${vars.taskId}`,
         { method: 'PATCH', body: JSON.stringify(vars.body) },
         '할 일 수정에 실패했습니다.',
@@ -370,20 +427,40 @@ export function usePatchTask() {
     },
     onSuccess: async (_, vars) => {
       await qc.invalidateQueries({
-        queryKey: ['taskListByDate', vars.groupId, vars.taskListId],
+        queryKey: ['taskListByDate', teamId, vars.groupId, vars.taskListId],
         exact: false,
       });
-      await qc.invalidateQueries({ queryKey: ['taskComments', vars.taskId] });
+      await qc.invalidateQueries({ queryKey: ['taskComments', teamId, vars.taskId] });
     },
   });
 }
 
-export function useDeleteTask() {
+/**
+ * ✅ 삭제:
+ * - recurringId 있으면: /tasks/{taskId}/recurring/{recurringId}
+ * - 없으면: /tasks/{taskId}
+ */
+export function useDeleteTask(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: { groupId: number; taskListId: number; taskId: number }) => {
+    mutationFn: async (vars: {
+      groupId: number;
+      taskListId: number;
+      taskId: number;
+      recurringId?: number;
+    }) => {
+      if (vars.recurringId) {
+        return fetchVoid(
+          teamId,
+          `groups/${vars.groupId}/task-lists/${vars.taskListId}/tasks/${vars.taskId}/recurring/${vars.recurringId}`,
+          { method: 'DELETE' },
+          '할 일 삭제에 실패했습니다.',
+        );
+      }
+
       return fetchVoid(
+        teamId,
         `groups/${vars.groupId}/task-lists/${vars.taskListId}/tasks/${vars.taskId}`,
         { method: 'DELETE' },
         '할 일 삭제에 실패했습니다.',
@@ -391,27 +468,28 @@ export function useDeleteTask() {
     },
     onSuccess: async (_, vars) => {
       await qc.invalidateQueries({
-        queryKey: ['taskListByDate', vars.groupId, vars.taskListId],
+        queryKey: ['taskListByDate', teamId, vars.groupId, vars.taskListId],
         exact: false,
       });
-      await qc.invalidateQueries({ queryKey: ['taskComments', vars.taskId] });
+      await qc.invalidateQueries({ queryKey: ['taskComments', teamId, vars.taskId] });
     },
   });
 }
 
-export function useCreateTaskComment() {
+export function useCreateTaskComment(teamId: string) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async (vars: { taskId: number; content: string }) => {
       return fetchJson<Comment>(
+        teamId,
         `tasks/${vars.taskId}/comments`,
         { method: 'POST', body: JSON.stringify({ content: vars.content }) },
         '댓글 작성에 실패했습니다.',
       );
     },
     onSuccess: async (_, vars) => {
-      await qc.invalidateQueries({ queryKey: ['taskComments', vars.taskId] });
+      await qc.invalidateQueries({ queryKey: ['taskComments', teamId, vars.taskId] });
     },
   });
 }

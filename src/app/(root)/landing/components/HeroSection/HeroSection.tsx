@@ -1,7 +1,6 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
-import BaseButton from '@/components/Button/base/BaseButton';
+import CtaButton from '../CtaButton';
 import gradationLogo from '@/assets/icons/landing/gradation_logo.svg';
 import landingPC01 from '@/assets/img/landing/pc/landingPC_01.svg';
 import landingTablet01 from '@/assets/img/landing/tablet/landingTablet_01.svg';
@@ -29,9 +28,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <Link href="/login" className={styles.ctaLink}>
-          <BaseButton>지금 시작하기</BaseButton>
-        </Link>
+        <CtaButton className={styles.ctaLink} />
       </div>
 
       {/*

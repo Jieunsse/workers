@@ -1,53 +1,11 @@
 'use client';
 
-import {
-  Suspense,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type MouseEvent as ReactMouseEvent,
-} from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useInitialGroupId } from './_hooks/useInitialGroupId';
+import { useParams, useRouter } from 'next/navigation';
 
-import styles from './list.module.css';
-
-import Sidebar from '@/components/sidebar/Sidebar';
-import TeamHeader from '@/components/team-header';
-import MobileHeader from '@/components/sidebar/MobileHeader';
-import MobileDrawer from '@/components/sidebar/MobileDrawer';
-
-import SidebarButton from '@/components/sidebar/SidebarButton';
-import SidebarAddButton from '@/components/sidebar/SidebarAddButton';
-import SidebarTeamSelect from '@/components/sidebar/SidebarTeamSelect';
-
-import WeekDateBar from '@/components/calendar/CalendarButton/WeekDateBar';
-
-import TaskListItem from '@/components/list/TaskListItem';
-import FloatingButton from '@/components/Button/domain/FloatingButton/FloatingButton';
-import ArrowButton from '@/components/Button/domain/ArrowButton/ArrowButton';
-
-import TodoCard from '@/components/todo-card/TodoCard';
-import type { TodoItem } from '@/components/todo-card/types/types';
-
-import GnbAddButton from '@/components/Button/domain/GnbAddButton/GnbAddButton';
-
-import calendarIcon from '@/assets/icons/calender/calenderSmall.svg';
-import chessSmall from '@/assets/icons/chess/chessSmall.svg';
-import boardSmall from '@/assets/icons/board/boardSmall.svg';
-import downArrowSmall from '@/assets/icons/arrow/downArrowSmall.svg';
-
-import TaskDetailCard from '@/components/Card/TaskDetailCard/TaskDetailCard';
-
-import CalenderModal from '@/components/Modal/domain/components/Calender/CalenderModal';
-import type { CalenderModalSubmitPayload } from '@/components/Modal/domain/components/Calender/types/CalenderModal.types';
-
-import AddTodoList from '@/components/Modal/domain/components/AddTodoList/AddTodoList';
-
-import Calendar from '@/components/calendar/Calendar';
+import styles from './TaskList.module.css';
 
 import {
   type ApiFrequency,
@@ -63,7 +21,27 @@ import {
   useTaskComments,
   useTaskListByDate,
   useUpdateTaskList,
-} from '@/app/(root)/list/hooks/queries';
+} from './queries';
+
+import TeamHeader from '@/components/team-header';
+import WeekDateBar from '@/components/calendar/CalendarButton/WeekDateBar';
+import TaskListItem from '@/components/list/TaskListItem';
+import FloatingButton from '@/components/Button/domain/FloatingButton/FloatingButton';
+import ArrowButton from '@/components/Button/domain/ArrowButton/ArrowButton';
+import TodoCard from '@/components/todo-card/TodoCard';
+import type { TodoItem } from '@/components/todo-card/types/types';
+import GnbAddButton from '@/components/Button/domain/GnbAddButton/GnbAddButton';
+import calendarIcon from '@/assets/icons/calender/calenderSmall.svg';
+import downArrowSmall from '@/assets/icons/arrow/downArrowSmall.svg';
+import TaskDetailCard from '@/components/Card/TaskDetailCard/TaskDetailCard';
+import CalenderModal from '@/components/Modal/domain/components/Calender/CalenderModal';
+import type { CalenderModalSubmitPayload } from '@/components/Modal/domain/components/Calender/types/CalenderModal.types';
+import AddTodoList from '@/components/Modal/domain/components/AddTodoList/AddTodoList';
+import Calendar from '@/components/calendar/Calendar';
+
+/* =========================p
+   helpers
+   ========================= */
 
 function isOpenDetailBlockedTarget(target: HTMLElement | null) {
   if (!target) return false;
@@ -81,9 +59,8 @@ function isOpenDetailBlockedTarget(target: HTMLElement | null) {
       v.includes('더보기') ||
       v.includes('kebab') ||
       v.includes('케밥')
-    ) {
+    )
       return true;
-    }
   }
 
   const cls = (target.className ?? '').toString().toLowerCase();
@@ -120,11 +97,17 @@ function isKebabTrigger(target: HTMLElement | null) {
 function formatYearMonth(date: Date) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
 }
-function addMonths(base: Date, diff: number) {
+
+// ✅ 주 단위 이동용
+function addDays(base: Date, diff: number) {
   const d = new Date(base);
-  d.setMonth(d.getMonth() + diff);
+  d.setDate(d.getDate() + diff);
   return d;
 }
+function addWeeks(base: Date, diff: number) {
+  return addDays(base, diff * 7);
+}
+
 function toDateKey(d: Date) {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -231,70 +214,66 @@ type TodoCardData = {
   items: TodoItem[];
 };
 
-type ApiWeekDay =
-  | 'MONDAY'
-  | 'TUESDAY'
-  | 'WEDNESDAY'
-  | 'THURSDAY'
-  | 'FRIDAY'
-  | 'SATURDAY'
-  | 'SUNDAY';
-
-function toApiWeekDays(input: unknown): ApiWeekDay[] | undefined {
+/**
+ * ✅ 서버 스웨거: weekDays는 string[]이 아니라 number[]
+ * Monday=0 ~ Sunday=6 로 보냄
+ */
+type ApiWeekDayNum = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+function toApiWeekDayNums(input: unknown): ApiWeekDayNum[] | undefined {
   if (!Array.isArray(input)) return undefined;
 
-  const map: Record<string, ApiWeekDay> = {
-    mon: 'MONDAY',
-    monday: 'MONDAY',
-    '1': 'MONDAY',
-    월: 'MONDAY',
-    월요일: 'MONDAY',
+  const map: Record<string, ApiWeekDayNum> = {
+    mon: 0,
+    monday: 0,
+    월: 0,
+    월요일: 0,
+    '1': 0,
 
-    tue: 'TUESDAY',
-    tuesday: 'TUESDAY',
-    '2': 'TUESDAY',
-    화: 'TUESDAY',
-    화요일: 'TUESDAY',
+    tue: 1,
+    tuesday: 1,
+    화: 1,
+    화요일: 1,
+    '2': 1,
 
-    wed: 'WEDNESDAY',
-    wednesday: 'WEDNESDAY',
-    '3': 'WEDNESDAY',
-    수: 'WEDNESDAY',
-    수요일: 'WEDNESDAY',
+    wed: 2,
+    wednesday: 2,
+    수: 2,
+    수요일: 2,
+    '3': 2,
 
-    thu: 'THURSDAY',
-    thursday: 'THURSDAY',
-    '4': 'THURSDAY',
-    목: 'THURSDAY',
-    목요일: 'THURSDAY',
+    thu: 3,
+    thursday: 3,
+    목: 3,
+    목요일: 3,
+    '4': 3,
 
-    fri: 'FRIDAY',
-    friday: 'FRIDAY',
-    '5': 'FRIDAY',
-    금: 'FRIDAY',
-    금요일: 'FRIDAY',
+    fri: 4,
+    friday: 4,
+    금: 4,
+    금요일: 4,
+    '5': 4,
 
-    sat: 'SATURDAY',
-    saturday: 'SATURDAY',
-    '6': 'SATURDAY',
-    토: 'SATURDAY',
-    토요일: 'SATURDAY',
+    sat: 5,
+    saturday: 5,
+    토: 5,
+    토요일: 5,
+    '6': 5,
 
-    sun: 'SUNDAY',
-    sunday: 'SUNDAY',
-    '0': 'SUNDAY',
-    '7': 'SUNDAY',
-    일: 'SUNDAY',
-    일요일: 'SUNDAY',
+    sun: 6,
+    sunday: 6,
+    일: 6,
+    일요일: 6,
+    '0': 6,
+    '7': 6,
   };
 
-  const out: ApiWeekDay[] = [];
+  const out: ApiWeekDayNum[] = [];
   for (const v of input) {
     if (typeof v !== 'string' && typeof v !== 'number') continue;
     const s = String(v).trim();
     const lower = s.toLowerCase();
     const mapped = map[lower] ?? map[s];
-    if (mapped && !out.includes(mapped)) out.push(mapped);
+    if (mapped !== undefined && !out.includes(mapped)) out.push(mapped);
   }
   return out.length > 0 ? out : undefined;
 }
@@ -317,31 +296,22 @@ function normalizeFreq(v: unknown): ApiFrequency {
 
 function getTaskFrequency(task: Task | null | undefined): ApiFrequency {
   const t = task as unknown as
-    | {
-        frequency?: unknown;
-        frequencyType?: unknown;
-        repeatType?: unknown;
-      }
+    | { frequency?: unknown; frequencyType?: unknown; repeatType?: unknown }
     | null
     | undefined;
 
   return normalizeFreq(t?.frequencyType ?? t?.frequency ?? t?.repeatType);
 }
 
-function getTaskWeekDays(task: Task | null | undefined): ApiWeekDay[] | undefined {
+function getTaskWeekDays(task: Task | null | undefined): number[] | undefined {
   const t = task as unknown as
-    | {
-        weekDays?: ApiWeekDay[];
-        repeatDays?: unknown;
-        repeatWeekDays?: ApiWeekDay[];
-      }
+    | { weekDays?: number[]; repeatWeekDays?: number[]; repeatDays?: unknown }
     | null
     | undefined;
 
   if (Array.isArray(t?.weekDays) && t?.weekDays.length) return t.weekDays;
   if (Array.isArray(t?.repeatWeekDays) && t?.repeatWeekDays.length) return t.repeatWeekDays;
-  const fromModalLike = toApiWeekDays(t?.repeatDays);
-  return fromModalLike;
+  return toApiWeekDayNums(t?.repeatDays);
 }
 
 function getTaskMonthDay(task: Task | null | undefined): number | undefined {
@@ -356,13 +326,13 @@ function normalizeIsoForUi(isoLike: string, fallbackDateKey: string) {
   return raw;
 }
 
-function weekDayKor(d: ApiWeekDay) {
-  if (d === 'MONDAY') return '월';
-  if (d === 'TUESDAY') return '화';
-  if (d === 'WEDNESDAY') return '수';
-  if (d === 'THURSDAY') return '목';
-  if (d === 'FRIDAY') return '금';
-  if (d === 'SATURDAY') return '토';
+function weekDayKorNum(d: number) {
+  if (d === 0) return '월';
+  if (d === 1) return '화';
+  if (d === 2) return '수';
+  if (d === 3) return '목';
+  if (d === 4) return '금';
+  if (d === 5) return '토';
   return '일';
 }
 
@@ -373,7 +343,7 @@ function frequencyLabelFromTask(task: Task | null | undefined, fallbackDateKey: 
 
   if (freq === 'WEEKLY') {
     const days = getTaskWeekDays(task);
-    if (days && days.length > 0) return `매주 반복(${days.map(weekDayKor).join(',')})`;
+    if (days && days.length > 0) return `매주 반복(${days.map(weekDayKorNum).join(',')})`;
     return '매주 반복';
   }
 
@@ -390,59 +360,32 @@ function frequencyLabelFromTask(task: Task | null | undefined, fallbackDateKey: 
   return undefined;
 }
 
-function toModalRepeatDays(days?: ApiWeekDay[]) {
+function toModalRepeatDays(days?: number[]) {
   if (!days || days.length === 0) return [];
-  const map: Record<ApiWeekDay, string> = {
-    MONDAY: 'mon',
-    TUESDAY: 'tue',
-    WEDNESDAY: 'wed',
-    THURSDAY: 'thu',
-    FRIDAY: 'fri',
-    SATURDAY: 'sat',
-    SUNDAY: 'sun',
+  const map: Record<number, string> = {
+    0: 'mon',
+    1: 'tue',
+    2: 'wed',
+    3: 'thu',
+    4: 'fri',
+    5: 'sat',
+    6: 'sun',
   };
   return days.map((d) => map[d]).filter(Boolean);
 }
 
-const ADD_TEAM_PATH = '/teams/new';
 const EDIT_TEAM_PATH = (groupId: number) => `/teams/${groupId}/edit`;
-
 type CreateTaskListResult = { id: number };
 
-function ListPage() {
+export default function List() {
   const router = useRouter();
   const qc = useQueryClient();
-  const desktopSidebarRef = useRef<HTMLDivElement | null>(null);
 
-  const [isPc, setIsPc] = useState(false);
-  const [isMobileUi, setIsMobileUi] = useState(false);
+  //  [teamid] 라우트에서 teamId 받음
+  const params = useParams<{ teamid?: string }>();
+  const teamId = String(params?.teamid ?? '').trim();
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mqPc = window.matchMedia('(min-width: 1025px)');
-    const mqMobileUi = window.matchMedia('(max-width: 1024px)');
-
-    const apply = () => {
-      setIsPc(mqPc.matches);
-      setIsMobileUi(mqMobileUi.matches);
-    };
-
-    apply();
-    mqPc.addEventListener('change', apply);
-    mqMobileUi.addEventListener('change', apply);
-
-    return () => {
-      mqPc.removeEventListener('change', apply);
-      mqMobileUi.removeEventListener('change', apply);
-    };
-  }, []);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const toggleDrawer = () => setDrawerOpen((p) => !p);
-  const closeDrawer = () => setDrawerOpen(false);
-
-  const { data: me } = useMe();
+  const { data: me } = useMe(teamId);
 
   const groups = useMemo(() => {
     const list =
@@ -452,18 +395,13 @@ function ListPage() {
     return list;
   }, [me?.memberships]);
 
-  const [activeGroupIdState, setActiveGroupIdState] = useState<number | undefined>(undefined);
-  const urlGroupId = useInitialGroupId();
-
-  // URL 파라미터 → 유저 선택 → 첫 번째 그룹 순으로 활성 그룹 결정
-  const activeGroupId = activeGroupIdState ?? urlGroupId ?? groups[0]?.id ?? 0;
-
+  const activeGroupId = useMemo(() => groups[0]?.id ?? 0, [groups]);
   const activeGroup = useMemo(
     () => groups.find((g) => g.id === activeGroupId) ?? null,
     [groups, activeGroupId],
   );
 
-  const groupDetailQuery = useGroupDetail(activeGroupId) as unknown as {
+  const groupDetailQuery = useGroupDetail(teamId, activeGroupId) as unknown as {
     data?: { taskLists?: Array<{ id: number; name: string; displayIndex: number }> };
     isLoading?: boolean;
     isFetching?: boolean;
@@ -502,6 +440,7 @@ function ListPage() {
   const selectedTodoKey = selectedTaskListId ? `taskList-${selectedTaskListId}` : 'taskList-0';
 
   const { data: taskListByDate } = useTaskListByDate({
+    teamId,
     groupId: activeGroupId,
     taskListId: selectedTaskListId,
     dateIso: selectedDateIso,
@@ -514,15 +453,7 @@ function ListPage() {
     const sorted = [...taskLists].sort((a, b) => a.displayIndex - b.displayIndex);
 
     if (sorted.length === 0) {
-      return [
-        {
-          id: 0,
-          key: 'taskList-0',
-          title: '제목 없음',
-          expanded: false,
-          items: [],
-        },
-      ];
+      return [{ id: 0, key: 'taskList-0', title: '제목 없음', expanded: false, items: [] }];
     }
 
     return sorted.map((tl) => {
@@ -592,9 +523,9 @@ function ListPage() {
     setAddTodoOpen(true);
   };
 
-  const createTaskList = useCreateTaskList();
-  const updateTaskList = useUpdateTaskList();
-  const deleteTaskList = useDeleteTaskList();
+  const createTaskList = useCreateTaskList(teamId);
+  const updateTaskList = useUpdateTaskList(teamId);
+  const deleteTaskList = useDeleteTaskList(teamId);
 
   const handleSubmitTodoModal = async () => {
     const name = todoNameDraft.trim();
@@ -632,13 +563,13 @@ function ListPage() {
     setCalendarModalOpen(true);
   };
 
-  const createTask = useCreateTask();
-  const patchTask = usePatchTask();
-  const deleteTask = useDeleteTask();
+  const createTask = useCreateTask(teamId);
+  const patchTask = usePatchTask(teamId);
+  const deleteTask = useDeleteTask(teamId);
 
   const invalidateCurrentList = async () => {
     await qc.invalidateQueries({
-      queryKey: ['taskListByDate', activeGroupId, selectedTaskListId, selectedDateIso],
+      queryKey: ['taskListByDate', teamId, activeGroupId, selectedTaskListId, selectedDateIso],
     });
   };
 
@@ -667,11 +598,16 @@ function ListPage() {
     start.setHours(hh, mm, 0, 0);
 
     const rawRepeatDays = (payload as unknown as { repeatDays?: unknown }).repeatDays;
-    const weekDays = freq === 'WEEKLY' ? toApiWeekDays(rawRepeatDays) : undefined;
+
+    // ✅ WEEKLY: number[]
+    const weekDays = freq === 'WEEKLY' ? toApiWeekDayNums(rawRepeatDays) : undefined;
+
+    // ✅ MONTHLY: monthDay 필요
     const monthDay = freq === 'MONTHLY' ? start.getDate() : undefined;
 
     const startIso = toIsoWithOffset(start);
 
+    // ✅ CREATE는 /recurring 로 보냄(신규 API)
     if (!taskEditTarget) {
       await createTask.mutateAsync({
         groupId: activeGroupId,
@@ -690,20 +626,20 @@ function ListPage() {
       return;
     }
 
-    const body = {
-      name: title,
-      description: memo,
-      startDate: startIso,
-      frequencyType: freq,
-      weekDays,
-      monthDay,
-    };
-
+    // ✅ EDIT: recurringId 있으면 recurring 수정, 없으면 task PATCH
     await patchTask.mutateAsync({
       groupId: activeGroupId,
       taskListId: selectedTaskListId,
       taskId: taskEditTarget.id,
-      body: body as unknown as never,
+      recurringId: taskEditTarget.recurringId ?? undefined,
+      body: {
+        name: title,
+        description: memo,
+        startDate: startIso,
+        frequencyType: freq,
+        weekDays,
+        monthDay,
+      },
     });
 
     await invalidateCurrentList();
@@ -714,7 +650,6 @@ function ListPage() {
   const [openedTaskMenuId, setOpenedTaskMenuId] = useState<number | null>(null);
   const [openedTodoMenuKey, setOpenedTodoMenuKey] = useState<string | null>(null);
   const [todoListDropdownOpen, setTodoListDropdownOpen] = useState(false);
-
   const [teamMenuOpen, setTeamMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -768,38 +703,16 @@ function ListPage() {
     setSelectedTaskIdState(undefined);
   };
 
+  // ✅ Detail Overlay
   const [detailMounted, setDetailMounted] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const setSidebarCollapsedByClick = (collapsed: boolean) => {
-    const root = desktopSidebarRef.current;
-    if (!root) return;
-
-    const closeBtn = root.querySelector<HTMLButtonElement>('button[aria-label="사이드바 닫기"]');
-    const openBtn = root.querySelector<HTMLButtonElement>('button[aria-label="사이드바 열기"]');
-
-    if (collapsed && closeBtn) closeBtn.click();
-    if (!collapsed && openBtn) openBtn.click();
-  };
-
   const openDetail = () => {
-    if (isMobileUi) {
-      setDetailMounted(true);
-      setDetailOpen(true);
-      return;
-    }
-    if (isPc) setSidebarCollapsedByClick(true);
     setDetailMounted(true);
     requestAnimationFrame(() => setDetailOpen(true));
   };
 
   const closeDetail = () => {
-    if (isMobileUi) {
-      setDetailOpen(false);
-      setDetailMounted(false);
-      return;
-    }
-    if (isPc) setSidebarCollapsedByClick(false);
     setDetailOpen(false);
     window.setTimeout(() => setDetailMounted(false), 260);
   };
@@ -818,8 +731,8 @@ function ListPage() {
     openDetail();
   };
 
-  const { data: detailComments = [] } = useTaskComments(selectedTaskId);
-  const createComment = useCreateTaskComment();
+  const { data: detailComments = [] } = useTaskComments(teamId, selectedTaskId);
+  const createComment = useCreateTaskComment(teamId);
 
   const meWriter = useMemo(() => {
     return {
@@ -829,78 +742,38 @@ function ListPage() {
     };
   }, [me]);
 
-  const profile40 = useMemo(() => {
-    const url = me?.image || '';
-    return (
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          backgroundColor: '#cbd5e1',
-          backgroundImage: url ? `url(${url})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
-    );
-  }, [me?.image]);
-
-  const profile32 = useMemo(() => {
-    const url = me?.image || '';
-    return (
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 12,
-          backgroundColor: '#cbd5e1',
-          backgroundImage: url ? `url(${url})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
-    );
-  }, [me?.image]);
-
-  const handleSelectGroup = (groupId: number) => {
-    setActiveGroupIdState(groupId);
-    setOpenedTaskMenuId(null);
-    setOpenedTodoMenuKey(null);
-    setTeamMenuOpen(false);
-    closeDrawer();
-  };
-
   const handleToggleDone = async (taskId: number, nextDone: boolean) => {
     if (!activeGroupId || !selectedTaskListId) return;
 
+    // ✅ doneAt은 task PATCH로만 처리(반복/비반복 공통)
     await patchTask.mutateAsync({
       groupId: activeGroupId,
       taskListId: selectedTaskListId,
       taskId,
-      body: { doneAt: nextDone ? new Date().toISOString() : null } as unknown as never,
+      recurringId: undefined,
+      body: { doneAt: nextDone ? new Date().toISOString() : null },
     });
 
     await invalidateCurrentList();
   };
 
-  const handleDeleteTask = async (taskId: number) => {
+  const handleDeleteTask = async (task: Task) => {
     if (!activeGroupId || !selectedTaskListId) return;
 
     await deleteTask.mutateAsync({
       groupId: activeGroupId,
       taskListId: selectedTaskListId,
-      taskId,
+      taskId: task.id,
+      recurringId: task.recurringId ?? undefined,
     });
 
     await invalidateCurrentList();
-
-    if (detailMounted && selectedTaskId === taskId) closeDetail();
+    if (detailMounted && selectedTaskId === task.id) closeDetail();
   };
 
   const deleteGroup = async (groupId: number) => {
     console.warn('TODO: deleteGroup API not wired', groupId);
-    await qc.invalidateQueries({ queryKey: ['me'] });
+    await qc.invalidateQueries({ queryKey: ['me', teamId] });
   };
 
   const handleClickTeamEdit = () => {
@@ -917,46 +790,7 @@ function ListPage() {
     if (!ok) return;
 
     await deleteGroup(activeGroupId);
-
-    const first = groups[0]?.id;
-    if (first) handleSelectGroup(first);
   };
-
-  const drawerContent = (
-    <>
-      <SidebarTeamSelect
-        icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-        label="팀 선택"
-        isSelected={false}
-      />
-
-      {groups.map((g) => (
-        <SidebarButton
-          key={g.id}
-          icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-          label={g.name}
-          isActive={g.id === activeGroupId}
-          onClick={() => handleSelectGroup(g.id)}
-        />
-      ))}
-
-      <SidebarAddButton
-        label="팀 추가하기"
-        onClick={() => {
-          closeDrawer();
-          router.push(ADD_TEAM_PATH);
-        }}
-      />
-
-      <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-
-      <SidebarButton
-        icon={<Image src={boardSmall} alt="" width={20} height={20} />}
-        label="자유게시판"
-        onClick={() => {}}
-      />
-    </>
-  );
 
   const hasRealTaskList = isGroupDetailReady && taskLists.length > 0;
 
@@ -976,12 +810,7 @@ function ListPage() {
 
   const calendarInitialValues = useMemo(() => {
     if (!taskEditTarget) {
-      return {
-        startDate: selectedDate,
-        startTime: '09:00',
-        repeatType: 'none',
-        repeatDays: [],
-      };
+      return { startDate: selectedDate, startTime: '09:00', repeatType: 'none', repeatDays: [] };
     }
 
     const iso = normalizeIsoForUi(getTaskIso(taskEditTarget), selectedDateKey);
@@ -1006,6 +835,14 @@ function ListPage() {
     };
   }, [taskEditTarget, selectedDate, selectedDateKey]);
 
+  if (!teamId) {
+    return (
+      <main className={styles.page}>
+        <div style={{ padding: 24 }}>teamId 경로가 비어있습니다.</div>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.page}>
       <style jsx global>{`
@@ -1013,94 +850,6 @@ function ListPage() {
           margin: 0 !important;
         }
       `}</style>
-
-      {isPc ? (
-        <div ref={desktopSidebarRef} className={styles.desktopSidebar}>
-          <Sidebar
-            isLoggedIn
-            profileName={me?.nickname ?? ''}
-            profileTeam={activeGroup?.name ?? ''}
-            profileImage={profile40}
-            teamSelect={(isCollapsed) =>
-              !isCollapsed ? (
-                <SidebarTeamSelect
-                  icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                  label="팀 선택"
-                  isSelected={false}
-                />
-              ) : null
-            }
-            addButton={(isCollapsed) => (
-              <>
-                {!isCollapsed ? (
-                  <SidebarAddButton
-                    label="팀 추가하기"
-                    onClick={() => router.push(ADD_TEAM_PATH)}
-                  />
-                ) : null}
-
-                <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '8px 0' }} />
-
-                <SidebarButton
-                  icon={
-                    <Image
-                      src={boardSmall}
-                      alt=""
-                      width={isCollapsed ? 24 : 20}
-                      height={isCollapsed ? 24 : 20}
-                    />
-                  }
-                  label="자유게시판"
-                  iconOnly={isCollapsed}
-                  onClick={() => {}}
-                />
-              </>
-            )}
-          >
-            {(isCollapsed) =>
-              !isCollapsed ? (
-                groups.map((g) => (
-                  <SidebarButton
-                    key={g.id}
-                    icon={<Image src={chessSmall} alt="" width={20} height={20} />}
-                    label={g.name}
-                    isActive={g.id === activeGroupId}
-                    onClick={() => handleSelectGroup(g.id)}
-                  />
-                ))
-              ) : (
-                <SidebarButton
-                  icon={<Image src={chessSmall} alt="" width={24} height={24} />}
-                  label={activeGroup?.name ?? ''}
-                  isActive
-                  iconOnly
-                  onClick={() => {
-                    const first = groups[0]?.id;
-                    if (first) handleSelectGroup(first);
-                  }}
-                />
-              )
-            }
-          </Sidebar>
-        </div>
-      ) : null}
-
-      {isMobileUi ? (
-        <div className={styles.mobileGnb}>
-          <MobileHeader
-            isLoggedIn
-            profileImage={profile32}
-            onMenuClick={toggleDrawer}
-            onProfileClick={() => {}}
-          />
-        </div>
-      ) : null}
-
-      {isMobileUi ? (
-        <MobileDrawer isOpen={drawerOpen} onClose={closeDrawer}>
-          {drawerContent}
-        </MobileDrawer>
-      ) : null}
 
       <section className={styles.mainContents}>
         <div className={styles.stage}>
@@ -1333,16 +1082,17 @@ function ListPage() {
                   <div className={styles.panelControls}>
                     <span className={styles.yearMonth}>{formatYearMonth(viewDate)}</span>
 
+                    {/* ✅ 주 단위 이동 */}
                     <div className={styles.arrowGroup}>
                       <ArrowButton
                         size="small"
                         direction="left"
-                        onClick={() => setViewDate((d) => addMonths(d, -1))}
+                        onClick={() => setViewDate((d) => addWeeks(d, -1))}
                       />
                       <ArrowButton
                         size="small"
                         direction="right"
-                        onClick={() => setViewDate((d) => addMonths(d, 1))}
+                        onClick={() => setViewDate((d) => addWeeks(d, 1))}
                       />
                     </div>
 
@@ -1364,7 +1114,10 @@ function ListPage() {
                           <Calendar
                             value={selectedDate}
                             onChange={(v) => {
-                              if (v) setSelectedDate(v);
+                              if (v) {
+                                setSelectedDate(v);
+                                setViewDate(v); // ✅ 달력 선택 시 viewDate도 동기화
+                              }
                               closeCalendar();
                             }}
                           />
@@ -1378,7 +1131,10 @@ function ListPage() {
                   <WeekDateBar
                     viewDate={viewDate}
                     value={selectedDate}
-                    onChange={setSelectedDate}
+                    onChange={(next) => {
+                      setSelectedDate(next);
+                      setViewDate(next); // ✅ 주바 선택 시 viewDate도 동기화
+                    }}
                   />
                 </div>
 
@@ -1462,7 +1218,7 @@ function ListPage() {
                                       className={styles.taskMenuItem}
                                       onClick={async () => {
                                         setOpenedTaskMenuId(null);
-                                        await handleDeleteTask(task.id);
+                                        await handleDeleteTask(task);
                                       }}
                                     >
                                       삭제하기
@@ -1488,12 +1244,18 @@ function ListPage() {
 
         {detailMounted && selectedTask ? (
           <div
-            className={`${styles.detailOverlay} ${detailOpen ? styles.detailOpen : styles.detailClose}`}
+            className={`${styles.detailOverlay} ${
+              detailOpen ? styles.detailOpen : styles.detailClose
+            }`}
             role="dialog"
             aria-modal="true"
             onClick={closeDetail}
           >
-            <div className={styles.detailInner} onClick={(e) => e.stopPropagation()}>
+            <div
+              className={styles.detailInner}
+              data-done={selectedTask.doneAt ? 'true' : 'false'}
+              onClick={(e) => e.stopPropagation()}
+            >
               <TaskDetailCard
                 id={selectedTask.id}
                 name={selectedTask.name}
@@ -1512,7 +1274,7 @@ function ListPage() {
                 }}
                 onEdit={() => openTaskEdit(selectedTask)}
                 onDelete={async () => {
-                  await handleDeleteTask(selectedTask.id);
+                  await handleDeleteTask(selectedTask);
                 }}
                 onClose={closeDetail}
                 onCommentSubmit={async (content) => {
@@ -1566,13 +1328,5 @@ function ListPage() {
         />
       </section>
     </main>
-  );
-}
-
-export default function ListPageRoot() {
-  return (
-    <Suspense>
-      <ListPage />
-    </Suspense>
   );
 }

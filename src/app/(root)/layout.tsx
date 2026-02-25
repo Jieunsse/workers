@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCurrentUserQuery } from '@/shared/queries/user/useCurrentUserQuery';
 import { Sidebar, MobileHeader } from '@/components/sidebar';
 import TeamSidebarDropdown from './[teamid]/_domain/components/Team/TeamSidebarDropdown';
 import humanBig from '@/assets/buttons/human/humanBig.svg';
@@ -11,12 +11,12 @@ import styles from './layout.module.css';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: user, isPending } = useCurrentUser();
+  const { data: user, isPending } = useCurrentUserQuery({ retry: false });
 
-  // isPending: 최초 로딩 중 (undefined)
-  // user === null: 로딩 완료 후 비로그인
-  // user !== null: 로그인
-  const isLoggedIn = !isPending && user !== null && user !== undefined;
+  // user가 존재하면 로그인, 없으면 비로그인
+  // isPending 중엔도 캐시된 데이터가 있으면 user는 정의되므로
+  // isPending으로 차단하지 않아 캐시 히트 시 깨박임 방지
+  const isLoggedIn = !!user;
   const isLanding = pathname === '/';
 
   // 자체 사이드바가 없는 페이지에서만 root layout 사이드바 표시
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           isLoggedIn={isLoggedIn}
           onProfileClick={handleProfileClick}
           onLogout={handleLogout}
-          onLogoClick={() => router.push('/addteam')}
+          onLogoClick={() => router.push('/')}
           profileImage={
             user?.image ? (
               <Image

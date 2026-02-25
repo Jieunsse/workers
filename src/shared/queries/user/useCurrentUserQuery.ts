@@ -14,8 +14,8 @@ export function currentUserQueryOptions() {
   });
 }
 
-export function useCurrentUserQuery() {
-  return useQuery(currentUserQueryOptions());
+export function useCurrentUserQuery(options?: { retry?: boolean | number }) {
+  return useQuery({ ...currentUserQueryOptions(), ...options });
 }
 
 export function useSuspenseCurrentUserQuery() {
