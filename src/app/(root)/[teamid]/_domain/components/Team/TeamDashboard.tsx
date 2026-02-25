@@ -125,7 +125,7 @@ export default function TeamDashboard() {
         </div>
 
         <aside className={styles.rightPanel}>
-          <Link href={`/list?groupId=${teamid}`} className={styles.listLink}>
+          <Link href={`/${teamid}/tasklist`} className={styles.listLink}>
             리스트 보기
           </Link>
           <MemberSection
