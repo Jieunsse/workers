@@ -47,7 +47,12 @@ async function fetchJson<T>(
   const method = (init?.method ?? 'GET').toUpperCase();
   const isBodyless = method === 'GET' || method === 'HEAD' || method === 'DELETE';
 
-  const res = await fetch(proxy(withTeam(teamId, path)), {
+  const url =
+    path === 'user'
+      ? proxy(path) // ✅ user는 teamId 없이
+      : proxy(withTeam(teamId, path));
+
+  const res = await fetch(url, {
     ...init,
     method,
     body: isBodyless ? undefined : init?.body,

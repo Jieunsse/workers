@@ -11,34 +11,6 @@
   overflow-x: hidden;
 }
 
-/*  TeamHeader 패딩 wrapper (모바일/태블릿만) */
-.teamHeaderPad {
-  padding: 0;
-}
-@media (max-width: 1024px) {
-  .teamHeaderPad {
-    padding: 0 12px;
-    box-sizing: border-box;
-  }
-}
-
-/* ✅ TeamHeader: PC에서만 가운데 정렬 */
-@media (min-width: 1025px) {
-  :global(.TeamHeader-module__H3kcRq__container) {
-    width: 100%;
-    max-width: 1200px;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-}
-@media (max-width: 1024px) {
-  :global(.TeamHeader-module__H3kcRq__container) {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: none !important;
-  }
-}
-
 /* ===== Desktop Sidebar ===== */
 .desktopSidebar {
   flex-shrink: 0;
@@ -70,37 +42,10 @@
   display: none;
 }
 
-/* ✅ 1024px 이상에서는 데스크탑 Sidebar가 보이도록 강제 */
-@media (min-width: 1024px) and (max-width: 1199px) {
-  .desktopSidebar {
-    display: flex !important;
-  }
-  .mobileGnb {
-    display: none !important;
-  }
-  :global([class*='Sidebar-module__'][class*='sidebar']) {
-    display: flex !important;
-  }
-}
-
-@media (max-width: 1023px) {
-  .desktopSidebar {
-    display: none;
-  }
-  .mobileGnb {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-background-inverse, #fff);
-    padding-top: env(safe-area-inset-top);
-  }
-}
-
 /* ===== Main contents ===== */
 .mainContents {
   flex: 1;
+  margin-left: 27px;
   display: flex;
   justify-content: center;
   padding: 120px 85px 80px 0px;
@@ -110,7 +55,7 @@
   min-width: 0;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .mainContents {
     width: 100%;
     padding: 0;
@@ -203,7 +148,7 @@
   min-height: 768px;
 }
 
-@media (min-width: 744px) and (max-width: 1024px) {
+@media (min-width: 744px) and (max-width: 1199px) {
   .rightWrap {
     min-height: 800px;
   }
@@ -289,7 +234,7 @@
   position: absolute;
   z-index: 4;
 }
-@media (min-width: 1025px) {
+@media (min-width: 1200px) {
   .fab {
     top: 262px;
     right: -28px;
@@ -297,7 +242,7 @@
     left: auto;
   }
 }
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .fab {
     right: 14px;
     bottom: 21px;
@@ -318,7 +263,7 @@
 }
 
 /* ✅ 모바일/태블릿: 투두카드 폭 고정 */
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .mobileTodoRow {
     display: flex !important;
     align-items: center !important;
@@ -348,7 +293,7 @@
   }
 }
 
-@media (min-width: 744px) and (max-width: 1024px) {
+@media (min-width: 744px) and (max-width: 1199px) {
   .todoCardWrap {
     width: 240px !important;
     flex: 0 0 240px !important;
@@ -357,7 +302,7 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .todoCardShell,
   .todoCardShellInner {
     width: 100% !important;
@@ -404,10 +349,10 @@
 }
 
 /* Tablet/Mobile */
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .stage {
     width: 100%;
-    max-width: 1024px;
+    max-width: 1199px;
     margin-top: 32px;
   }
 
@@ -444,7 +389,7 @@
 
   .rightWrap {
     width: 100%;
-    max-width: 1024px;
+    max-width: none;
     flex: 0 0 auto;
     background: #ffffff;
     border-radius: 0;
@@ -488,7 +433,7 @@
   display: none;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .todoArrowBtn {
     display: inline-flex;
     align-items: center;
@@ -696,7 +641,7 @@
 }
 
 /* ✅ 모바일/태블릿: 애니메이션 제거 + 전체 화면 */
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .detailOverlay {
     left: 0;
     right: 0;
@@ -723,7 +668,7 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   .taskMenu {
     top: 52px !important;
     right: 0px !important;
@@ -804,7 +749,7 @@
 }
 
 /* ===== 모바일/태블릿: 팀선택(hover) 시 내용이 박스 밖으로 튀는 문제 방지 ===== */
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   :global([class*='SidebarTeamSelect-module__'] *),
   :global([class*='SidebarButton-module__'] *),
   :global([class*='SidebarAddButton-module__'] *) {
@@ -841,7 +786,7 @@
 }
 
 /* ✅ 모바일/태블릿: 케밥 "버튼은 유지", 아이콘만 숨김 (드롭다운은 클릭으로 뜸) */
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
   /* TodoCard / TaskListItem 케밥 버튼 내부의 svg/img만 투명 */
   :global([class*='TodoCard-module__'] svg),
   :global([class*='TodoCard-module__'] img),

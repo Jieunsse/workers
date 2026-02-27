@@ -31,7 +31,7 @@
   flex-shrink: 0;
 }
 /* Tablet styles */
-@media (min-width: 768px) and (max-width: 1279px) {
+@media (min-width: 768px) and (max-width: 1200px) {
   .page {
     flex-direction: column;
   }
@@ -71,7 +71,7 @@
 }
 
 /* Tablet specific rules for kanbanResponsiveContainer */
-@media (min-width: 768px) and (max-width: 1279px) {
+@media (min-width: 768px) and (max-width: 1200px) {
   .kanbanResponsiveContainer {
     flex-wrap: nowrap; /* Prevent wrapping on tablet */
     justify-content: space-between; /* Distribute items evenly */

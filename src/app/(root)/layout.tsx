@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const isLanding = pathname === '/';
 
   // 자체 사이드바가 없는 페이지에서만 root layout 사이드바 표시
-  const rootSidebarPaths = ['/', '/boards', '/mypage'];
+  const rootSidebarPaths = ['/', '/boards', '/mypage', '/myhistory'];
   const showRootSidebar = rootSidebarPaths.some(
     (p) => pathname === p || pathname.startsWith(p + '/'),
   );

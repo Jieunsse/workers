@@ -1,7 +1,6 @@
 .container {
   position: relative;
   overflow: hidden;
-
   height: 64px;
   width: 1120px;
   max-width: 100%;
@@ -156,13 +155,16 @@
   line-height: 1;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .patternWrap {
     display: block;
   }
+  .container[data-variant='list'] {
+    margin: 0 auto;
+  }
 }
 
-@media (min-width: 744px) and (max-width: 1023px) {
+@media (min-width: 744px) and (max-width: 1199px) {
   .container[data-variant='team'] .teamLeftGroup {
     height: 32px;
     max-width: 203px;
