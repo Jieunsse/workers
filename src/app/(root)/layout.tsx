@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentUserQuery } from '@/shared/queries/user/useCurrentUserQuery';
 import { Sidebar, MobileHeader } from '@/components/sidebar';
 import TeamSidebarDropdown from './[teamid]/_domain/components/Team/TeamSidebarDropdown';
@@ -11,6 +12,7 @@ import styles from './layout.module.css';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: user, isPending } = useCurrentUserQuery({ retry: false });
 
   // user가 존재하면 로그인, 없으면 비로그인
@@ -34,7 +36,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('로그아웃 API 호출 실패:', error);
+    }
+    queryClient.clear();
     router.push('/login');
   };
 
