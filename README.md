@@ -1,17 +1,10 @@
-# Frontend Starter (Next.js App Router)
+##  🌏배포주소
 
-부트캠프 최종 프로젝트를 위한 **프론트엔드 공통 스타터 레포지토리**입니다.  
-프로젝트 주제 공개 전까지, 팀 개발에 필요한 **기본 구조와 개발 환경**을 미리 구성해두었습니다.
-
----
-
-## 배포주소
-
-https://workers-blond.vercel.app/
+https://coworkers-twenty.vercel.app/
 
 ---
 
-## 기술 스택
+## 🛠️ 기술 스택
 
 - **Next.js** (App Router)
 - **TypeScript**
@@ -24,7 +17,7 @@ https://workers-blond.vercel.app/
 
 ---
 
-## 프로젝트 구조
+## 🏗️ 프로젝트 구조
 
 ```txt
 src/
